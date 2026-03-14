@@ -248,5 +248,255 @@
     "department": "BD",
     "difficulty": "factual",
     "category": "structural"
+  },
+  {
+    "id": "qa-026",
+    "question": "How do the fire safety provisions in Cap 123 interact with the structural requirements under the Code of Practice for Fire Resisting Construction when designing a composite steel-concrete building?",
+    "expected_source": "Code of Practice for Fire Resisting Construction 1996",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["fire resisting", "structural", "composite"],
+    "department": "BD",
+    "difficulty": "cross-regulatory",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-027",
+    "question": "When the Code of Practice for Fire Safety in Buildings 2011 cross-references the Means of Escape Code, which provisions take precedence for a mixed-use commercial/residential building?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part IV",
+    "expected_answer_contains": ["means of escape", "mixed-use", "precedence"],
+    "department": "BD",
+    "difficulty": "cross-regulatory",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-028",
+    "question": "How do the amendments to Cap 123F in 2012 affect the plot ratio calculations previously permitted under the original regulations?",
+    "expected_source": "Building (Planning) Regulations Cap. 123F",
+    "expected_section": "Section 20",
+    "expected_answer_contains": ["plot ratio", "amendment", "Cap 123F"],
+    "department": "BD",
+    "difficulty": "cross-regulatory",
+    "category": "planning"
+  },
+  {
+    "id": "qa-029",
+    "question": "What are the combined requirements from the Wind Effects Code and the Structural Use of Steel Code for designing exposed steel roof trusses in typhoon-prone areas?",
+    "expected_source": "Code of Practice on Wind Effects 2019",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["wind", "steel", "typhoon"],
+    "department": "BD",
+    "difficulty": "cross-regulatory",
+    "category": "structural"
+  },
+  {
+    "id": "qa-030",
+    "question": "How did the superseding of the 1996 fire codes by the 2011 Code of Practice for Fire Safety in Buildings affect existing building compliance obligations?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part I",
+    "expected_answer_contains": ["superseded", "1996", "2011", "compliance"],
+    "department": "BD",
+    "difficulty": "cross-regulatory",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-031",
+    "question": "What are the Housing Authority architectural specifications for minimum flat size in new public rental housing estates?",
+    "expected_source": "HA Specification Library - Architectural",
+    "expected_section": "Section A3",
+    "expected_answer_contains": ["flat size", "public housing", "minimum"],
+    "department": "HA",
+    "difficulty": "factual",
+    "category": "ha_architectural"
+  },
+  {
+    "id": "qa-032",
+    "question": "What structural engineering requirements does the Housing Authority specify for precast concrete facades in public housing blocks?",
+    "expected_source": "HA Specification Library - Structural Engineering",
+    "expected_section": "Section S5",
+    "expected_answer_contains": ["precast", "concrete", "facade"],
+    "department": "HA",
+    "difficulty": "factual",
+    "category": "ha_structural"
+  },
+  {
+    "id": "qa-033",
+    "question": "What building services requirements does the Housing Authority mandate for communal water supply systems in public housing?",
+    "expected_source": "HA Specification Library - Building Services",
+    "expected_section": "Section BS2",
+    "expected_answer_contains": ["water supply", "communal", "public housing"],
+    "department": "HA",
+    "difficulty": "multi-section",
+    "category": "ha_building_services"
+  },
+  {
+    "id": "qa-034",
+    "question": "What are the Housing Authority specifications for fire services installations in public housing common areas?",
+    "expected_source": "HA Specification Library - Building Services",
+    "expected_section": "Section BS6",
+    "expected_answer_contains": ["fire services", "common area", "installation"],
+    "department": "HA",
+    "difficulty": "factual",
+    "category": "ha_building_services"
+  },
+  {
+    "id": "qa-035",
+    "question": "What seismic design provisions does the Housing Authority structural specification require for public housing tower blocks over 40 storeys?",
+    "expected_source": "HA Specification Library - Structural Engineering",
+    "expected_section": "Section S3",
+    "expected_answer_contains": ["seismic", "tower block", "structural"],
+    "department": "HA",
+    "difficulty": "multi-section",
+    "category": "ha_structural"
+  },
+  {
+    "id": "qa-036",
+    "question": "I'm designing a 40-storey residential tower in Kowloon. What are the key structural requirements I need to comply with, including wind loading, foundation, and concrete grade?",
+    "expected_source": "Code of Practice on Wind Effects 2019",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["wind load", "foundation", "concrete", "40-storey"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "structural"
+  },
+  {
+    "id": "qa-037",
+    "question": "What permits and approvals do I need before starting demolition of a 6-storey commercial building in a built-up area?",
+    "expected_source": "Code of Practice for Demolition of Buildings 2004",
+    "expected_section": "Section 2",
+    "expected_answer_contains": ["permit", "demolition", "approval", "Building Authority"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "demolition"
+  },
+  {
+    "id": "qa-038",
+    "question": "Our client wants to convert a factory building to a hotel — what fire safety changes are needed to comply with current regulations?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part V",
+    "expected_answer_contains": ["change of use", "hotel", "fire safety", "means of escape"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-039",
+    "question": "A developer wants to add a rooftop swimming pool to an existing 20-storey residential building. What structural and safety approvals are required?",
+    "expected_source": "Buildings Ordinance Cap. 123",
+    "expected_section": "Section 14",
+    "expected_answer_contains": ["rooftop", "structural", "approval", "loading"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "structural"
+  },
+  {
+    "id": "qa-040",
+    "question": "We are installing a backup diesel generator in the basement of a commercial tower. What ventilation and fire separation requirements apply?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part VII",
+    "expected_answer_contains": ["generator", "ventilation", "fire separation", "basement"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-041",
+    "question": "Our project involves piling works adjacent to an MTR tunnel. What precautions and regulatory requirements must we address?",
+    "expected_source": "Code of Practice for Foundations 2017",
+    "expected_section": "Section 7",
+    "expected_answer_contains": ["piling", "adjacent", "tunnel", "precaution"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "geotechnical"
+  },
+  {
+    "id": "qa-042",
+    "question": "A heritage building is being renovated and the client wants to install a glass curtain wall on the ground floor. What structural and planning permissions are needed?",
+    "expected_source": "Code of Practice for Structural Use of Glass 2018",
+    "expected_section": "Part 3",
+    "expected_answer_contains": ["glass", "curtain wall", "heritage", "approval"],
+    "department": "BD",
+    "difficulty": "scenario",
+    "category": "planning"
+  },
+  {
+    "id": "qa-043",
+    "question": "What does Section 41(1)(a) of the Buildings Ordinance Cap 123 say about the powers of the Building Authority to order demolition?",
+    "expected_source": "Buildings Ordinance Cap. 123",
+    "expected_section": "Section 41(1)(a)",
+    "expected_answer_contains": ["Section 41", "Building Authority", "demolition", "order"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "primary_legislation"
+  },
+  {
+    "id": "qa-044",
+    "question": "Are the provisions of the Building (Administration) Regulations Cap 123A regarding registered contractors still applicable after the 2012 amendment to Cap 123?",
+    "expected_source": "Building (Administration) Regulations Cap. 123A",
+    "expected_section": "Section 8",
+    "expected_answer_contains": ["registered contractor", "Cap 123A", "amendment"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "subsidiary_legislation"
+  },
+  {
+    "id": "qa-045",
+    "question": "The 1996 Code of Practice for Fire Resisting Construction specified different FRP ratings than the 2011 code — which applies to a building approved in 1998 but undergoing alteration now?",
+    "expected_source": "Code of Practice for Fire Resisting Construction 1996",
+    "expected_section": "Section 2",
+    "expected_answer_contains": ["1996", "2011", "alteration", "fire resisting"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-046",
+    "question": "What does the term 'authorized person' mean under Cap 123, and how does it differ from 'registered structural engineer'?",
+    "expected_source": "Buildings Ordinance Cap. 123",
+    "expected_section": "Section 2",
+    "expected_answer_contains": ["authorized person", "registered structural engineer", "definition"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "primary_legislation"
+  },
+  {
+    "id": "qa-047",
+    "question": "Regulation 41 of Cap 123F refers to 'prescribed window' — what exactly constitutes a prescribed window and has this definition changed over time?",
+    "expected_source": "Building (Planning) Regulations Cap. 123F",
+    "expected_section": "Regulation 41",
+    "expected_answer_contains": ["prescribed window", "Regulation 41", "definition"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "planning"
+  },
+  {
+    "id": "qa-048",
+    "question": "For a new commercial building, what are the overlapping requirements between the Buildings Department fire safety provisions and the Fire Services Department fire services installation requirements?",
+    "expected_source": "Fire Safety (Commercial Premises) Ordinance Cap. 502",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["Buildings Department", "Fire Services Department", "fire services installation", "commercial"],
+    "department": "FSD",
+    "difficulty": "cross-regulatory",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-049",
+    "question": "When constructing near a nullah or drainage channel, what are the combined requirements from the Buildings Department for structural safety and the Environmental Protection Department for water discharge control?",
+    "expected_source": "Water Pollution Control Ordinance Cap. 358",
+    "expected_section": "Section 15",
+    "expected_answer_contains": ["water pollution", "drainage", "structural", "discharge"],
+    "department": "EPD",
+    "difficulty": "cross-regulatory",
+    "category": "environmental"
+  },
+  {
+    "id": "qa-050",
+    "question": "What are the EMSD requirements for fixed electrical installations in a new high-rise building, and how do they interact with the BD requirements for electrical room fire separation?",
+    "expected_source": "Electricity Ordinance Cap. 406",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["electrical installation", "fire separation", "EMSD", "high-rise"],
+    "department": "EMSD",
+    "difficulty": "cross-regulatory",
+    "category": "mep"
   }
 ]

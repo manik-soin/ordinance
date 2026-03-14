@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
-    "test:evals": "vitest run tests/evals",
+    "test:evals": "vitest run --config vitest.evals.config.ts",
     "test:coverage": "vitest run --coverage",
     "scrape": "tsx src/cli/scrape.ts",
     "ingest": "tsx src/cli/ingest.ts",
