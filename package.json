@@ -1,6 +1,6 @@
 {
   "name": "hk-compliance-rag",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI-powered Hong Kong building regulatory compliance knowledge base with cited answers",
   "type": "module",
   "main": "dist/index.js",
