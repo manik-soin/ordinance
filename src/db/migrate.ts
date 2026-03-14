@@ -52,8 +52,6 @@ const MIGRATIONS = [
   {
     name: '003_create_indexes',
     sql: `
-      CREATE INDEX IF NOT EXISTS idx_chunks_embedding ON regulation_chunks
-        USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
       CREATE INDEX IF NOT EXISTS idx_chunks_search ON regulation_chunks USING gin (search_vector);
       CREATE INDEX IF NOT EXISTS idx_chunks_dept_type ON regulation_chunks (source_department, document_type);
       CREATE INDEX IF NOT EXISTS idx_chunks_current ON regulation_chunks (is_current);
@@ -116,6 +114,12 @@ const MIGRATIONS = [
         name TEXT PRIMARY KEY,
         applied_at TIMESTAMPTZ DEFAULT NOW()
       );
+    `,
+  },
+  {
+    name: '008_fix_vector_index',
+    sql: `
+      DROP INDEX IF EXISTS idx_chunks_embedding;
     `,
   },
 ];
