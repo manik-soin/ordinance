@@ -251,6 +251,9 @@ describe('Embedder', () => {
       const mockClient = { embeddings: { create: mockCreate } } as any;
 
       const promise = embedQuery('test', { client: mockClient });
+      // Attach a no-op catch so Node does not flag the rejection as unhandled
+      // while we advance fake timers; the real assertion follows below.
+      promise.catch(() => {});
 
       // Advance through all backoff sleeps: 1000ms + 2000ms
       await vi.advanceTimersByTimeAsync(1000);
@@ -268,6 +271,7 @@ describe('Embedder', () => {
       const mockClient = { embeddings: { create: mockCreate } } as any;
 
       const promise = embedQuery('test', { client: mockClient });
+      promise.catch(() => {});
 
       await vi.advanceTimersByTimeAsync(1000);
       await vi.advanceTimersByTimeAsync(2000);
@@ -280,6 +284,7 @@ describe('Embedder', () => {
       const mockClient = { embeddings: { create: mockCreate } } as any;
 
       const promise = embedQuery('test', { client: mockClient });
+      promise.catch(() => {});
 
       await vi.advanceTimersByTimeAsync(1000);
       await vi.advanceTimersByTimeAsync(2000);
