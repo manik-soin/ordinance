@@ -1,0 +1,252 @@
+[
+  {
+    "id": "qa-001",
+    "question": "What is the minimum fire resistance period for structural elements in a commercial building over 25m height?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Table 4",
+    "expected_answer_contains": ["fire resistance period", "structural elements"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-002",
+    "question": "What are the requirements for barrier-free access to a new office building?",
+    "expected_source": "Design Manual - Barrier Free Access 2008",
+    "expected_section": "Part 2",
+    "expected_answer_contains": ["barrier-free", "access"],
+    "department": "BD",
+    "difficulty": "multi-section",
+    "category": "accessibility"
+  },
+  {
+    "id": "qa-003",
+    "question": "Does Section 17 of Cap 123F apply to buildings in scheduled areas?",
+    "expected_source": "Building (Planning) Regulations Cap. 123F",
+    "expected_section": "Section 17",
+    "expected_answer_contains": ["Section 17", "Cap 123F"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "planning"
+  },
+  {
+    "id": "qa-004",
+    "question": "What is the maximum permissible imposed load for office floor in a new building?",
+    "expected_source": "Code of Practice for Dead and Imposed Loads 2011",
+    "expected_section": "Table 2",
+    "expected_answer_contains": ["imposed load", "office"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "structural"
+  },
+  {
+    "id": "qa-005",
+    "question": "What site supervision requirements apply to demolition works?",
+    "expected_source": "Code of Practice for Demolition of Buildings 2004",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["supervision", "demolition"],
+    "department": "BD",
+    "difficulty": "multi-section",
+    "category": "demolition"
+  },
+  {
+    "id": "qa-006",
+    "question": "What are the wind load design requirements for buildings over 200m tall?",
+    "expected_source": "Code of Practice on Wind Effects 2019",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["wind", "design"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "structural"
+  },
+  {
+    "id": "qa-007",
+    "question": "What fire resisting construction is required for compartment walls?",
+    "expected_source": "Code of Practice for Fire Resisting Construction 1996",
+    "expected_section": "Section 4",
+    "expected_answer_contains": ["fire resisting", "compartment"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-008",
+    "question": "What are the structural design requirements for glass facades?",
+    "expected_source": "Code of Practice for Structural Use of Glass 2018",
+    "expected_section": "Part 2",
+    "expected_answer_contains": ["glass", "structural"],
+    "department": "BD",
+    "difficulty": "multi-section",
+    "category": "structural"
+  },
+  {
+    "id": "qa-009",
+    "question": "What are the building works requirements for lift installations?",
+    "expected_source": "Code of Practice for Building Works for Lifts and Escalators 2011",
+    "expected_section": "Section 2",
+    "expected_answer_contains": ["lift", "building works"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "mep"
+  },
+  {
+    "id": "qa-010",
+    "question": "What foundation design standards apply for buildings on reclaimed land?",
+    "expected_source": "Code of Practice for Foundations 2017",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["foundation", "design"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "geotechnical"
+  },
+  {
+    "id": "qa-011",
+    "question": "What are the concrete strength requirements for reinforced concrete structures?",
+    "expected_source": "Code of Practice for Structural Use of Concrete 2013",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["concrete", "strength"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "structural"
+  },
+  {
+    "id": "qa-012",
+    "question": "What are the steel grade requirements for structural steel members?",
+    "expected_source": "Code of Practice for Structural Use of Steel 2011",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["steel", "grade"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "structural"
+  },
+  {
+    "id": "qa-013",
+    "question": "What are the means of escape requirements for a hotel building above 13 storeys?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part V",
+    "expected_answer_contains": ["means of escape", "hotel"],
+    "department": "BD",
+    "difficulty": "multi-section",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-014",
+    "question": "What qualifications must a site supervision technical officer hold?",
+    "expected_source": "Code of Practice for Site Supervision 2009",
+    "expected_section": "Section 2",
+    "expected_answer_contains": ["technical officer", "qualifications"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "supervision"
+  },
+  {
+    "id": "qa-015",
+    "question": "Under the Buildings Ordinance Cap. 123, what building works require prior approval?",
+    "expected_source": "Buildings Ordinance Cap. 123",
+    "expected_section": "Section 14",
+    "expected_answer_contains": ["approval", "building works"],
+    "department": "BD",
+    "difficulty": "legal_interpretation",
+    "category": "primary_legislation"
+  },
+  {
+    "id": "qa-016",
+    "question": "What are the noise control requirements during construction works?",
+    "expected_source": "Noise Control Ordinance Cap. 400",
+    "expected_section": "Section 6",
+    "expected_answer_contains": ["noise", "construction"],
+    "department": "EPD",
+    "difficulty": "factual",
+    "category": "environmental"
+  },
+  {
+    "id": "qa-017",
+    "question": "What fire safety measures are required for commercial premises under Cap 502?",
+    "expected_source": "Fire Safety (Commercial Premises) Ordinance Cap. 502",
+    "expected_section": "Section 4",
+    "expected_answer_contains": ["fire safety", "commercial"],
+    "department": "FSD",
+    "difficulty": "multi-section",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-018",
+    "question": "What environmental impact assessment is required before major construction?",
+    "expected_source": "Environmental Impact Assessment Ordinance Cap. 499",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["environmental impact", "assessment"],
+    "department": "EPD",
+    "difficulty": "legal_interpretation",
+    "category": "environmental"
+  },
+  {
+    "id": "qa-019",
+    "question": "What are the electricity supply safety requirements for building installations?",
+    "expected_source": "Electricity Ordinance Cap. 406",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["electricity", "safety"],
+    "department": "EMSD",
+    "difficulty": "factual",
+    "category": "mep"
+  },
+  {
+    "id": "qa-020",
+    "question": "What safety requirements apply to lift and escalator installations?",
+    "expected_source": "Lifts and Escalators Ordinance Cap. 618",
+    "expected_section": "Part 3",
+    "expected_answer_contains": ["lift", "escalator", "safety"],
+    "department": "EMSD",
+    "difficulty": "multi-section",
+    "category": "mep"
+  },
+  {
+    "id": "qa-021",
+    "question": "What are the ventilation requirements for underground car parks in residential buildings?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part VII",
+    "expected_answer_contains": ["ventilation", "car park"],
+    "department": "BD",
+    "difficulty": "multi-section",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-022",
+    "question": "What minimum staircase width is required for a building with 500 occupants?",
+    "expected_source": "Code of Practice for Fire Safety in Buildings 2011",
+    "expected_section": "Part V",
+    "expected_answer_contains": ["staircase", "width"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "fire_safety"
+  },
+  {
+    "id": "qa-023",
+    "question": "What are the requirements for temporary works during demolition?",
+    "expected_source": "Code of Practice for Demolition of Buildings 2004",
+    "expected_section": "Section 5",
+    "expected_answer_contains": ["temporary works", "demolition"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "demolition"
+  },
+  {
+    "id": "qa-024",
+    "question": "What sanitary fitment standards apply to new residential buildings?",
+    "expected_source": "Building (Standards of Sanitary Fitments) Regulations Cap. 123I",
+    "expected_section": "Section 3",
+    "expected_answer_contains": ["sanitary", "residential"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "subsidiary_legislation"
+  },
+  {
+    "id": "qa-025",
+    "question": "What are the dead load assumptions for concrete flat roofs?",
+    "expected_source": "Code of Practice for Dead and Imposed Loads 2011",
+    "expected_section": "Table 1",
+    "expected_answer_contains": ["dead load", "roof"],
+    "department": "BD",
+    "difficulty": "factual",
+    "category": "structural"
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "name": "hk-compliance-rag",
+  "version": "0.1.0",
+  "description": "AI-powered Hong Kong building regulatory compliance knowledge base with cited answers",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:evals": "vitest run tests/evals",
+    "test:coverage": "vitest run --coverage",
+    "scrape": "tsx src/cli/scrape.ts",
+    "ingest": "tsx src/cli/ingest.ts",
+    "migrate": "tsx src/db/migrate.ts",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "rag",
+    "compliance",
+    "hong-kong",
+    "building-regulations",
+    "ai"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@types/node": "^25.5.0",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "node-cron": "^4.2.1",
+    "openai": "^6.29.0",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.20.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0",
+    "vitest": "^4.1.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/pg": "^8.18.0",
+    "@types/uuid": "^10.0.0",
+    "@vitest/coverage-v8": "^4.1.0"
+  }
+}
