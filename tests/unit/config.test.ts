@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Prevent dotenv from loading .env file during tests
+vi.mock('dotenv', () => ({ default: { config: vi.fn() }, config: vi.fn() }));
+
 describe('Config', () => {
   const originalEnv = { ...process.env };
 

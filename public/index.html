@@ -5,31 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HK Compliance RAG — Regulatory Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#1a56db;--primary-light:#3b82f6;--primary-subtle:#dbeafe;
-  --success:#059669;--success-light:#d1fae5;
+  --primary:#1a56db;--primary-light:#3b82f6;--primary-subtle:#dbeafe;--primary-dark:#1e40af;
+  --success:#059669;--success-light:#d1fae5;--success-subtle:#ecfdf5;
   --warning:#d97706;--warning-light:#fef3c7;
   --danger:#dc2626;--danger-light:#fee2e2;
-  --bg:#f6f7f9;--bg-chat:#ffffff;--sidebar:#0b1120;--sidebar-hover:#151e33;
+  --bg:#f8fafc;--bg-chat:#ffffff;--sidebar:#0b1120;--sidebar-hover:#151e33;
   --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
   --border:#e2e8f0;--border-light:#f1f5f9;
   --font-display:'DM Serif Display',Georgia,serif;
   --font-body:'IBM Plex Sans',-apple-system,sans-serif;
   --font-mono:'IBM Plex Mono','SF Mono',monospace;
-  --radius:8px;--radius-lg:12px;
+  --radius:8px;--radius-lg:12px;--radius-xl:16px;
   --shadow-sm:0 1px 2px rgba(0,0,0,.05);
   --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg:0 4px 16px rgba(0,0,0,.1);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+  --shadow-lg:0 10px 25px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
+  /* Department colors */
+  --bd:#1a56db;--fsd:#dc2626;--epd:#059669;--emsd:#d97706;--ha:#7c3aed;--leg:#64748b;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--font-body);color:var(--text);background:var(--bg);display:flex}
 
 /* ─── SIDEBAR ─── */
 .sidebar{
-  width:280px;min-width:280px;background:var(--sidebar);color:#e2e8f0;
+  width:300px;min-width:300px;background:var(--sidebar);color:#e2e8f0;
   display:flex;flex-direction:column;padding:0;overflow:hidden;
   border-right:1px solid rgba(255,255,255,.06);
   transition:transform .3s ease;z-index:100;
@@ -37,12 +40,19 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 .sidebar-header{
   padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08);
 }
-.sidebar-brand{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.sidebar-brand{display:flex;align-items:center;gap:12px;margin-bottom:2px}
 .sidebar-brand svg{flex-shrink:0}
-.sidebar-brand h1{font-family:var(--font-display);font-size:18px;font-weight:400;color:#fff;letter-spacing:-.01em}
+.sidebar-brand h1{font-family:var(--font-display);font-size:19px;font-weight:400;color:#fff;letter-spacing:-.01em}
 .sidebar-subtitle{font-size:11px;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;font-weight:500}
+.sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.sidebar-scroll::-webkit-scrollbar{width:4px}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 .sidebar-section{padding:16px 20px 8px}
-.sidebar-section-title{font-size:10px;color:#475569;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.sidebar-section-title{
+  font-size:10px;color:#475569;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
 .filter-select{
   width:100%;background:#151e33;border:1px solid rgba(255,255,255,.1);
   border-radius:var(--radius);color:#e2e8f0;padding:9px 12px;font-size:13px;
@@ -55,18 +65,49 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 .filter-select:focus{outline:none;border-color:var(--primary-light)}
 .filter-select option{background:#151e33;color:#e2e8f0}
 
+/* Sidebar departments */
+.dept-list{display:flex;flex-direction:column;gap:6px}
+.dept-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:var(--radius);
+  cursor:pointer;transition:background .2s;font-size:12px;
+}
+.dept-item:hover{background:rgba(255,255,255,.05)}
+.dept-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dept-name{color:#cbd5e1;font-weight:500;flex:1}
+.dept-count{color:#475569;font-family:var(--font-mono);font-size:11px}
+
+/* Sources list */
+.source-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;font-size:12px;
+}
+.source-item-dept{color:#94a3b8;font-weight:500}
+.source-item-stats{color:#475569;font-family:var(--font-mono);font-size:11px}
+
 /* System status */
-.sidebar-status{padding:16px 20px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-status{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
 .status-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0}
 .status-label{color:#64748b}
 .status-value{color:#94a3b8;font-family:var(--font-mono);font-size:11px}
 .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;position:relative;top:-1px}
 .status-dot.healthy{background:var(--success);box-shadow:0 0 6px rgba(5,150,105,.4)}
 .status-dot.unhealthy{background:var(--danger);box-shadow:0 0 6px rgba(220,38,38,.4)}
+.status-dot.checking{background:var(--warning);animation:pulse 1.5s ease infinite}
+
+/* Sidebar new chat button */
+.new-chat-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin:12px 20px;padding:10px;border-radius:var(--radius);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:#cbd5e1;font-size:13px;font-weight:500;cursor:pointer;
+  transition:all .2s;font-family:var(--font-body);
+}
+.new-chat-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
 
 .sidebar-footer{
   padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);
-  font-size:11px;color:#475569;
+  font-size:11px;color:#475569;display:flex;justify-content:space-between;align-items:center;
 }
 .sidebar-footer a{color:#64748b;text-decoration:none}
 .sidebar-footer a:hover{color:#94a3b8}
@@ -86,49 +127,194 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 }
 .topbar-menu:hover{background:var(--border-light)}
 .topbar-title{font-size:13px;color:var(--text-secondary);font-weight:500}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .topbar-badge{
-  margin-left:auto;font-size:11px;color:var(--text-muted);
+  font-size:11px;color:var(--text-muted);
   font-family:var(--font-mono);background:var(--border-light);
   padding:3px 10px;border-radius:20px;
 }
+.topbar-info-btn{
+  background:none;border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text-muted);cursor:pointer;padding:5px 10px;font-size:11px;
+  font-family:var(--font-body);font-weight:500;transition:all .2s;
+  display:flex;align-items:center;gap:5px;
+}
+.topbar-info-btn:hover{border-color:var(--primary-light);color:var(--primary)}
 
 /* ─── CHAT AREA ─── */
 .chat-area{flex:1;overflow-y:auto;padding:0;scroll-behavior:smooth}
-.chat-inner{max-width:820px;margin:0 auto;padding:24px 24px 100px}
+.chat-inner{max-width:860px;margin:0 auto;padding:24px 24px 100px}
 
-/* Empty state */
-.empty-state{
+/* ─── LANDING / EMPTY STATE ─── */
+.landing{
   display:flex;flex-direction:column;align-items:center;
-  justify-content:center;min-height:60vh;text-align:center;
-  padding:40px 20px;animation:fadeUp .6s ease;
+  padding:32px 20px;animation:fadeUp .6s ease;
 }
-.empty-icon{
-  width:64px;height:64px;border-radius:16px;
-  background:linear-gradient(135deg,var(--primary-subtle),#ede9fe);
-  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+
+/* Hero */
+.landing-hero{
+  text-align:center;max-width:640px;margin-bottom:36px;
 }
-.empty-state h2{font-family:var(--font-display);font-size:26px;font-weight:400;margin-bottom:8px;color:var(--text)}
-.empty-state p{color:var(--text-secondary);font-size:14px;max-width:420px;line-height:1.6;margin-bottom:28px}
-.starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:560px}
+.landing-icon{
+  width:72px;height:72px;border-radius:18px;
+  background:linear-gradient(135deg,#1a56db,#7c3aed);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  box-shadow:0 8px 24px rgba(26,86,219,.25);
+}
+.landing-hero h2{
+  font-family:var(--font-display);font-size:30px;font-weight:400;
+  margin-bottom:10px;color:var(--text);line-height:1.2;
+}
+.landing-hero p{
+  color:var(--text-secondary);font-size:15px;line-height:1.7;max-width:500px;margin:0 auto;
+}
+
+/* Stats bar */
+.stats-bar{
+  display:flex;gap:1px;background:var(--border);border-radius:var(--radius-lg);
+  overflow:hidden;margin-bottom:36px;width:100%;max-width:640px;
+  box-shadow:var(--shadow-sm);
+}
+.stat-item{
+  flex:1;padding:16px 20px;background:var(--bg-chat);text-align:center;
+}
+.stat-number{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:500}
+
+/* Department explorer */
+.dept-explorer{width:100%;max-width:860px;margin-bottom:36px}
+.dept-explorer-title{
+  font-size:11px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+}
+.dept-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.dept-card{
+  padding:16px 14px;border-radius:var(--radius-lg);
+  border:1px solid var(--border);background:var(--bg-chat);
+  text-align:center;cursor:pointer;transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.dept-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  transition:height .25s;
+}
+.dept-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.dept-card:hover::before{height:4px}
+.dept-card[data-dept="BD"]::before{background:var(--bd)}
+.dept-card[data-dept="FSD"]::before{background:var(--fsd)}
+.dept-card[data-dept="EPD"]::before{background:var(--epd)}
+.dept-card[data-dept="EMSD"]::before{background:var(--emsd)}
+.dept-card[data-dept="HA"]::before{background:var(--ha)}
+.dept-card-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 10px;font-size:18px;
+}
+.dept-card[data-dept="BD"] .dept-card-icon{background:#dbeafe;color:var(--bd)}
+.dept-card[data-dept="FSD"] .dept-card-icon{background:#fee2e2;color:var(--fsd)}
+.dept-card[data-dept="EPD"] .dept-card-icon{background:#d1fae5;color:var(--epd)}
+.dept-card[data-dept="EMSD"] .dept-card-icon{background:#fef3c7;color:var(--emsd)}
+.dept-card[data-dept="HA"] .dept-card-icon{background:#ede9fe;color:var(--ha)}
+.dept-card-code{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.dept-card-name{font-size:10px;color:var(--text-muted);line-height:1.3}
+
+/* How it works */
+.how-section{width:100%;max-width:720px;margin-bottom:36px}
+.how-title{
+  font-size:11px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+}
+.how-steps{display:flex;align-items:flex-start;gap:0}
+.how-step{flex:1;text-align:center;position:relative;padding:0 12px}
+.how-step:not(:last-child)::after{
+  content:'';position:absolute;top:20px;right:-4px;
+  width:8px;height:8px;border-top:2px solid var(--border);
+  border-right:2px solid var(--border);transform:rotate(45deg);
+}
+.how-step-num{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--primary-subtle);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:14px;font-weight:600;
+  margin:0 auto 10px;
+}
+.how-step-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.how-step-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+
+/* Starter questions */
+.starter-section{width:100%;max-width:720px}
+.starter-title{
+  font-size:11px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+}
+.starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .starter-card{
   text-align:left;padding:14px 16px;border-radius:var(--radius);
   border:1px solid var(--border);background:var(--bg-chat);cursor:pointer;
   font-size:13px;color:var(--text-secondary);line-height:1.5;
-  transition:all .2s;
+  transition:all .2s;position:relative;overflow:hidden;
 }
-.starter-card:hover{border-color:var(--primary-light);background:var(--primary-subtle);color:var(--primary)}
+.starter-card::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+}
+.starter-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.starter-card[data-dept="BD"]::before{background:var(--bd)}
+.starter-card[data-dept="FSD"]::before{background:var(--fsd)}
+.starter-card[data-dept="EPD"]::before{background:var(--epd)}
+.starter-card[data-dept="EMSD"]::before{background:var(--emsd)}
+.starter-card[data-dept="HA"]::before{background:var(--ha)}
+.starter-card[data-dept="LEG"]::before{background:var(--leg)}
 .starter-card .starter-dept{
   font-size:10px;font-weight:600;color:var(--text-muted);
   text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;
 }
 
-/* Messages */
+/* ─── INFO MODAL ─── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;align-items:center;justify-content:center;
+  animation:fadeIn .2s ease;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--bg-chat);border-radius:var(--radius-xl);
+  width:90%;max-width:700px;max-height:85vh;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .3s ease;
+  display:flex;flex-direction:column;
+}
+.modal-header{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-header h3{font-family:var(--font-display);font-size:20px;font-weight:400}
+.modal-close{
+  background:none;border:none;cursor:pointer;color:var(--text-muted);
+  padding:6px;border-radius:6px;transition:all .2s;
+}
+.modal-close:hover{background:var(--border-light);color:var(--text)}
+.modal-body{padding:24px;overflow-y:auto;font-size:14px;line-height:1.7;color:var(--text-secondary)}
+.modal-body h4{font-size:15px;font-weight:600;color:var(--text);margin:20px 0 8px}
+.modal-body h4:first-child{margin-top:0}
+.modal-body p{margin-bottom:12px}
+.modal-body ul{margin:0 0 12px 20px}
+.modal-body li{margin-bottom:4px}
+.modal-body code{
+  font-family:var(--font-mono);font-size:12px;
+  background:var(--border-light);padding:2px 6px;border-radius:4px;
+}
+.modal-body .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.modal-body .info-card{padding:14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg)}
+.modal-body .info-card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.modal-body .info-card-desc{font-size:12px;color:var(--text-muted)}
+
+/* ─── MESSAGES ─── */
 .message{margin-bottom:24px;animation:fadeUp .35s ease}
 .message-user{display:flex;justify-content:flex-end}
 .message-user .message-bubble{
   background:var(--primary);color:#fff;border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
   padding:12px 16px;max-width:600px;font-size:14px;line-height:1.6;
 }
+
 .message-assistant{display:flex;flex-direction:column;gap:10px}
 
 /* Source cards */
@@ -136,14 +322,27 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 .source-card{
   flex-shrink:0;scroll-snap-align:start;
   border:1px solid var(--border);border-radius:var(--radius);
-  padding:10px 14px;background:var(--bg-chat);min-width:200px;max-width:260px;
-  transition:all .2s;cursor:default;
+  padding:10px 14px;background:var(--bg-chat);min-width:210px;max-width:270px;
+  transition:all .2s;cursor:default;position:relative;overflow:hidden;
 }
+.source-card::before{
+  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+}
+.source-card[data-dept="BD"]::before{background:var(--bd)}
+.source-card[data-dept="FSD"]::before{background:var(--fsd)}
+.source-card[data-dept="EPD"]::before{background:var(--epd)}
+.source-card[data-dept="EMSD"]::before{background:var(--emsd)}
+.source-card[data-dept="HA"]::before{background:var(--ha)}
 .source-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
 .source-card-dept{
   font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--primary);margin-bottom:4px;
+  margin-bottom:4px;
 }
+.source-card[data-dept="BD"] .source-card-dept{color:var(--bd)}
+.source-card[data-dept="FSD"] .source-card-dept{color:var(--fsd)}
+.source-card[data-dept="EPD"] .source-card-dept{color:var(--epd)}
+.source-card[data-dept="EMSD"] .source-card-dept{color:var(--emsd)}
+.source-card[data-dept="HA"] .source-card-dept{color:var(--ha)}
 .source-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px}
 .source-card-section{font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
 
@@ -152,9 +351,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   display:inline-flex;align-items:center;gap:8px;
   font-size:12px;color:var(--text-muted);padding:6px 0;
 }
-.stream-status .dot-pulse{
-  display:flex;gap:3px;
-}
+.stream-status .dot-pulse{display:flex;gap:3px}
 .stream-status .dot-pulse span{
   width:4px;height:4px;border-radius:50%;background:var(--primary-light);
   animation:pulse 1.2s ease infinite;
@@ -167,7 +364,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   background:var(--bg-chat);border:1px solid var(--border);
   border-radius:var(--radius-lg);padding:16px 20px;
   font-size:14px;line-height:1.75;color:var(--text);
-  box-shadow:var(--shadow-sm);
+  box-shadow:var(--shadow-sm);position:relative;
 }
 .answer-bubble p{margin-bottom:10px}
 .answer-bubble p:last-child{margin-bottom:0}
@@ -176,14 +373,25 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   font-family:var(--font-mono);font-size:12px;
   background:var(--border-light);padding:2px 6px;border-radius:4px;
 }
+.answer-bubble ul,.answer-bubble ol{margin:8px 0 8px 20px}
+.answer-bubble li{margin-bottom:4px}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:var(--border-light);border:1px solid var(--border);
+  border-radius:6px;padding:4px 8px;cursor:pointer;
+  font-size:10px;color:var(--text-muted);transition:all .2s;
+  font-family:var(--font-body);opacity:0;
+}
+.answer-bubble:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--primary-subtle);color:var(--primary);border-color:var(--primary-light)}
 
 /* Quality bar */
 .quality-bar{
-  display:flex;align-items:center;gap:12px;padding:8px 0 0;flex-wrap:wrap;
+  display:flex;align-items:center;gap:10px;padding:8px 0 0;flex-wrap:wrap;
 }
 .quality-badge{
   display:inline-flex;align-items:center;gap:5px;
-  font-size:11px;font-weight:500;padding:3px 10px;
+  font-size:11px;font-weight:500;padding:4px 10px;
   border-radius:20px;font-family:var(--font-mono);
 }
 .quality-badge.good{background:var(--success-light);color:#065f46}
@@ -196,21 +404,24 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   margin-top:12px;padding:10px 14px;border-radius:var(--radius);
   background:#fefce8;border:1px solid #fde68a;
   font-size:11px;color:#92400e;line-height:1.5;
+  display:flex;align-items:flex-start;gap:8px;
 }
+.disclaimer svg{flex-shrink:0;margin-top:1px}
 
 /* ─── INPUT BAR ─── */
 .input-bar{
-  position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 20%);
+  position:sticky;bottom:0;
+  background:linear-gradient(transparent,var(--bg) 24%);
   padding:16px 24px 20px;
 }
 .input-wrap{
-  max-width:820px;margin:0 auto;
+  max-width:860px;margin:0 auto;
   display:flex;align-items:flex-end;gap:10px;
   background:var(--bg-chat);border:1px solid var(--border);
   border-radius:var(--radius-lg);padding:8px 8px 8px 16px;
   box-shadow:var(--shadow-lg);transition:border-color .2s;
 }
-.input-wrap:focus-within{border-color:var(--primary-light)}
+.input-wrap:focus-within{border-color:var(--primary-light);box-shadow:var(--shadow-lg),0 0 0 3px rgba(26,86,219,.08)}
 .input-wrap textarea{
   flex:1;border:none;outline:none;resize:none;
   font-family:var(--font-body);font-size:14px;color:var(--text);
@@ -224,12 +435,12 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   display:flex;align-items:center;justify-content:center;
   transition:all .2s;
 }
-.send-btn:hover{background:var(--primary-light)}
-.send-btn:disabled{background:var(--border);cursor:not-allowed}
+.send-btn:hover{background:var(--primary-light);transform:scale(1.05)}
+.send-btn:disabled{background:var(--border);cursor:not-allowed;transform:none}
 .send-btn svg{color:#fff}
 .input-hint{
   text-align:center;font-size:11px;color:var(--text-muted);
-  margin-top:8px;max-width:820px;margin-left:auto;margin-right:auto;
+  margin-top:8px;max-width:860px;margin-left:auto;margin-right:auto;
 }
 
 /* ─── MOBILE ─── */
@@ -243,12 +454,27 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   .sidebar-overlay.open{display:block;opacity:1}
   .topbar-menu{display:flex}
   .starter-grid{grid-template-columns:1fr}
+  .dept-grid{grid-template-columns:repeat(3,1fr)}
+  .how-steps{flex-wrap:wrap}
+  .how-step{min-width:calc(33% - 8px)}
+  .how-step:not(:last-child)::after{display:none}
   .chat-inner{padding:16px 16px 100px}
   .input-bar{padding:12px 16px 16px}
+  .stats-bar{flex-wrap:wrap}
+  .stat-item{min-width:calc(33% - 1px)}
+  .landing-hero h2{font-size:24px}
+  .modal{width:95%;max-height:90vh}
+}
+@media(max-width:480px){
+  .dept-grid{grid-template-columns:repeat(2,1fr)}
+  .how-step{min-width:calc(50% - 8px)}
+  .modal-body .info-grid{grid-template-columns:1fr}
 }
 
 /* ─── ANIMATIONS ─── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 
@@ -270,37 +496,76 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-brand">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <rect width="28" height="28" rx="7" fill="#1a56db"/>
-        <path d="M8 9h12M8 14h8M8 19h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="url(#brandGrad)"/>
+        <path d="M9 10h14M9 16h9M9 22h11" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+        <defs><linearGradient id="brandGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#1a56db"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
       </svg>
       <h1>HK Compliance</h1>
     </div>
-    <div class="sidebar-subtitle">Regulatory Intelligence</div>
+    <div class="sidebar-subtitle">Regulatory Intelligence Platform</div>
   </div>
 
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">Department Filter</div>
-    <select class="filter-select" id="deptFilter">
-      <option value="">All Departments</option>
-      <option value="BD">BD — Buildings Department</option>
-      <option value="FSD">FSD — Fire Services</option>
-      <option value="EPD">EPD — Environmental Protection</option>
-      <option value="EMSD">EMSD — Electrical &amp; Mechanical</option>
-      <option value="HA">HA — Housing Authority</option>
-    </select>
-  </div>
+  <button class="new-chat-btn" onclick="clearChat()">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    New Conversation
+  </button>
 
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">Ingested Sources</div>
-    <div id="sourcesList" style="font-size:12px;color:#64748b;padding:4px 0">
-      Loading...
+  <div class="sidebar-scroll">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Department Filter</div>
+      <select class="filter-select" id="deptFilter" onchange="onDeptFilterChange()">
+        <option value="">All Departments</option>
+        <option value="BD">BD — Buildings Department</option>
+        <option value="FSD">FSD — Fire Services</option>
+        <option value="EPD">EPD — Environmental Protection</option>
+        <option value="EMSD">EMSD — Electrical &amp; Mechanical</option>
+        <option value="HA">HA — Housing Authority</option>
+      </select>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Departments</div>
+      <div class="dept-list">
+        <div class="dept-item" onclick="selectDept('BD')">
+          <span class="dept-dot" style="background:var(--bd)"></span>
+          <span class="dept-name">Buildings Dept</span>
+          <span class="dept-count" id="deptCountBD">—</span>
+        </div>
+        <div class="dept-item" onclick="selectDept('FSD')">
+          <span class="dept-dot" style="background:var(--fsd)"></span>
+          <span class="dept-name">Fire Services</span>
+          <span class="dept-count" id="deptCountFSD">—</span>
+        </div>
+        <div class="dept-item" onclick="selectDept('EPD')">
+          <span class="dept-dot" style="background:var(--epd)"></span>
+          <span class="dept-name">Environmental Protection</span>
+          <span class="dept-count" id="deptCountEPD">—</span>
+        </div>
+        <div class="dept-item" onclick="selectDept('EMSD')">
+          <span class="dept-dot" style="background:var(--emsd)"></span>
+          <span class="dept-name">Electrical &amp; Mechanical</span>
+          <span class="dept-count" id="deptCountEMSD">—</span>
+        </div>
+        <div class="dept-item" onclick="selectDept('HA')">
+          <span class="dept-dot" style="background:var(--ha)"></span>
+          <span class="dept-name">Housing Authority</span>
+          <span class="dept-count" id="deptCountHA">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Ingested Sources</div>
+      <div id="sourcesList" style="font-size:12px;color:#64748b;padding:4px 0">
+        Loading...
+      </div>
     </div>
   </div>
 
   <div class="sidebar-status" id="systemStatus">
     <div class="status-row">
-      <span class="status-label"><span class="status-dot" id="statusDot"></span>System</span>
+      <span class="status-label"><span class="status-dot checking" id="statusDot"></span>System</span>
       <span class="status-value" id="statusText">Checking...</span>
     </div>
     <div class="status-row">
@@ -314,9 +579,69 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   </div>
 
   <div class="sidebar-footer">
-    HK Compliance RAG v0.1.0
+    <span>HK Compliance RAG v0.2.0</span>
+    <span>MIT License</span>
   </div>
 </aside>
+
+<!-- Info Modal -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>About HK Compliance RAG</h3>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h4>What is this?</h4>
+      <p>HK Compliance RAG is an AI-powered knowledge base that answers questions about Hong Kong building regulations with <strong>exact clause citations</strong>. Every answer is grounded in official government codes of practice, ordinances, and practice notes.</p>
+
+      <h4>Regulatory Sources</h4>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-title">Codes of Practice</div>
+          <div class="info-card-desc">Fire safety, structural steel, concrete, foundations, wind effects, demolition, site supervision</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Practice Notes (PNAPs)</div>
+          <div class="info-card-desc">Authorized Persons, Registered Structural Engineers, and Registered Geotechnical Engineers guidance</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Legislation</div>
+          <div class="info-card-desc">Buildings Ordinance (Cap. 123), Building (Planning) Regulations (Cap. 123F), Cap. 572</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-title">Design Manuals</div>
+          <div class="info-card-desc">Barrier-free access, energy efficiency, environmental assessment, fire engineering</div>
+        </div>
+      </div>
+
+      <h4>How It Works</h4>
+      <p>The system uses a <strong>Retrieval-Augmented Generation (RAG)</strong> pipeline:</p>
+      <ul>
+        <li><strong>Ingestion</strong> — PDFs are fetched from government websites, parsed, and split into structure-aware chunks preserving Part &gt; Section &gt; Clause hierarchy</li>
+        <li><strong>Embedding</strong> — Each chunk is embedded using OpenAI text-embedding-3-large (3072 dimensions) and stored in PostgreSQL with pgvector</li>
+        <li><strong>Retrieval</strong> — Hybrid search combines vector similarity with BM25 full-text search, fused via Reciprocal Rank Fusion</li>
+        <li><strong>Reranking</strong> — Top results are reranked using Cohere Rerank for precision</li>
+        <li><strong>Generation</strong> — GPT-4o generates citation-grounded answers with mandatory clause references</li>
+        <li><strong>Verification</strong> — Every answer is checked for phantom citations and faithfulness to source material</li>
+      </ul>
+
+      <h4>Safety &amp; Quality</h4>
+      <p>Every query goes through prompt injection detection, and every answer is verified for:</p>
+      <ul>
+        <li><strong>Faithfulness Score</strong> — LLM judge rates how well the answer reflects retrieved context (0-10)</li>
+        <li><strong>Citation Accuracy</strong> — Percentage of cited clauses that actually appear in context</li>
+        <li><strong>Phantom Citations</strong> — Citations made up by the model (flagged and counted)</li>
+        <li><strong>Uncited Claims</strong> — Factual statements that should have citations but don't</li>
+      </ul>
+
+      <h4>Change Detection</h4>
+      <p>The system periodically checks government sources for regulation updates via SHA-256 content hashing, ensuring the knowledge base stays current with the latest amendments.</p>
+    </div>
+  </div>
+</div>
 
 <!-- Main -->
 <div class="main">
@@ -325,34 +650,145 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
       <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
     <span class="topbar-title">Hong Kong Building Regulations Assistant</span>
-    <span class="topbar-badge" id="topbarBadge">0 chunks indexed</span>
+    <div class="topbar-right">
+      <span class="topbar-badge" id="topbarBadge">0 chunks indexed</span>
+      <button class="topbar-info-btn" onclick="openModal()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        About
+      </button>
+    </div>
   </div>
 
   <div class="chat-area" id="chatArea">
     <div class="chat-inner" id="chatInner">
-      <!-- Empty state -->
-      <div class="empty-state" id="emptyState">
-        <div class="empty-icon">
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke="#1a56db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- Landing state -->
+      <div class="landing" id="landingState">
+        <div class="landing-hero">
+          <div class="landing-icon">
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h2>Hong Kong Regulatory Intelligence</h2>
+          <p>Ask questions about HK building regulations and receive AI-generated answers grounded in official codes of practice, ordinances, and practice notes — with exact clause citations and quality verification.</p>
         </div>
-        <h2>Regulatory Intelligence</h2>
-        <p>Ask questions about Hong Kong building regulations. Answers are grounded in official codes with exact clause citations.</p>
-        <div class="starter-grid">
-          <div class="starter-card" onclick="askQuestion(this)">
-            <div class="starter-dept">BD — Fire Safety</div>
-            What is the minimum fire resistance period for structural elements in buildings over 25m?
+
+        <!-- Stats bar -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-number" id="statDepts">5</div>
+            <div class="stat-label">Departments</div>
           </div>
-          <div class="starter-card" onclick="askQuestion(this)">
-            <div class="starter-dept">BD — Structural</div>
-            What are the wind load design requirements for buildings over 200m tall?
+          <div class="stat-item">
+            <div class="stat-number" id="statDocs">—</div>
+            <div class="stat-label">Documents</div>
           </div>
-          <div class="starter-card" onclick="askQuestion(this)">
-            <div class="starter-dept">BD — Accessibility</div>
-            What are the barrier-free access requirements for new office buildings?
+          <div class="stat-item">
+            <div class="stat-number" id="statChunks">—</div>
+            <div class="stat-label">Indexed Chunks</div>
           </div>
-          <div class="starter-card" onclick="askQuestion(this)">
-            <div class="starter-dept">BD — Planning</div>
-            Does Section 17 of Cap 123F apply to buildings in scheduled areas?
+        </div>
+
+        <!-- Department explorer -->
+        <div class="dept-explorer">
+          <div class="dept-explorer-title">Covered Government Departments</div>
+          <div class="dept-grid">
+            <div class="dept-card" data-dept="BD" onclick="selectDept('BD')">
+              <div class="dept-card-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M2 22h20M6 18V2l12 4v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10h4m-4 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="dept-card-code">BD</div>
+              <div class="dept-card-name">Buildings Department</div>
+            </div>
+            <div class="dept-card" data-dept="FSD" onclick="selectDept('FSD')">
+              <div class="dept-card-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 2c1 3 4 5.5 4 9a4 4 0 11-8 0c0-3.5 3-6 4-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="dept-card-code">FSD</div>
+              <div class="dept-card-name">Fire Services</div>
+            </div>
+            <div class="dept-card" data-dept="EPD" onclick="selectDept('EPD')">
+              <div class="dept-card-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+              </div>
+              <div class="dept-card-code">EPD</div>
+              <div class="dept-card-name">Environmental Protection</div>
+            </div>
+            <div class="dept-card" data-dept="EMSD" onclick="selectDept('EMSD')">
+              <div class="dept-card-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="dept-card-code">EMSD</div>
+              <div class="dept-card-name">Electrical &amp; Mechanical</div>
+            </div>
+            <div class="dept-card" data-dept="HA" onclick="selectDept('HA')">
+              <div class="dept-card-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-6h6v6m-6-10h.01M15 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="dept-card-code">HA</div>
+              <div class="dept-card-name">Housing Authority</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="how-section">
+          <div class="how-title">How It Works</div>
+          <div class="how-steps">
+            <div class="how-step">
+              <div class="how-step-num">1</div>
+              <div class="how-step-title">Ask</div>
+              <div class="how-step-desc">Type a question about HK building regulations</div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">2</div>
+              <div class="how-step-title">Retrieve</div>
+              <div class="how-step-desc">Hybrid search finds relevant clauses from official codes</div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">3</div>
+              <div class="how-step-title">Rerank</div>
+              <div class="how-step-desc">AI reranks results for maximum relevance</div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">4</div>
+              <div class="how-step-title">Generate</div>
+              <div class="how-step-desc">GPT-4o creates a cited answer from source text</div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">5</div>
+              <div class="how-step-title">Verify</div>
+              <div class="how-step-desc">Citations and faithfulness are automatically checked</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Starter questions -->
+        <div class="starter-section">
+          <div class="starter-title">Try asking about</div>
+          <div class="starter-grid">
+            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+              <div class="starter-dept">BD — Fire Safety</div>
+              What is the minimum fire resistance period for structural elements in buildings over 25m?
+            </div>
+            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+              <div class="starter-dept">BD — Structural</div>
+              What are the wind load design requirements for buildings over 200m tall?
+            </div>
+            <div class="starter-card" data-dept="FSD" onclick="askQuestion(this)">
+              <div class="starter-dept">FSD — Fire Services</div>
+              What are the fire service installation requirements for composite buildings?
+            </div>
+            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+              <div class="starter-dept">BD — Accessibility</div>
+              What barrier-free access provisions are required for new commercial buildings?
+            </div>
+            <div class="starter-card" data-dept="EPD" onclick="askQuestion(this)">
+              <div class="starter-dept">EPD — Environment</div>
+              What are the noise assessment requirements during construction in residential areas?
+            </div>
+            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+              <div class="starter-dept">BD — Planning</div>
+              What are the site coverage and plot ratio limits under Building (Planning) Regulations?
+            </div>
           </div>
         </div>
       </div>
@@ -367,7 +803,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
-    <div class="input-hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for new line</div>
+    <div class="input-hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for new line · Answers include exact clause citations</div>
   </div>
 </div>
 
@@ -376,10 +812,19 @@ const chatInner = document.getElementById('chatInner');
 const chatArea = document.getElementById('chatArea');
 const queryInput = document.getElementById('queryInput');
 const sendBtn = document.getElementById('sendBtn');
-const emptyState = document.getElementById('emptyState');
+const landingState = document.getElementById('landingState');
 const deptFilter = document.getElementById('deptFilter');
 
 let isStreaming = false;
+
+// ─── Department data ───
+const DEPTS = {
+  BD: { name: 'Buildings Department', color: '#1a56db' },
+  FSD: { name: 'Fire Services Department', color: '#dc2626' },
+  EPD: { name: 'Environmental Protection Department', color: '#059669' },
+  EMSD: { name: 'Electrical & Mechanical Services', color: '#d97706' },
+  HA: { name: 'Housing Authority', color: '#7c3aed' },
+};
 
 // ─── Health & Sources ───
 async function checkHealth() {
@@ -399,9 +844,17 @@ async function checkHealth() {
       dot.className = 'status-dot unhealthy';
       text.textContent = 'Unhealthy';
     }
-    docs.textContent = (data.documentChunks || 0).toLocaleString();
-    badge.textContent = `${(data.documentChunks || 0).toLocaleString()} chunks indexed`;
-    scrape.textContent = data.lastScrape ? new Date(data.lastScrape).toLocaleDateString() : 'Never';
+    const chunks = data.documentChunks || 0;
+    docs.textContent = chunks.toLocaleString();
+    badge.textContent = `${chunks.toLocaleString()} chunks indexed`;
+
+    // Update landing stats
+    const statChunks = document.getElementById('statChunks');
+    const statDocs = document.getElementById('statDocs');
+    if (statChunks) statChunks.textContent = chunks.toLocaleString() || '—';
+    if (statDocs) statDocs.textContent = chunks > 0 ? Math.ceil(chunks / 50).toLocaleString() : '—';
+
+    scrape.textContent = data.lastScrape ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Never';
   } catch {
     document.getElementById('statusDot').className = 'status-dot unhealthy';
     document.getElementById('statusText').textContent = 'Offline';
@@ -414,13 +867,20 @@ async function loadSources() {
     const data = await res.json();
     const el = document.getElementById('sourcesList');
     if (!data.sources || data.sources.length === 0) {
-      el.innerHTML = '<div style="color:#475569">No documents ingested yet</div>';
+      el.innerHTML = '<div style="color:#475569;font-size:11px">No documents ingested yet. Run <code style="font-size:10px;background:#1e293b;padding:1px 4px;border-radius:3px;color:#94a3b8">npm run ingest</code> to start.</div>';
       return;
     }
+
+    // Update department counts in sidebar
+    for (const s of data.sources) {
+      const countEl = document.getElementById('deptCount' + s.department);
+      if (countEl) countEl.textContent = `${s.chunk_count}`;
+    }
+
     el.innerHTML = data.sources.map(s => `
-      <div style="display:flex;justify-content:space-between;padding:3px 0">
-        <span style="color:#94a3b8">${s.department}</span>
-        <span style="color:#64748b;font-family:var(--font-mono)">${s.document_count} docs · ${s.chunk_count} chunks</span>
+      <div class="source-item">
+        <span class="source-item-dept">${s.department}</span>
+        <span class="source-item-stats">${s.document_count} docs · ${s.chunk_count} chunks</span>
       </div>
     `).join('');
   } catch {
@@ -432,10 +892,44 @@ checkHealth();
 loadSources();
 setInterval(checkHealth, 60000);
 
+// ─── Department selection ───
+function selectDept(dept) {
+  deptFilter.value = dept;
+  onDeptFilterChange();
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) toggleSidebar();
+}
+
+function onDeptFilterChange() {
+  // Visual feedback - could be expanded later
+}
+
 // ─── Sidebar toggle (mobile) ───
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+// ─── Modal ───
+function openModal() {
+  document.getElementById('infoModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('infoModal').classList.remove('open');
+}
+document.getElementById('infoModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── Chat management ───
+function clearChat() {
+  chatInner.innerHTML = '';
+  chatInner.appendChild(landingState);
+  landingState.style.display = 'flex';
+  queryInput.focus();
 }
 
 // ─── Input handling ───
@@ -468,8 +962,8 @@ async function sendQuery() {
   const query = queryInput.value.trim();
   if (!query || isStreaming) return;
 
-  // Hide empty state
-  if (emptyState) emptyState.style.display = 'none';
+  // Hide landing state
+  if (landingState) landingState.style.display = 'none';
 
   // Add user message
   appendMessage('user', query);
@@ -530,6 +1024,7 @@ async function sendQuery() {
             if (!answerEl) {
               answerEl = document.createElement('div');
               answerEl.className = 'answer-bubble';
+              answerEl.innerHTML = '<button class="copy-btn" onclick="copyAnswer(this)">Copy</button>';
               msgEl.appendChild(answerEl);
             }
             return answerEl;
@@ -562,13 +1057,15 @@ function handleStreamEvent(event, msgEl, statusEl, getAnswerEl, appendText) {
       if (event.sources && event.sources.length > 0) {
         const strip = document.createElement('div');
         strip.className = 'sources-strip';
-        strip.innerHTML = event.sources.map(s => `
-          <div class="source-card" style="animation:slideIn .3s ease">
-            <div class="source-card-dept">${s.department || 'BD'}</div>
+        strip.innerHTML = event.sources.map(s => {
+          const dept = s.department || 'BD';
+          return `
+          <div class="source-card" data-dept="${dept}" style="animation:slideIn .3s ease">
+            <div class="source-card-dept">${dept} — ${DEPTS[dept]?.name || dept}</div>
             <div class="source-card-name">${s.document_name || 'Regulation'}</div>
-            <div class="source-card-section">${(s.section || []).join(' › ')}</div>
+            <div class="source-card-section">${(s.section || []).join(' > ')}</div>
           </div>
-        `).join('');
+        `}).join('');
         msgEl.insertBefore(strip, statusEl);
       }
       scrollToBottom();
@@ -577,10 +1074,11 @@ function handleStreamEvent(event, msgEl, statusEl, getAnswerEl, appendText) {
     case 'token':
       const el = getAnswerEl();
       appendText(event.content);
-      el.innerHTML = formatMarkdown(el.textContent + event.content);
-      // Overwrite with raw text tracking
       el._rawText = (el._rawText || '') + event.content;
+      // Keep copy button, update content
+      const copyBtn = el.querySelector('.copy-btn');
       el.innerHTML = formatMarkdown(el._rawText);
+      if (copyBtn) el.prepend(copyBtn);
       scrollToBottom();
       break;
 
@@ -612,23 +1110,30 @@ async function fetchQualityMetrics(query, filter, answerText, msgEl) {
     const faith = data.quality?.faithfulness ?? -1;
     const citAcc = data.quality?.citationAccuracy ?? -1;
     const phantom = data.quality?.phantomCitations ?? 0;
+    const uncited = data.quality?.uncitedClaims ?? 0;
 
     if (faith >= 0) {
       const cls = faith >= 7 ? 'good' : faith >= 4 ? 'warn' : 'bad';
       qualBar.innerHTML += `<span class="quality-badge ${cls}">
         <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        Faithfulness ${faith}/10
+        Faithfulness ${faith.toFixed(1)}/10
       </span>`;
     }
     if (citAcc >= 0) {
       const cls = citAcc >= 0.95 ? 'good' : citAcc >= 0.7 ? 'warn' : 'bad';
-      qualBar.innerHTML += `<span class="quality-badge ${cls}">Citations ${Math.round(citAcc * 100)}%</span>`;
+      qualBar.innerHTML += `<span class="quality-badge ${cls}">
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+        Citations ${Math.round(citAcc * 100)}%
+      </span>`;
     }
     if (phantom > 0) {
-      qualBar.innerHTML += `<span class="quality-badge bad">${phantom} phantom</span>`;
+      qualBar.innerHTML += `<span class="quality-badge bad">
+        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        ${phantom} phantom
+      </span>`;
     }
     if (data.latency_ms) {
-      qualBar.innerHTML += `<span class="quality-meta">${(data.latency_ms / 1000).toFixed(1)}s</span>`;
+      qualBar.innerHTML += `<span class="quality-meta">${(data.latency_ms / 1000).toFixed(1)}s latency</span>`;
     }
 
     if (qualBar.innerHTML) msgEl.appendChild(qualBar);
@@ -636,7 +1141,10 @@ async function fetchQualityMetrics(query, filter, answerText, msgEl) {
     // Disclaimer
     const disc = document.createElement('div');
     disc.className = 'disclaimer';
-    disc.textContent = 'This information is for reference only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant HK government department and consult qualified professionals.';
+    disc.innerHTML = `
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>This information is for reference only and does not constitute legal or professional advice. Regulations may have been amended since last ingestion. Always verify with the relevant HK government department and consult qualified Authorized Persons (APs), Registered Structural Engineers (RSEs), or legal professionals.</span>
+    `;
     msgEl.appendChild(disc);
 
   } catch {}
@@ -667,11 +1175,23 @@ function escapeHtml(str) {
 function formatMarkdown(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\[(.*?)\]/g, '<code>[$1]</code>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>')
     .replace(/^/, '<p>').replace(/$/, '</p>')
     .replace(/<p><\/p>/g, '');
+}
+
+function copyAnswer(btn) {
+  const bubble = btn.closest('.answer-bubble');
+  const text = bubble._rawText || bubble.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
 }
 </script>
 </body>

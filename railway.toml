@@ -1,6 +1,10 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npx tsc"
+buildCommand = "npx tsc"
+nixpacksVersion = "1.30.0"
+
+[build.nixpacks]
+NODE_VERSION = "22"
 
 [deploy]
 startCommand = "node dist/server.js"
