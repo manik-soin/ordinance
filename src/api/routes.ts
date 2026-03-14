@@ -112,18 +112,28 @@ router.get('/health', async (_req: Request, res: Response) => {
   try {
     const pool = getPool();
     const { rows: dbCheck } = await pool.query('SELECT 1 AS ok');
-    const { rows: countRows } = await pool.query(
-      'SELECT COUNT(*) AS count FROM regulation_chunks WHERE is_current = true'
-    );
-    const { rows: scrapeRows } = await pool.query(
-      'SELECT MAX(completed_at) AS last_scrape FROM scrape_log'
-    );
+
+    // These may fail before migrations — handle gracefully
+    let documentChunks = 0;
+    let lastScrape = null;
+    try {
+      const { rows: countRows } = await pool.query(
+        'SELECT COUNT(*) AS count FROM regulation_chunks WHERE is_current = true'
+      );
+      documentChunks = Number(countRows[0]?.count ?? 0);
+      const { rows: scrapeRows } = await pool.query(
+        'SELECT MAX(completed_at) AS last_scrape FROM scrape_log'
+      );
+      lastScrape = scrapeRows[0]?.last_scrape ?? null;
+    } catch {
+      // Tables don't exist yet — that's OK for health check
+    }
 
     res.json({
       status: 'healthy',
       database: dbCheck[0]?.ok === 1,
-      documentChunks: Number(countRows[0]?.count ?? 0),
-      lastScrape: scrapeRows[0]?.last_scrape ?? null,
+      documentChunks,
+      lastScrape,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
