@@ -15,6 +15,7 @@
     "test:evals": "vitest run --config vitest.evals.config.ts",
     "test:coverage": "vitest run --coverage",
     "scrape": "tsx src/cli/scrape.ts",
+    "scrape:all": "tsx src/cli/scrape-all.ts",
     "ingest": "tsx src/cli/ingest.ts",
     "migrate": "tsx src/db/migrate.ts",
     "lint": "tsc --noEmit"
