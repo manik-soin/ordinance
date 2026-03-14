@@ -97,5 +97,70 @@ describe('Hybrid Retrieval', () => {
       const fused = rrfFuse([], [], 5);
       expect(fused).toEqual([]);
     });
+
+    it('ranks items appearing in both lists higher than single-list items', () => {
+      // 'shared' appears in both, 'vector-only' and 'keyword-only' appear in one each
+      const vectorResults = [
+        makeResult('shared', 0.9),
+        makeResult('vector-only', 0.8),
+      ];
+      const keywordResults = [
+        makeResult('keyword-only', 5.0, 'keyword'),
+        makeResult('shared', 4.0, 'keyword'),
+      ];
+
+      const fused = rrfFuse(vectorResults, keywordResults, 5);
+      expect(fused[0].id).toBe('shared');
+    });
+
+    it('preserves content and metadata from original results', () => {
+      const vectorResults = [
+        {
+          ...makeResult('a', 0.9),
+          document_name: 'Fire Safety Code',
+          source_department: 'BD',
+          version: '2024 Edition',
+          section_hierarchy: ['Part III', 'Section 17'],
+          page_number: 42,
+          cross_references: ['Cap. 123'],
+        },
+      ];
+
+      const fused = rrfFuse(vectorResults, [], 5);
+      expect(fused[0].document_name).toBe('Fire Safety Code');
+      expect(fused[0].section_hierarchy).toEqual(['Part III', 'Section 17']);
+      expect(fused[0].page_number).toBe(42);
+      expect(fused[0].cross_references).toEqual(['Cap. 123']);
+    });
+
+    it('assigns RRF scores based on rank position', () => {
+      const vectorResults = [
+        makeResult('first', 0.99),
+        makeResult('second', 0.50),
+      ];
+
+      const fused = rrfFuse(vectorResults, [], 5);
+      // First result: 1/(60+0+1) = 1/61
+      // Second result: 1/(60+1+1) = 1/62
+      expect(fused[0].score).toBeGreaterThan(fused[1].score);
+      expect(fused[0].score).toBeCloseTo(1 / 61, 5);
+      expect(fused[1].score).toBeCloseTo(1 / 62, 5);
+    });
+
+    it('handles large result sets efficiently', () => {
+      const vectorResults = Array.from({ length: 100 }, (_, i) =>
+        makeResult(`v${i}`, 1 - i * 0.01)
+      );
+      const keywordResults = Array.from({ length: 100 }, (_, i) =>
+        makeResult(`k${i}`, 100 - i)
+      );
+
+      const fused = rrfFuse(vectorResults, keywordResults, 10);
+      expect(fused.length).toBe(10);
+      // Scores should be monotonically decreasing
+      for (let i = 1; i < fused.length; i++) {
+        expect(fused[i].score).toBeLessThanOrEqual(fused[i - 1].score);
+      }
+    });
   });
 });

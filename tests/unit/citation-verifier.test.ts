@@ -95,6 +95,61 @@ describe('Citation Verifier', () => {
       const result = verifyCitations(answer, [], []);
       expect(result.uncitedClaims.length).toBeGreaterThan(0);
     });
+
+    it('does not flag cited regulatory claims as uncited', () => {
+      const answer = 'The minimum fire resistance period must be 120 minutes [Fire Safety Code, Section 17.2].';
+      const citations: Citation[] = [
+        { document_name: 'Fire Safety Code', section: 'Section 17.2', department: 'BD', version: '2024' },
+      ];
+      const context = [makeContext('Fire Safety Code', 'Section 17.2 content', ['Section 17'])];
+
+      const result = verifyCitations(answer, citations, context);
+      expect(result.uncitedClaims).toHaveLength(0);
+    });
+
+    it('detects "shall" as regulatory language requiring citation', () => {
+      const answer = 'Every building shall have at least two means of escape. This is very important for safety.';
+      const result = verifyCitations(answer, [], []);
+      expect(result.uncitedClaims.some((c) => c.includes('shall'))).toBe(true);
+    });
+
+    it('verifies citation via section_hierarchy match', () => {
+      const citations: Citation[] = [
+        { document_name: 'Some Code', section: 'Part III', department: 'BD', version: '2024' },
+      ];
+      const context = [
+        makeContext('Some Code', 'text about fire', ['Part III', 'Section 17']),
+      ];
+
+      const result = verifyCitations('answer', citations, context);
+      expect(result.verifiedCitations).toBe(1);
+    });
+
+    it('verifies citation via content text match', () => {
+      const citations: Citation[] = [
+        { document_name: 'Different Name', section: 'Table 4', department: 'BD', version: '2024' },
+      ];
+      // Content includes the section reference even though document_name doesn't match
+      const context = [
+        makeContext('Fire Safety Code', 'Fire resistance rating per Table 4 requirements', ['Section 17']),
+      ];
+
+      const result = verifyCitations('answer', citations, context);
+      expect(result.verifiedCitations).toBe(1);
+    });
+
+    it('totalCitations equals sum of verified + phantom', () => {
+      const citations: Citation[] = [
+        { document_name: 'Real Code', section: 'Section 1', department: 'BD', version: '2024' },
+        { document_name: 'Fake Code', section: 'Section 99', department: 'BD', version: '2024' },
+        { document_name: 'Real Code', section: 'Section 2', department: 'BD', version: '2024' },
+      ];
+      const context = [makeContext('Real Code', 'Section 1 and Section 2 content', ['Section 1', 'Section 2'])];
+
+      const result = verifyCitations('answer', citations, context);
+      expect(result.totalCitations).toBe(3);
+      expect(result.verifiedCitations + result.phantomCitations.length).toBe(3);
+    });
   });
 
   describe('appendDisclaimer', () => {
@@ -104,6 +159,17 @@ describe('Citation Verifier', () => {
       expect(result).toContain('Disclaimer');
       expect(result).toContain('does not constitute legal advice');
       expect(result).toContain(answer);
+    });
+
+    it('preserves the original answer text before disclaimer', () => {
+      const answer = 'Specific compliance requirement details here.';
+      const result = appendDisclaimer(answer);
+      expect(result.startsWith(answer)).toBe(true);
+    });
+
+    it('includes advice to verify with government departments', () => {
+      const result = appendDisclaimer('test');
+      expect(result).toContain('Hong Kong government department');
     });
   });
 });
