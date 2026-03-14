@@ -3,9 +3,13 @@ import type { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import crypto from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import { router } from './api/routes.js';
 import { runMigrations } from './db/migrate.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config();
 
@@ -13,7 +17,18 @@ const app = express();
 const PORT = parseInt(process.env.PORT ?? '3000', 10);
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'"],
+      imgSrc: ["'self'", "data:"],
+    },
+  },
+}));
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
@@ -69,13 +84,13 @@ app.use('/api/query', rateLimiter);
 // Routes
 app.use('/api', router);
 
-// Root
-app.get('/', (_req, res) => {
-  res.json({
-    name: 'HK Compliance RAG',
-    version: '0.1.0',
-    docs: '/api/health',
-  });
+// Serve frontend
+const publicDir = path.resolve(__dirname, '..', 'public');
+app.use(express.static(publicDir));
+
+// SPA fallback — serve index.html for non-API routes
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 // Start

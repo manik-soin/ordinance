@@ -20,6 +20,7 @@ WORKDIR /app
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./
+COPY public/ ./public/
 
 ENV NODE_ENV=production
 EXPOSE 3000
