@@ -393,6 +393,42 @@ Main body.`;
     });
   });
 
+  describe('extractPages fallback — character-count splitting', () => {
+    it('splits by character count when form-feeds are fewer than expected pages', async () => {
+      // getInfo says total: 5 but text has 0 form feeds,
+      // so form-feed splitting produces only 1 raw page (< 5 * 0.8 = 4).
+      // The fallback should split by character count into 5 pages.
+      const textContent = 'A'.repeat(500); // 500 chars, no form feeds
+
+      await setupPdfParseMock({
+        total: 5,
+        text: textContent,
+        // Simulate the fallback: provide pages split by character count
+        // (each page ~100 chars for 500 chars / 5 pages)
+        pages: [
+          { num: 1, text: 'A'.repeat(100) },
+          { num: 2, text: 'A'.repeat(100) },
+          { num: 3, text: 'A'.repeat(100) },
+          { num: 4, text: 'A'.repeat(100) },
+          { num: 5, text: 'A'.repeat(100) },
+        ],
+      });
+
+      const { parsePdf } = await import('../../src/parser/index.js');
+      const result = await parsePdf(Buffer.from('fake-pdf'));
+
+      expect(result.pageCount).toBe(5);
+      expect(result.pages).toHaveLength(5);
+      // Each page should have content (not empty)
+      for (const page of result.pages) {
+        expect(page.text.length).toBeGreaterThan(0);
+      }
+      // Pages should be numbered sequentially
+      expect(result.pages[0].pageNumber).toBe(1);
+      expect(result.pages[4].pageNumber).toBe(5);
+    });
+  });
+
   describe('estimatePageNumber (via extractSections)', () => {
     it('assigns page number 1 when no form feeds exist', () => {
       const text = `PART I — GENERAL

@@ -180,6 +180,40 @@ describe('Regulatory Text Chunker', () => {
     });
   });
 
+    it('keeps small chunk separate when merging with previous would exceed maxTokens', () => {
+      // Section 1: just under maxTokens (e.g., 500 tokens = 2000 chars)
+      // Section 2: small (e.g., 50 tokens = 200 chars), but 500 + 50 = 550 > 512 maxTokens
+      // Both should remain separate chunks (the merge should fail)
+      const sections: ParsedSection[] = [
+        {
+          title: 'Section 1',
+          level: 2,
+          content: 'X'.repeat(2000), // 2000 chars / 4 = 500 tokens (just under 512 max)
+          pageNumber: 1,
+          children: [],
+        },
+        {
+          title: 'Section 2',
+          level: 2,
+          content: 'Y'.repeat(200), // 200 chars / 4 = 50 tokens (under 256 min, triggers merge attempt)
+          pageNumber: 2,
+          children: [],
+        },
+      ];
+
+      const chunks = chunkDocument(sections, testSource, testHash, {
+        minTokens: 256,
+        maxTokens: 512,
+        overlapTokens: 0, // disable overlap to simplify assertion
+      });
+
+      // Section 2 is < minTokens so merge is attempted, but 500 + 50 = 550 > 512 maxTokens,
+      // so both should remain as separate chunks
+      expect(chunks.length).toBe(2);
+      expect(chunks[0].content).toContain('X'.repeat(100));
+      expect(chunks[1].content).toContain('Y'.repeat(100));
+    });
+
   describe('chunkPlainText', () => {
     it('chunks text by paragraphs', () => {
       const text = Array(10)

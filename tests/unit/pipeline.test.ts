@@ -61,7 +61,7 @@ vi.mock('../../src/db/pool.js', () => ({
 // ---- Imports (after mocks are registered) ----
 
 import { queryPipeline } from '../../src/pipeline/query.js';
-import { ingestSource } from '../../src/pipeline/ingest.js';
+import { ingestSource, ingestSources } from '../../src/pipeline/ingest.js';
 
 import { expandQuery } from '../../src/retrieval/query-expansion.js';
 import { hybridSearch, rrfFuse } from '../../src/retrieval/hybrid-search.js';
@@ -452,5 +452,149 @@ describe('ingestSource', () => {
     await ingestSource(testSource, { storageDir: '/tmp/pdfs' });
 
     expect(storePdf).toHaveBeenCalledWith(mockBuffer, '/tmp/pdfs', testSource);
+  });
+});
+
+// ======================================================================
+// ingestSources tests
+// ======================================================================
+
+describe('ingestSources', () => {
+  const mockBuffer = Buffer.from('fake pdf content');
+  const mockHash = 'sha256-abc123';
+  const mockParsed = {
+    title: 'Fire Safety Code',
+    fullText: 'Full text of the document...',
+    pages: [{ pageNumber: 1, text: 'Page 1 text' }],
+    sections: [
+      {
+        title: 'Part I',
+        level: 1,
+        content: 'Part I content with details about fire resistance.',
+        pageNumber: 1,
+        children: [],
+      },
+    ],
+    pageCount: 1,
+  };
+  const mockChunks = [
+    {
+      content: 'Chunk 1 content',
+      metadata: {
+        source_department: 'BD',
+        document_type: 'code_of_practice',
+        document_name: 'Code of Practice for Fire Safety',
+        version: '2024',
+        section_hierarchy: ['Part I'],
+        page_number: 1,
+        is_current: true,
+        cross_references: [],
+        content_hash: mockHash,
+        ingested_at: '2024-01-01T00:00:00.000Z',
+      },
+    },
+  ];
+  const mockEmbeddedChunks = [
+    {
+      ...mockChunks[0],
+      embedding: [0.1, 0.2, 0.3],
+    },
+  ];
+
+  const mockPoolInstance = { query: vi.fn() } as unknown as import('pg').Pool;
+
+  const sourceA: RegulationSource = {
+    name: 'Doc A',
+    url: 'https://example.com/a.pdf',
+    version: '2024',
+    department: 'BD',
+    type: 'code_of_practice',
+    category: 'fire_safety',
+  };
+
+  const sourceB: RegulationSource = {
+    name: 'Doc B',
+    url: 'https://example.com/b.pdf',
+    version: '2024',
+    department: 'BD',
+    type: 'code_of_practice',
+    category: 'structural',
+  };
+
+  const sourceC: RegulationSource = {
+    name: 'Doc C',
+    url: 'https://example.com/c.pdf',
+    version: '2024',
+    department: 'BD',
+    type: 'code_of_practice',
+    category: 'structural',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    vi.mocked(getPool).mockReturnValue(mockPoolInstance);
+    vi.mocked(fetchPdf).mockResolvedValue({ buffer: mockBuffer, contentHash: mockHash });
+    vi.mocked(getDocumentHash).mockResolvedValue(null);
+    vi.mocked(storePdf).mockResolvedValue(undefined as never);
+    vi.mocked(parsePdf).mockResolvedValue(mockParsed);
+    vi.mocked(chunkDocument).mockReturnValue(mockChunks);
+    vi.mocked(embedChunks).mockResolvedValue(mockEmbeddedChunks);
+    vi.mocked(supersedePreviousChunks).mockResolvedValue(0);
+    vi.mocked(storeChunks).mockResolvedValue(['id-1']);
+    vi.mocked(recordDocumentVersion).mockResolvedValue('version-id-1');
+  });
+
+  it('processes multiple sources and returns all results', async () => {
+    const results = await ingestSources([sourceA, sourceB, sourceC]);
+
+    expect(results).toHaveLength(3);
+    expect(results[0].source).toBe(sourceA);
+    expect(results[1].source).toBe(sourceB);
+    expect(results[2].source).toBe(sourceC);
+    expect(results.every((r) => r.status === 'ingested')).toBe(true);
+    expect(fetchPdf).toHaveBeenCalledTimes(3);
+  });
+
+  it('respects concurrency parameter (batches of 2)', async () => {
+    // Track the order of calls to detect batching
+    const callOrder: string[] = [];
+
+    vi.mocked(fetchPdf).mockImplementation(async (url: string) => {
+      callOrder.push(url);
+      return { buffer: mockBuffer, contentHash: mockHash };
+    });
+
+    await ingestSources([sourceA, sourceB, sourceC], 2);
+
+    // All 3 should have been called
+    expect(callOrder).toHaveLength(3);
+    // First batch: sourceA and sourceB; second batch: sourceC
+    expect(callOrder[0]).toBe(sourceA.url);
+    expect(callOrder[1]).toBe(sourceB.url);
+    expect(callOrder[2]).toBe(sourceC.url);
+  });
+
+  it('handles mixed success/failure across batches', async () => {
+    // sourceA succeeds, sourceB fails, sourceC succeeds
+    vi.mocked(fetchPdf)
+      .mockResolvedValueOnce({ buffer: mockBuffer, contentHash: mockHash })
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({ buffer: mockBuffer, contentHash: mockHash });
+
+    const results = await ingestSources([sourceA, sourceB, sourceC], 2);
+
+    expect(results).toHaveLength(3);
+    expect(results[0].status).toBe('ingested');
+    expect(results[1].status).toBe('failed');
+    expect(results[1].error).toBe('Network error');
+    expect(results[2].status).toBe('ingested');
+  });
+
+  it('returns empty array for empty sources list', async () => {
+    const results = await ingestSources([]);
+
+    expect(results).toEqual([]);
+    expect(fetchPdf).not.toHaveBeenCalled();
   });
 });

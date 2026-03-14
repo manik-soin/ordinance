@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+data/pdfs
+*.pdf
+.git
+.github
+tests
+.DS_Store
+tmp

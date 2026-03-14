@@ -19,11 +19,16 @@ vi.mock('../../src/db/pool.js', () => ({
   getPool: vi.fn(() => ({ query: mockQuery })),
 }));
 
+vi.mock('node-cron', () => ({
+  default: { schedule: vi.fn() },
+}));
+
 // ── Imports (after mocks) ────────────────────────────────────────────────────
 
-import { DEFAULT_SCHEDULES, checkForChanges } from '../../src/scheduler/index.js';
+import { DEFAULT_SCHEDULES, checkForChanges, startScheduler } from '../../src/scheduler/index.js';
 import { fetchPdf } from '../../src/scraper/index.js';
 import { getDocumentHash, recordDocumentVersion } from '../../src/db/store.js';
+import cron from 'node-cron';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -238,6 +243,28 @@ describe('Scheduler', () => {
 
       expect(result.documentsChanged).toBe(1);
       expect(recordDocumentVersion).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // ── startScheduler ──────────────────────────────────────────────────────
+
+  describe('startScheduler', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('calls cron.schedule for each DEFAULT_SCHEDULE with correct expression and callback', () => {
+      startScheduler();
+
+      expect(cron.schedule).toHaveBeenCalledTimes(DEFAULT_SCHEDULES.length);
+
+      for (let i = 0; i < DEFAULT_SCHEDULES.length; i++) {
+        const call = vi.mocked(cron.schedule).mock.calls[i];
+        // First argument is the cron expression
+        expect(call[0]).toBe(DEFAULT_SCHEDULES[i].schedule);
+        // Second argument is the callback function
+        expect(typeof call[1]).toBe('function');
+      }
     });
   });
 });
