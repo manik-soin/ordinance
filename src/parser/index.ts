@@ -52,37 +52,6 @@ export async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
 }
 
 /**
- * Split full text into approximate pages based on form feed characters
- * or estimated character counts.
- */
-function extractPages(text: string, numPages: number): ParsedPage[] {
-  // pdf-parse uses form feed (\f) to separate pages
-  const rawPages = text.split('\f').filter((p) => p.trim().length > 0);
-
-  if (rawPages.length >= numPages * 0.8) {
-    // Form feed splitting worked reasonably
-    return rawPages.map((pageText, i) => ({
-      pageNumber: i + 1,
-      text: pageText.trim(),
-    }));
-  }
-
-  // Fallback: split by estimated character count per page
-  const charsPerPage = Math.ceil(text.length / numPages);
-  const pages: ParsedPage[] = [];
-  for (let i = 0; i < numPages; i++) {
-    const start = i * charsPerPage;
-    const end = Math.min(start + charsPerPage, text.length);
-    pages.push({
-      pageNumber: i + 1,
-      text: text.slice(start, end).trim(),
-    });
-  }
-
-  return pages;
-}
-
-/**
  * Extract hierarchical section structure from regulatory text.
  */
 export function extractSections(text: string): ParsedSection[] {
