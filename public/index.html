@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HK Compliance - Regulatory Intelligence</title>
+<title>Ordinance - Hong Kong Building Regulations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -36,7 +36,7 @@
   --radius-lg:30px;
   --radius-xl:40px;
   --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --font-display:'Newsreader',Georgia,serif;
+  --font-display:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --font-mono:'IBM Plex Mono','SF Mono',monospace;
   --bd:#295e90;
   --fsd:#944236;
@@ -476,25 +476,20 @@ button,input,select,textarea{font:inherit}
   animation:fadeUp .45s ease;
 }
 .hero-panel,
-.dept-explorer,
-.how-section,
 .starter-section{
   border:1px solid var(--line);
   background:rgba(255,255,255,.64);
   border-radius:32px;
   box-shadow:var(--shadow-sm);
-  backdrop-filter:blur(16px);
 }
 .hero-panel{
-  display:grid;
-  grid-template-columns:minmax(0,1.45fr) minmax(280px,.95fr);
-  gap:20px;
-  padding:30px;
+  padding:36px 30px;
+  text-align:center;
 }
 .hero-copy{
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
+  align-items:center;
 }
 .hero-eyebrow{
   font-family:var(--font-mono);
@@ -506,21 +501,22 @@ button,input,select,textarea{font:inherit}
 }
 .hero-title{
   font-family:var(--font-display);
-  font-size:clamp(44px,6vw,68px);
-  line-height:.96;
-  letter-spacing:-.055em;
-  max-width:11ch;
-  margin-bottom:18px;
+  font-size:clamp(36px,5vw,56px);
+  line-height:1;
+  letter-spacing:-.04em;
+  margin-bottom:14px;
+  font-weight:800;
 }
 .hero-title span{
   font-style:italic;
   color:var(--accent-strong);
 }
 .hero-copy p{
-  max-width:58ch;
+  max-width:52ch;
   font-size:16px;
   line-height:1.8;
   color:var(--ink-soft);
+  text-align:center;
 }
 .hero-pills{
   display:flex;
@@ -1275,8 +1271,6 @@ button,input,select,textarea{font:inherit}
 [data-dept="LEG"]{--dept-color:var(--leg);--dept-tint:rgba(94,105,111,.10)}
 
 @media(max-width:1180px){
-  .hero-panel{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr)}
-  .dept-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:980px){
   body{display:block}
@@ -1302,12 +1296,6 @@ button,input,select,textarea{font:inherit}
   .topbar-menu{display:flex}
   .topbar{padding:16px 18px 10px}
   .chat-area{padding:0 16px 110px}
-  .hero-panel{grid-template-columns:1fr}
-  .hero-preview{display:none}
-  .metrics-row{display:none}
-  .dept-explorer{display:none}
-  .how-section{display:none}
-  .overview-grid{display:block}
   .starter-grid{grid-template-columns:1fr}
   .starter-card:nth-child(n+4){display:none}
   .input-bar{
@@ -1319,8 +1307,6 @@ button,input,select,textarea{font:inherit}
   .input-wrap textarea{min-height:44px;font-size:15px}
   .input-hint{display:none}
   .send-btn{width:46px;height:46px;border-radius:16px}
-  .hero-panel,
-  .starter-section,
   .answer-bubble,
   .source-card,
   .source-card-static{backdrop-filter:none}
@@ -1332,10 +1318,8 @@ button,input,select,textarea{font:inherit}
   .topbar-badge{display:none}
   .hero-panel,
   .starter-section{padding:20px}
-  .hero-title{font-size:40px}
+  .hero-title{font-size:34px}
   .hero-copy p{font-size:14px;line-height:1.7}
-  .hero-pills{gap:8px}
-  .hero-pill{padding:8px 12px;font-size:11px}
   .input-meta{
     flex-direction:column;
     align-items:flex-start;
@@ -1351,10 +1335,8 @@ button,input,select,textarea{font:inherit}
   .info-grid{grid-template-columns:1fr}
 }
 @media(max-width:520px){
-  .hero-title{font-size:34px}
-  .hero-eyebrow{font-size:10px;margin-bottom:12px}
+  .hero-title{font-size:28px}
   .hero-panel{padding:18px}
-  .hero-pills{display:none}
   .starter-section{padding:16px}
   .starter-card{padding:14px 14px 16px;font-size:13px}
   .source-card,
@@ -1396,8 +1378,8 @@ button,input,select,textarea{font:inherit}
         </svg>
       </div>
       <div class="brand-copy">
-        <h1>HK Compliance</h1>
-        <div class="sidebar-subtitle">Minimal regulatory intelligence for Hong Kong building teams.</div>
+        <h1>Ordinance</h1>
+        <div class="sidebar-subtitle">HK building regulation intelligence for AEC teams.</div>
       </div>
     </div>
 
@@ -1485,7 +1467,7 @@ button,input,select,textarea{font:inherit}
   </div>
 
   <div class="sidebar-footer">
-    <span>HK Compliance RAG v0.2.0</span>
+    <span>Ordinance v0.2.0</span>
     <a class="signature-link" href="https://maniksoin.com">made with love by maniksoin.com</a>
   </div>
 </aside>
@@ -1503,7 +1485,7 @@ button,input,select,textarea{font:inherit}
     </div>
     <div class="modal-body">
       <h4>What it does</h4>
-      <p>HK Compliance RAG answers questions about Hong Kong building regulations with clause-level citations from official documents. The interface is intentionally minimal, but the pipeline behind it is not.</p>
+      <p>Ordinance answers questions about Hong Kong building regulations with clause-level citations from official documents. The interface is intentionally minimal, but the pipeline behind it is not.</p>
 
       <h4>Source coverage</h4>
       <div class="info-grid">
@@ -1550,8 +1532,8 @@ button,input,select,textarea{font:inherit}
     </button>
 
     <div class="topbar-copy">
-      <span class="topbar-title">Hong Kong Building Regulations Assistant</span>
-      <span class="topbar-context">Official-source answers with clause citations.</span>
+      <span class="topbar-title">Ordinance</span>
+      <span class="topbar-context">HK building regulation answers with clause citations.</span>
     </div>
 
     <div class="topbar-right">
@@ -1569,142 +1551,18 @@ button,input,select,textarea{font:inherit}
         <section class="hero-panel">
           <div class="hero-copy">
             <div>
-              <div class="hero-eyebrow">Official-source reasoning for Hong Kong building codes</div>
-              <h2 class="hero-title">Compliance answers, <span>pared back.</span></h2>
-              <p>Ask about ordinances, codes of practice, practice notes, fire services, accessibility, energy and environmental requirements. Answers stream from ingested government PDFs with exact clause citations.</p>
-            </div>
-
-            <div class="hero-pills">
-              <div class="hero-pill"><strong>Grounded</strong> Clause-aware retrieval from official documents</div>
-              <div class="hero-pill"><strong>Verified</strong> Citation and faithfulness checks</div>
-              <div class="hero-pill"><strong>Focused</strong> Department filter when you need a tighter scope</div>
-            </div>
-          </div>
-
-          <div class="hero-preview">
-            <div class="preview-card">
-              <div class="preview-top">
-                <div class="preview-mark" aria-hidden="true">
-                  <svg viewBox="0 0 48 48" fill="none">
-                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4"/>
-                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(60 24 24)"/>
-                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(120 24 24)"/>
-                  </svg>
-                </div>
-                <div class="preview-label">Sample answer structure</div>
-              </div>
-              <div class="preview-question">For buildings above 25 m, required fire resistance periods depend on occupancy, element type and the applicable fire resisting construction tables.</div>
-              <p class="preview-answer">The interface stays quiet so the evidence is easier to scan: retrieve the clause, read the answer, open the PDF, verify the section.</p>
-              <div class="preview-citations">
-                <span>Code of Practice for Fire Safety in Buildings</span>
-                <span>Building (Planning) Regulations</span>
-              </div>
+              <h2 class="hero-title">Ordinance</h2>
+              <p>Ask questions about Hong Kong building regulations. Answers are grounded in official government PDFs with clause-level citations.</p>
             </div>
           </div>
         </section>
-
-        <section class="metrics-row">
-          <div class="stat-item">
-            <div class="stat-label">Departments covered</div>
-            <div class="stat-number" id="statDepts">5</div>
-            <div class="stat-foot">Buildings, fire services, environment, electrical and mechanical, and housing.</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Current documents</div>
-            <div class="stat-number" id="statDocs">-</div>
-            <div class="stat-foot">The live corpus is pulled from current document versions stored in the knowledge base.</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Indexed clauses</div>
-            <div class="stat-number" id="statChunks">-</div>
-            <div class="stat-foot">Chunked for retrieval while keeping the original section hierarchy intact.</div>
-          </div>
-        </section>
-
-        <div class="overview-grid">
-          <section class="dept-explorer">
-            <div class="dept-explorer-title">Browse by department</div>
-            <div class="dept-grid">
-              <div class="dept-card" data-dept="BD">
-                <div class="dept-card-icon">
-                  <svg fill="none" viewBox="0 0 24 24"><path d="M2 22h20M6 18V2l12 4v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10h4m-4 4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </div>
-                <div class="dept-card-code">BD</div>
-                <div class="dept-card-name">Buildings Department</div>
-              </div>
-              <div class="dept-card" data-dept="FSD">
-                <div class="dept-card-icon">
-                  <svg fill="none" viewBox="0 0 24 24"><path d="M12 2c1 3 4 5.5 4 9a4 4 0 11-8 0c0-3.5 3-6 4-9z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </div>
-                <div class="dept-card-code">FSD</div>
-                <div class="dept-card-name">Fire Services Department</div>
-              </div>
-              <div class="dept-card" data-dept="EPD">
-                <div class="dept-card-icon">
-                  <svg fill="none" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/></svg>
-                </div>
-                <div class="dept-card-code">EPD</div>
-                <div class="dept-card-name">Environmental Protection</div>
-              </div>
-              <div class="dept-card" data-dept="EMSD">
-                <div class="dept-card-icon">
-                  <svg fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div class="dept-card-code">EMSD</div>
-                <div class="dept-card-name">Electrical &amp; Mechanical</div>
-              </div>
-              <div class="dept-card" data-dept="HA">
-                <div class="dept-card-icon">
-                  <svg fill="none" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-6h6v6m-6-10h.01M15 11h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </div>
-                <div class="dept-card-code">HA</div>
-                <div class="dept-card-name">Housing Authority</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="how-section">
-            <div class="how-title">How answers are built</div>
-            <div class="how-steps">
-              <div class="how-step">
-                <div class="how-step-num">1</div>
-                <div class="how-step-title">Ask</div>
-                <div class="how-step-desc">Enter a regulation or compliance question in natural language.</div>
-              </div>
-              <div class="how-step">
-                <div class="how-step-num">2</div>
-                <div class="how-step-title">Retrieve</div>
-                <div class="how-step-desc">Hybrid search finds relevant clauses across the ingested corpus.</div>
-              </div>
-              <div class="how-step">
-                <div class="how-step-num">3</div>
-                <div class="how-step-title">Rerank</div>
-                <div class="how-step-desc">High-signal chunks are reordered before answer generation.</div>
-              </div>
-              <div class="how-step">
-                <div class="how-step-num">4</div>
-                <div class="how-step-title">Generate</div>
-                <div class="how-step-desc">The answer is streamed with citations attached to the evidence used.</div>
-              </div>
-              <div class="how-step">
-                <div class="how-step-num">5</div>
-                <div class="how-step-title">Verify</div>
-                <div class="how-step-desc">Use the linked PDFs to confirm the clause, section and wording directly.</div>
-              </div>
-            </div>
-          </section>
-        </div>
 
         <section class="starter-section">
-          <div class="starter-title">Try a high-signal prompt</div>
+          <div class="starter-title">Try asking</div>
           <div class="starter-grid">
             <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD - Fire safety</div>
               What is the minimum fire resistance period for structural elements in buildings over 25 m?
-            </div>
-            <div class="starter-card" data-dept="BD">
-              <div class="starter-dept">BD - Structural</div>
-              What are the wind load design requirements for buildings over 200 m tall?
             </div>
             <div class="starter-card" data-dept="FSD">
               <div class="starter-dept">FSD - Fire services</div>
@@ -1713,10 +1571,6 @@ button,input,select,textarea{font:inherit}
             <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD - Accessibility</div>
               What barrier-free access provisions are required for new commercial buildings?
-            </div>
-            <div class="starter-card" data-dept="EPD">
-              <div class="starter-dept">EPD - Environment</div>
-              What are the noise assessment requirements during construction in residential areas?
             </div>
             <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD - Planning</div>
@@ -1731,7 +1585,7 @@ button,input,select,textarea{font:inherit}
   <div class="input-bar">
     <div class="input-wrap">
       <div class="input-meta">
-        <span class="input-meta-label">Ask anything about Hong Kong building compliance</span>
+        <span class="input-meta-label">Ask about HK building regulations</span>
         <span class="input-meta-filter" id="activeDeptPill">All departments</span>
       </div>
       <div class="composer-row">
@@ -1760,7 +1614,7 @@ const activeDeptPill = $('activeDeptPill');
 const sidebar = $('sidebar');
 const sidebarOverlay = $('sidebarOverlay');
 const infoModal = $('infoModal');
-const deptCards = Array.from(document.querySelectorAll('.dept-card'));
+const deptCards = [];
 const deptItems = Array.from(document.querySelectorAll('.dept-item'));
 
 let isStreaming = false;
@@ -1838,9 +1692,6 @@ async function checkHealth() {
     text.textContent = data.status === 'healthy' ? 'Healthy' : 'Unhealthy';
     docs.textContent = chunks > 0 ? chunks.toLocaleString() : '-';
     badge.textContent = chunks > 0 ? chunks.toLocaleString() + ' clauses indexed' : 'Corpus not indexed';
-
-    const statChunks = $('statChunks');
-    if (statChunks) statChunks.textContent = chunks > 0 ? chunks.toLocaleString() : '-';
 
     scrape.textContent = data.lastScrape
       ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' })

@@ -10,6 +10,7 @@ import { router } from './api/routes.js';
 import { runMigrations } from './db/migrate.js';
 import { ensureCacheTable } from './cache/semantic-cache.js';
 import { getPool } from './db/pool.js';
+import { startScheduler } from './scheduler/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -47,7 +48,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    if (req.path !== '/api/health') {
+    if (!req.path.endsWith('/health')) {
       console.log(
         `[${req.method}] ${req.path} ${res.statusCode} ${duration}ms`
       );
@@ -117,6 +118,14 @@ async function start(): Promise<void> {
     console.log('[Server] Cache table ready');
   } catch (err) {
     console.error('[Server] Cache table error (non-fatal):', err);
+  }
+
+  // Start scheduled scrape jobs (non-fatal)
+  try {
+    startScheduler();
+    console.log('[Server] Scheduler started');
+  } catch (err) {
+    console.error('[Server] Scheduler error (non-fatal):', err);
   }
 
   // Cleanup rate limit map periodically
