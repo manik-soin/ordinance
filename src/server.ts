@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import { router } from './api/routes.js';
 import { runMigrations } from './db/migrate.js';
+import { ensureCacheTable } from './cache/semantic-cache.js';
+import { getPool } from './db/pool.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -101,10 +103,11 @@ async function start(): Promise<void> {
     console.log(`[Server] Listening on port ${PORT}`);
   });
 
-  // Run migrations in background
+  // Run migrations + create cache table in background
   try {
     await runMigrations();
-    console.log('[Server] Database migrations complete');
+    await ensureCacheTable(getPool());
+    console.log('[Server] Database migrations + cache table complete');
   } catch (err) {
     console.error('[Server] Migration error (non-fatal):', err);
   }

@@ -15,6 +15,7 @@ import {
   detectNewBDCirculars,
   detectNewFSDCirculars,
 } from './live-data.js';
+import { liveWebSearch } from '../retrieval/web-search.js';
 import {
   fetchGovDataSummary,
   fetchFireDoorsets,
@@ -67,6 +68,8 @@ router.post('/query', async (req: Request, res: Response) => {
       audit_id: result.auditId,
       latency_ms: result.latencyMs,
       model: result.model,
+      cached: result.cached ?? false,
+      webSources: result.webSources ?? [],
     });
   } catch (err) {
     console.error('[API] Query error:', err);
@@ -120,11 +123,20 @@ router.post('/query/stream', async (req: Request, res: Response) => {
 
     res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy, pdf_url: urlMap.get(s.document_name) || null })) })}\n\n`);
 
+    // Run live web search in parallel with answer generation
+    const webSearchPromise = liveWebSearch(validation.data.query).catch(() => ({ webResults: [], supplementaryContext: '' }));
+
     // Stream answer
     res.write(`data: ${JSON.stringify({ type: 'status', message: 'Generating answer...' })}\n\n`);
 
     for await (const chunk of streamAnswer(validation.data.query, reranked)) {
       res.write(`data: ${JSON.stringify({ type: 'token', content: chunk })}\n\n`);
+    }
+
+    // Send web sources after answer completes
+    const webSearch = await webSearchPromise;
+    if (webSearch.webResults.length > 0) {
+      res.write(`data: ${JSON.stringify({ type: 'web_sources', sources: webSearch.webResults })}\n\n`);
     }
 
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);

@@ -1117,6 +1117,19 @@ async function sendQuery() {
             el.querySelector('.answer-content').innerHTML = formatMarkdown(rawText);
             scrollToBottom();
           }
+          else if (ev.type === 'web_sources' && ev.sources?.length) {
+            const webDiv = document.createElement('div');
+            webDiv.style.cssText = 'margin-top:8px;padding:8px 12px;background:var(--border-light);border-radius:var(--radius);font-size:11px';
+            webDiv.innerHTML = '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Live Web Sources</div>' +
+              ev.sources.map(s => {
+                const isExternal = s.url.startsWith('http');
+                return '<a href="' + s.url + '"' + (isExternal ? ' target="_blank" rel="noopener"' : '') +
+                  ' style="display:block;color:var(--primary);font-size:11px;text-decoration:none;padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + s.title + '">' +
+                  s.title + ' <span style="color:var(--text-muted)">(' + s.source + ')</span></a>';
+              }).join('');
+            msgEl.appendChild(webDiv);
+            scrollToBottom();
+          }
           else if (ev.type === 'error') {
             statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + ev.message + '</span>';
           }

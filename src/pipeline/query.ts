@@ -7,6 +7,8 @@ import { verifyCitations, appendDisclaimer } from '../safety/citation-verifier.j
 import { scoreFaithfulness } from '../safety/faithfulness.js';
 import { logQueryAudit } from '../db/store.js';
 import { rrfFuse } from '../retrieval/hybrid-search.js';
+import { liveWebSearch } from '../retrieval/web-search.js';
+import { checkCache, writeCache } from '../cache/semantic-cache.js';
 import type { SearchFilter, SearchResult } from '../retrieval/hybrid-search.js';
 import type { Citation } from '../generator/index.js';
 import type { VerificationResult } from '../safety/citation-verifier.js';
@@ -21,6 +23,8 @@ export interface QueryPipelineResult {
   auditId: string;
   latencyMs: number;
   model: string;
+  cached?: boolean;
+  webSources?: Array<{ title: string; url: string; source: string }>;
 }
 
 export interface QueryPipelineOptions {
@@ -45,11 +49,28 @@ export async function queryPipeline(
   const useReranker = options?.useReranker ?? true;
   const topK = options?.topK ?? 5;
 
-  // 1. Run query expansion AND primary search in parallel
+  // 0. Check semantic cache first (500x speedup on cache hit)
+  const cached = await checkCache(pool, query, options?.filter).catch(() => null);
+  if (cached) {
+    return {
+      answer: cached.answer,
+      citations: (cached.citations ?? []) as Citation[],
+      sources: (cached.sources ?? []) as SearchResult[],
+      verification: { totalCitations: 0, verifiedCitations: 0, citationAccuracy: 1, phantomCitations: [], uncitedClaims: [] } as VerificationResult,
+      faithfulness: { score: -1, reasoning: 'Cached', flaggedClaims: [] },
+      auditId: 'cached',
+      latencyMs: Date.now() - start,
+      model: 'cached',
+      cached: true,
+    };
+  }
+
+  // 1. Run query expansion + primary search + live web search in parallel
   //    The original query search starts immediately while expansion runs
-  const [primaryResults, expandedQueries] = await Promise.all([
+  const [primaryResults, expandedQueries, webSearch] = await Promise.all([
     hybridSearch(pool, query, { filter: options?.filter, topK: topK * 2 }),
     useExpansion ? expandQuery(query) : Promise.resolve([query]),
+    liveWebSearch(query),
   ]);
 
   // 2. If expansion produced extra queries, search those and fuse with primary
@@ -107,6 +128,9 @@ export async function queryPipeline(
     }),
   ]);
 
+  // 8. Write to semantic cache (non-blocking)
+  writeCache(pool, query, finalAnswer, generation.citations, reranked, options?.filter?.department).catch(() => {});
+
   return {
     answer: finalAnswer,
     citations: generation.citations,
@@ -116,5 +140,7 @@ export async function queryPipeline(
     auditId,
     latencyMs,
     model: generation.model,
+    cached: false,
+    webSources: webSearch.webResults.map(w => ({ title: w.title, url: w.url, source: w.source })),
   };
 }
