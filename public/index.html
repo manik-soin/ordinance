@@ -1402,31 +1402,31 @@ button,input,select,textarea{font:inherit}
   .sidebar-footer{padding:0 18px calc(18px + env(safe-area-inset-bottom))}
   .topbar-menu{display:flex}
   .sidebar-collapse-btn{display:none}
-  .topbar{padding:14px 16px 8px}
+  .topbar{padding:10px 16px 6px}
   .topbar-title{display:none}
-  .chat-area{padding:0 16px calc(148px + env(safe-area-inset-bottom))}
+  .chat-area{padding:0 14px calc(120px + env(safe-area-inset-bottom))}
   .starter-grid{grid-template-columns:1fr}
   .starter-card:nth-child(n+4){display:none}
   .input-bar{
-    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    padding:8px 14px calc(8px + env(safe-area-inset-bottom));
     backdrop-filter:none;
     background:linear-gradient(180deg,rgba(236,232,222,0) 0%,rgba(236,232,222,.96) 20%,rgba(236,232,222,1) 100%);
   }
   .input-wrap{
     max-width:none;
-    padding:10px 10px 12px 12px;
-    border-radius:24px;
-    gap:10px;
+    padding:8px 8px 10px 12px;
+    border-radius:22px;
+    gap:8px;
   }
   .input-meta{display:none}
   .mobile-filter-row{display:flex}
   .input-wrap textarea{
-    min-height:44px;
+    min-height:40px;
     max-height:34dvh;
     font-size:15px;
   }
   .input-hint{display:none}
-  .send-btn{width:48px;height:48px;border-radius:16px}
+  .send-btn{width:44px;height:44px;border-radius:14px}
   .answer-bubble,
   .source-card,
   .source-card-static{backdrop-filter:none}
@@ -1437,26 +1437,30 @@ button,input,select,textarea{font:inherit}
     margin-left:auto;
     margin-bottom:10px;
   }
-  .landing{gap:14px}
+  .landing{gap:10px;padding-bottom:12px}
+  .hero-panel{padding:20px 18px;border-radius:24px}
+  .hero-title{font-size:28px;margin-bottom:8px}
+  .hero-copy p{font-size:14px;line-height:1.6;max-width:36ch}
+  .starter-section{padding:16px;border-radius:24px}
 }
 @media(max-width:720px){
   .brand-copy h1{font-size:18px}
-  .topbar{padding:12px 14px 6px}
-  .topbar-context{font-size:14px}
+  .topbar{padding:8px 14px 4px}
+  .topbar-context{font-size:13px}
   .topbar-badge{display:none}
-  .topbar-info-btn{padding:10px 12px}
-  .hero-panel,
-  .starter-section{padding:18px}
-  .hero-panel{text-align:left}
+  .topbar-info-btn{padding:8px 10px}
+  .hero-panel{text-align:left;padding:16px}
   .hero-copy{align-items:flex-start}
-  .hero-title{font-size:32px;margin-bottom:10px}
+  .hero-title{font-size:26px;margin-bottom:6px}
   .hero-copy p{
-    font-size:14px;
-    line-height:1.65;
-    max-width:32ch;
+    font-size:13px;
+    line-height:1.6;
+    max-width:30ch;
     text-align:left;
   }
-  .starter-title{margin-bottom:12px}
+  .starter-section{padding:14px}
+  .starter-title{margin-bottom:10px;font-size:10px}
+  .starter-card{padding:12px 14px 14px;font-size:13px}
   .starter-card:nth-child(n+3){display:none}
   .input-meta{
     flex-direction:column;
@@ -1516,23 +1520,31 @@ button,input,select,textarea{font:inherit}
   .info-grid{grid-template-columns:1fr}
 }
 @media(max-width:520px){
-  .hero-title{font-size:28px}
-  .hero-panel{padding:16px}
-  .starter-section{padding:14px}
-  .starter-card{padding:14px 14px 16px;font-size:13px}
+  .hero-title{font-size:24px}
+  .hero-panel{padding:14px}
+  .hero-copy p{font-size:12px;line-height:1.55;max-width:28ch}
+  .starter-section{padding:12px}
+  .starter-card{padding:10px 12px 12px;font-size:12px}
   .source-card,
   .source-card-static{padding:12px}
-  .topbar{padding:10px 12px 6px}
+  .topbar{padding:8px 12px 4px}
   .topbar-copy{gap:2px}
-  .topbar-context{font-size:13px}
+  .topbar-context{font-size:12px}
+  .topbar-logo{width:18px;height:18px}
   .topbar-info-btn{
-    width:42px;
-    height:42px;
+    width:36px;
+    height:36px;
     padding:0;
   }
   .topbar-info-btn span{display:none}
-  .chat-area{padding:0 12px calc(144px + env(safe-area-inset-bottom))}
-  .input-bar{padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  .chat-area{padding:0 10px calc(110px + env(safe-area-inset-bottom))}
+  .input-bar{padding:6px 10px calc(6px + env(safe-area-inset-bottom))}
+  .input-wrap{padding:6px 6px 8px 10px;border-radius:20px;gap:6px}
+  .send-btn{width:40px;height:40px;border-radius:12px}
+  .landing{gap:8px;padding-bottom:8px}
+  .answer-bubble{padding:14px 12px 12px;border-radius:20px}
+  .answer-bubble p{font-size:13px;line-height:1.7}
+  .mobile-filter-chip{padding:7px 10px;font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{
