@@ -6,7 +6,8 @@
 <title>HK Compliance - Regulatory Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -456,8 +457,9 @@ button,input,select,textarea{font:inherit}
 .chat-area{
   flex:1;
   overflow-y:auto;
-  scroll-behavior:smooth;
   padding:0 28px 140px;
+  contain:content;
+  -webkit-overflow-scrolling:touch;
 }
 .chat-area::-webkit-scrollbar{width:7px}
 .chat-area::-webkit-scrollbar-track{background:transparent}
@@ -1278,6 +1280,8 @@ button,input,select,textarea{font:inherit}
 }
 @media(max-width:980px){
   body{display:block}
+  body::before{display:none}
+  body::after{display:none}
   .sidebar{
     position:fixed;
     top:12px;
@@ -1291,45 +1295,81 @@ button,input,select,textarea{font:inherit}
     transition:transform .24s ease;
     z-index:120;
     box-shadow:var(--shadow-lg);
+    backdrop-filter:none;
+    background:rgba(255,255,255,.96);
   }
   .sidebar.open{transform:translateX(0)}
   .topbar-menu{display:flex}
   .topbar{padding:16px 18px 10px}
-  .chat-area{padding:0 16px 150px}
-  .hero-panel,
-  .overview-grid,
-  .metrics-row{grid-template-columns:1fr}
+  .chat-area{padding:0 16px 110px}
+  .hero-panel{grid-template-columns:1fr}
+  .hero-preview{display:none}
+  .metrics-row{display:none}
+  .dept-explorer{display:none}
+  .how-section{display:none}
+  .overview-grid{display:block}
   .starter-grid{grid-template-columns:1fr}
-  .input-bar{padding:16px}
+  .starter-card:nth-child(n+4){display:none}
+  .input-bar{
+    padding:12px 16px 16px;
+    backdrop-filter:none;
+    background:linear-gradient(180deg,rgba(236,232,222,0) 0%,rgba(236,232,222,.96) 20%,rgba(236,232,222,1) 100%);
+  }
+  .input-wrap{padding:10px 10px 10px 14px;border-radius:24px}
+  .input-wrap textarea{min-height:44px;font-size:15px}
+  .input-hint{display:none}
+  .send-btn{width:46px;height:46px;border-radius:16px}
+  .hero-panel,
+  .starter-section,
+  .answer-bubble,
+  .source-card,
+  .source-card-static{backdrop-filter:none}
+  .landing{gap:14px}
 }
 @media(max-width:720px){
   .brand-copy h1{font-size:18px}
   .topbar-context{font-size:14px}
   .topbar-badge{display:none}
   .hero-panel,
-  .dept-explorer,
-  .how-section,
-  .starter-section{padding:22px}
-  .hero-title{font-size:42px}
-  .hero-copy p{font-size:15px}
-  .preview-card{padding:20px}
-  .dept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .how-steps{grid-template-columns:1fr}
+  .starter-section{padding:20px}
+  .hero-title{font-size:40px}
+  .hero-copy p{font-size:14px;line-height:1.7}
+  .hero-pills{gap:8px}
+  .hero-pill{padding:8px 12px;font-size:11px}
   .input-meta{
     flex-direction:column;
     align-items:flex-start;
   }
   .composer-row{gap:10px}
   .message-user .message-bubble{font-size:14px}
-  .answer-bubble{padding:20px 18px 18px}
+  .answer-bubble{padding:18px 16px 16px;border-radius:24px}
+  .answer-bubble p{font-size:14px;line-height:1.8}
+  .sources-strip{gap:8px}
+  .source-card,
+  .source-card-static{flex-basis:220px;min-height:110px;padding:14px;border-radius:18px}
   .modal-header h3{font-size:28px}
   .info-grid{grid-template-columns:1fr}
 }
 @media(max-width:520px){
-  .hero-title{font-size:38px}
-  .dept-grid{grid-template-columns:1fr}
+  .hero-title{font-size:34px}
+  .hero-eyebrow{font-size:10px;margin-bottom:12px}
+  .hero-panel{padding:18px}
+  .hero-pills{display:none}
+  .starter-section{padding:16px}
+  .starter-card{padding:14px 14px 16px;font-size:13px}
   .source-card,
-  .source-card-static{flex-basis:236px}
+  .source-card-static{flex-basis:200px;min-height:100px;padding:12px}
+  .topbar{padding:14px 14px 8px}
+  .topbar-copy{gap:2px}
+  .topbar-title{font-size:10px}
+  .topbar-context{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
 }
 
 @keyframes fadeUp{
@@ -2006,6 +2046,18 @@ async function sendQuery() {
   let completed = false;
   let failed = false;
   const pdfUrlMap = {};
+  let _renderTimer = 0;
+
+  function scheduleRender() {
+    if (_renderTimer) return;
+    _renderTimer = requestAnimationFrame(() => {
+      _renderTimer = 0;
+      if (answerEl) {
+        answerEl.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
+      }
+      scrollToBottom();
+    });
+  }
 
   function getOrCreateAnswer() {
     if (!answerEl) {
@@ -2088,10 +2140,9 @@ async function sendQuery() {
             assistantMessage.insertBefore(strip, statusEl);
             scrollToBottom();
           } else if (event.type === 'token') {
-            const bubble = getOrCreateAnswer();
+            getOrCreateAnswer();
             rawText += event.content;
-            bubble.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
-            scrollToBottom();
+            scheduleRender();
           } else if (event.type === 'web_sources' && event.sources?.length) {
             const webSources = document.createElement('div');
             webSources.className = 'web-sources';
@@ -2113,6 +2164,10 @@ async function sendQuery() {
       }
     }
 
+    if (_renderTimer) { cancelAnimationFrame(_renderTimer); _renderTimer = 0; }
+    if (answerEl && rawText) {
+      answerEl.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
+    }
     statusEl.remove();
     const disclaimer = document.createElement('div');
     disclaimer.className = 'disclaimer';
@@ -2167,8 +2222,11 @@ function appendMessage(role, text) {
   scrollToBottom();
 }
 
+let _scrollRAF = 0;
 function scrollToBottom() {
-  requestAnimationFrame(() => {
+  if (_scrollRAF) return;
+  _scrollRAF = requestAnimationFrame(() => {
+    _scrollRAF = 0;
     chatArea.scrollTop = chatArea.scrollHeight;
   });
 }
