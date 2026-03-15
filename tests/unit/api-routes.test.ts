@@ -25,6 +25,16 @@ vi.mock('../../src/generator/index.js', () => ({
   streamAnswer: (...args: unknown[]) => mockStreamAnswer(...args),
 }));
 
+const mockLiveWebSearch = vi.fn();
+vi.mock('../../src/retrieval/web-search.js', () => ({
+  liveWebSearch: (...args: unknown[]) => mockLiveWebSearch(...args),
+}));
+
+const mockContextualizeFollowUpQuery = vi.fn();
+vi.mock('../../src/retrieval/follow-up-context.js', () => ({
+  contextualizeFollowUpQuery: (...args: unknown[]) => mockContextualizeFollowUpQuery(...args),
+}));
+
 // Mock the hybrid search
 const mockHybridSearch = vi.fn();
 vi.mock('../../src/retrieval/hybrid-search.js', () => ({
@@ -140,6 +150,11 @@ describe('API Routes', () => {
   beforeEach(() => {
     app = createApp();
     vi.clearAllMocks();
+    mockContextualizeFollowUpQuery.mockImplementation(async (query: string) => query);
+    mockLiveWebSearch.mockResolvedValue({
+      webResults: [],
+      supplementaryContext: '',
+    });
   });
 
   afterEach(() => {
@@ -224,6 +239,32 @@ describe('API Routes', () => {
         expect.any(String),
         expect.objectContaining({
           filter: { department: 'BD', documentType: 'code_of_practice' },
+        })
+      );
+    });
+
+    it('passes history to queryPipeline for follow-up questions', async () => {
+      mockQueryPipeline.mockResolvedValueOnce(makePipelineResult());
+
+      await request(app)
+        .post('/api/query')
+        .send({
+          query: 'What about residential buildings?',
+          history: [
+            { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+            { role: 'assistant', content: 'They depend on occupancy type.' },
+          ],
+        })
+        .expect(200);
+
+      expect(mockQueryPipeline).toHaveBeenCalledWith(
+        mockPool,
+        'What about residential buildings?',
+        expect.objectContaining({
+          history: [
+            { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+            { role: 'assistant', content: 'They depend on occupancy type.' },
+          ],
         })
       );
     });
@@ -405,6 +446,53 @@ describe('API Routes', () => {
       expect(sourcesEvent.sources[0]).toHaveProperty('document_name');
       expect(sourcesEvent.sources[0]).toHaveProperty('department');
       expect(sourcesEvent.sources[0]).toHaveProperty('section');
+    });
+
+    it('resolves follow-up history before streaming answer generation', async () => {
+      const searchResults = [makeSearchResult()];
+      mockContextualizeFollowUpQuery.mockResolvedValueOnce(
+        'What are the fire resistance requirements for stair enclosures in residential buildings?'
+      );
+      mockHybridSearch.mockResolvedValueOnce(searchResults);
+      mockRerank.mockResolvedValueOnce(searchResults);
+      mockLiveWebSearch.mockResolvedValueOnce({
+        webResults: [{ title: 'Official source', url: 'https://example.com', source: 'bd.gov.hk' }],
+        supplementaryContext: '[Live Web Sources]\n- Official source (bd.gov.hk)',
+      });
+
+      async function* fakeStream() {
+        yield 'Answer.';
+      }
+      mockStreamAnswer.mockReturnValueOnce(fakeStream());
+
+      await request(app)
+        .post('/api/query/stream')
+        .send({
+          query: 'What about residential buildings?',
+          history: [
+            { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+            { role: 'assistant', content: 'They depend on occupancy type.' },
+          ],
+        })
+        .expect(200);
+
+      expect(mockContextualizeFollowUpQuery).toHaveBeenCalledWith(
+        'What about residential buildings?',
+        [
+          { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+          { role: 'assistant', content: 'They depend on occupancy type.' },
+        ]
+      );
+      expect(mockHybridSearch).toHaveBeenCalledWith(
+        mockPool,
+        'What are the fire resistance requirements for stair enclosures in residential buildings?',
+        { filter: undefined, topK: 12 }
+      );
+      expect(mockStreamAnswer).toHaveBeenCalledWith(
+        'What are the fire resistance requirements for stair enclosures in residential buildings?',
+        searchResults,
+        { supplementaryContext: '[Live Web Sources]\n- Official source (bd.gov.hk)' }
+      );
     });
 
     it('returns 400 for invalid query on stream endpoint', async () => {

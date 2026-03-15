@@ -17,6 +17,7 @@ import {
 } from './live-data.js';
 import { liveWebSearch } from '../retrieval/web-search.js';
 import { getAggregateStats } from '../observability/cost-tracker.js';
+import { contextualizeFollowUpQuery } from '../retrieval/follow-up-context.js';
 import {
   fetchGovDataSummary,
   fetchFireDoorsets,
@@ -47,6 +48,7 @@ router.post('/query', async (req: Request, res: Response) => {
     const pool = getPool();
     const result = await queryPipeline(pool, validation.data.query, {
       filter: validation.data.filter,
+      history: validation.data.history,
     });
 
     res.json({
@@ -89,6 +91,7 @@ router.post('/query/stream', async (req: Request, res: Response) => {
     res.status(400).json({ error: validation.error });
     return;
   }
+  const queryData = validation.data;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -96,16 +99,25 @@ router.post('/query/stream', async (req: Request, res: Response) => {
 
   try {
     const pool = getPool();
+    const resolvedQuery = await contextualizeFollowUpQuery(
+      queryData.query,
+      queryData.history ?? []
+    ).catch(() => queryData.query);
+
+    const liveSearchPromise = liveWebSearch(resolvedQuery).catch(() => ({
+      webResults: [],
+      supplementaryContext: '',
+    }));
 
     // Retrieve context (skip query expansion for faster TTFB)
-    res.write(`data: ${JSON.stringify({ type: 'status', message: 'Retrieving relevant regulations...' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'status', message: 'Resolving follow-up context and retrieving relevant regulations...' })}\n\n`);
 
-    const context = await hybridSearch(pool, validation.data.query, {
-      filter: validation.data.filter,
+    const context = await hybridSearch(pool, resolvedQuery, {
+      filter: queryData.filter,
       topK: 12,
     });
 
-    const reranked = await rerank(validation.data.query, context, { topK: 6 });
+    const reranked = await rerank(resolvedQuery, context, { topK: 6 });
 
     // Look up PDF URLs for source documents
     const docNames = [...new Set(reranked.map((s) => s.document_name))];
@@ -124,21 +136,23 @@ router.post('/query/stream', async (req: Request, res: Response) => {
     }
 
     res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy, pdf_url: urlMap.get(s.document_name) || null })) })}\n\n`);
-
-    // Run live web search in parallel with answer generation
-    const webSearchPromise = liveWebSearch(validation.data.query).catch(() => ({ webResults: [], supplementaryContext: '' }));
+    const liveSearch = await liveSearchPromise;
+    if (queryData.history?.length) {
+      res.write(`data: ${JSON.stringify({ type: 'status', message: `Using ${Math.min(queryData.history.length, 12)} prior turns to resolve this follow-up...` })}\n\n`);
+    }
 
     // Stream answer
     res.write(`data: ${JSON.stringify({ type: 'status', message: 'Generating answer...' })}\n\n`);
 
-    for await (const chunk of streamAnswer(validation.data.query, reranked)) {
+    for await (const chunk of streamAnswer(resolvedQuery, reranked, {
+      supplementaryContext: liveSearch.supplementaryContext,
+    })) {
       res.write(`data: ${JSON.stringify({ type: 'token', content: chunk })}\n\n`);
     }
 
     // Send web sources after answer completes
-    const webSearch = await webSearchPromise;
-    if (webSearch.webResults.length > 0) {
-      res.write(`data: ${JSON.stringify({ type: 'web_sources', sources: webSearch.webResults })}\n\n`);
+    if (liveSearch.webResults.length > 0) {
+      res.write(`data: ${JSON.stringify({ type: 'web_sources', sources: liveSearch.webResults })}\n\n`);
     }
 
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);

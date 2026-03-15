@@ -103,6 +103,22 @@ describe('Guardrails', () => {
       });
       expect(result.valid).toBe(true);
     });
+
+    it('accepts sanitized conversation history for follow-up questions', () => {
+      const result = validateQueryInput({
+        query: 'What about residential buildings?',
+        history: [
+          { role: 'user', content: 'Tell me about stair enclosures.\x00' },
+          { role: 'assistant', content: 'The requirements vary by use.\x01' },
+        ],
+      });
+
+      expect(result.valid).toBe(true);
+      expect(result.data?.history).toEqual([
+        { role: 'user', content: 'Tell me about stair enclosures.' },
+        { role: 'assistant', content: 'The requirements vary by use.' },
+      ]);
+    });
   });
 
   describe('detectInjection', () => {

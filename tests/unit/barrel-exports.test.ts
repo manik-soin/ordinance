@@ -9,6 +9,7 @@ describe('Barrel exports', () => {
       expect(mod.vectorSearch).toBeTypeOf('function');
       expect(mod.keywordSearch).toBeTypeOf('function');
       expect(mod.rrfFuse).toBeTypeOf('function');
+      expect(mod.contextualizeFollowUpQuery).toBeTypeOf('function');
       expect(mod.expandQuery).toBeTypeOf('function');
       expect(mod.rerank).toBeTypeOf('function');
     });

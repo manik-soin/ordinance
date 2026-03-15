@@ -19,6 +19,10 @@ vi.mock('../../src/retrieval/web-search.js', () => ({
   liveWebSearch: vi.fn(),
 }));
 
+vi.mock('../../src/retrieval/follow-up-context.js', () => ({
+  contextualizeFollowUpQuery: vi.fn(),
+}));
+
 vi.mock('../../src/generator/index.js', () => ({
   generateAnswer: vi.fn(),
 }));
@@ -71,6 +75,7 @@ import { expandQuery } from '../../src/retrieval/query-expansion.js';
 import { hybridSearch, rrfFuse } from '../../src/retrieval/hybrid-search.js';
 import { rerank } from '../../src/retrieval/reranker.js';
 import { liveWebSearch } from '../../src/retrieval/web-search.js';
+import { contextualizeFollowUpQuery } from '../../src/retrieval/follow-up-context.js';
 import { generateAnswer } from '../../src/generator/index.js';
 import { verifyCitations, appendDisclaimer } from '../../src/safety/citation-verifier.js';
 import { scoreFaithfulness } from '../../src/safety/faithfulness.js';
@@ -162,6 +167,7 @@ describe('queryPipeline', () => {
       'fire resistance requirements',
       'minimum fire rating',
     ]);
+    vi.mocked(contextualizeFollowUpQuery).mockImplementation(async (query: string) => query);
     vi.mocked(hybridSearch).mockResolvedValue(mockResults);
     vi.mocked(rrfFuse).mockReturnValue(mockResults);
     vi.mocked(rerank).mockResolvedValue(mockResults);
@@ -178,6 +184,11 @@ describe('queryPipeline', () => {
 
   it('calls all pipeline stages in order and returns correct result', async () => {
     const result = await queryPipeline(mockPool, 'What is the fire resistance requirement?');
+
+    expect(contextualizeFollowUpQuery).toHaveBeenCalledWith(
+      'What is the fire resistance requirement?',
+      []
+    );
 
     // 1. Query expansion called
     expect(expandQuery).toHaveBeenCalledWith('What is the fire resistance requirement?');
@@ -304,6 +315,43 @@ describe('queryPipeline', () => {
       filter: { department: 'BD', documentType: 'code_of_practice' },
       topK: 6, // 3 * 2
     });
+  });
+
+  it('uses conversation history to resolve follow-up queries before retrieval', async () => {
+    vi.mocked(contextualizeFollowUpQuery).mockResolvedValue(
+      'What are the fire resistance requirements for stair enclosures in residential buildings?'
+    );
+
+    await queryPipeline(mockPool, 'What about residential buildings?', {
+      useQueryExpansion: false,
+      history: [
+        { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+        { role: 'assistant', content: 'They depend on the occupancy type.' },
+      ],
+    });
+
+    expect(contextualizeFollowUpQuery).toHaveBeenCalledWith(
+      'What about residential buildings?',
+      [
+        { role: 'user', content: 'What are the fire resistance requirements for stair enclosures?' },
+        { role: 'assistant', content: 'They depend on the occupancy type.' },
+      ]
+    );
+    expect(hybridSearch).toHaveBeenCalledWith(
+      mockPool,
+      'What are the fire resistance requirements for stair enclosures in residential buildings?',
+      {
+        filter: undefined,
+        topK: 10,
+      }
+    );
+    expect(generateAnswer).toHaveBeenCalledWith(
+      'What are the fire resistance requirements for stair enclosures in residential buildings?',
+      mockResults,
+      {
+        supplementaryContext: '[Live Web Sources]\n- Official BD reference (bd.gov.hk): Live source',
+      }
+    );
   });
 });
 

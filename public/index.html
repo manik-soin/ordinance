@@ -1724,6 +1724,7 @@ const deptCards = Array.from(document.querySelectorAll('.dept-card'));
 const deptItems = Array.from(document.querySelectorAll('.dept-item'));
 
 let isStreaming = false;
+let conversationHistory = [];
 
 const DEPTS = {
   BD: { name: 'Buildings Department', color: '#295e90' },
@@ -1955,6 +1956,7 @@ function setLandingVisible(visible) {
 
 function clearChat() {
   chatInner.querySelectorAll('.message').forEach((message) => message.remove());
+  conversationHistory = [];
   setLandingVisible(true);
   queryInput.focus();
 }
@@ -1984,6 +1986,9 @@ async function sendQuery() {
 
   const dept = deptFilter.value;
   const body = { query };
+  if (conversationHistory.length) {
+    body.history = conversationHistory.slice(-8);
+  }
   if (dept) body.filter = { department: dept };
 
   const assistantMessage = document.createElement('div');
@@ -1998,6 +2003,8 @@ async function sendQuery() {
 
   let answerEl = null;
   let rawText = '';
+  let completed = false;
+  let failed = false;
   const pdfUrlMap = {};
 
   function getOrCreateAnswer() {
@@ -2097,7 +2104,10 @@ async function sendQuery() {
             assistantMessage.appendChild(webSources);
             scrollToBottom();
           } else if (event.type === 'error') {
+            failed = true;
             statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + escapeHtml(event.message || 'Request failed') + '</span>';
+          } else if (event.type === 'done') {
+            completed = true;
           }
         } catch {}
       }
@@ -2108,8 +2118,16 @@ async function sendQuery() {
     disclaimer.className = 'disclaimer';
     disclaimer.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>For reference only. Verify the cited clause and confirm with the relevant Hong Kong government authority where required.</span>';
     assistantMessage.appendChild(disclaimer);
+    if (completed && rawText && !failed) {
+      conversationHistory.push(
+        { role: 'user', content: query },
+        { role: 'assistant', content: rawText }
+      );
+      conversationHistory = conversationHistory.slice(-12);
+    }
     scrollToBottom();
   } catch (error) {
+    failed = true;
     const message = error instanceof Error ? error.message : 'Connection failed';
     statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + escapeHtml(message) + '</span>';
   } finally {

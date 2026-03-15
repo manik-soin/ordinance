@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ConversationTurn } from '../retrieval/follow-up-context.js';
 
 /**
  * Input validation schema for compliance queries.
@@ -8,6 +9,15 @@ export const queryInputSchema = z.object({
     .string()
     .min(5, 'Query must be at least 5 characters')
     .max(2000, 'Query must be at most 2000 characters'),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().min(1).max(4000),
+      })
+    )
+    .max(12)
+    .optional(),
   filter: z
     .object({
       department: z.enum(['BD', 'FSD', 'EPD', 'EMSD', 'HA']).optional(),
@@ -114,6 +124,10 @@ export function validateQueryInput(raw: unknown): {
     data: {
       ...parsed.data,
       query: sanitizeInput(parsed.data.query),
+      history: parsed.data.history?.map((turn) => ({
+        role: turn.role,
+        content: sanitizeInput(turn.content),
+      })) as ConversationTurn[] | undefined,
     },
   };
 }

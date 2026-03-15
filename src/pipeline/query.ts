@@ -10,10 +10,12 @@ import { rrfFuse } from '../retrieval/hybrid-search.js';
 import { liveWebSearch } from '../retrieval/web-search.js';
 import { checkCache, writeCache } from '../cache/semantic-cache.js';
 import { estimateQueryCost } from '../observability/cost-tracker.js';
+import { contextualizeFollowUpQuery } from '../retrieval/follow-up-context.js';
 import type { SearchFilter, SearchResult } from '../retrieval/hybrid-search.js';
 import type { Citation } from '../generator/index.js';
 import type { VerificationResult } from '../safety/citation-verifier.js';
 import type { FaithfulnessResult } from '../safety/faithfulness.js';
+import type { ConversationTurn } from '../retrieval/follow-up-context.js';
 
 export interface QueryPipelineResult {
   answer: string;
@@ -31,6 +33,7 @@ export interface QueryPipelineResult {
 
 export interface QueryPipelineOptions {
   filter?: SearchFilter;
+  history?: ConversationTurn[];
   useQueryExpansion?: boolean;
   useReranker?: boolean;
   skipFaithfulness?: boolean;
@@ -50,10 +53,19 @@ export async function queryPipeline(
   const useExpansion = options?.useQueryExpansion ?? true;
   const useReranker = options?.useReranker ?? true;
   const topK = options?.topK ?? 5;
+  const resolvedQuery = await contextualizeFollowUpQuery(
+    query,
+    options?.history ?? []
+  ).catch(() => query);
 
   // 0. Check semantic cache first (500x speedup on cache hit)
-  const cached = await checkCache(pool, query, options?.filter).catch(() => null);
+  const cached = await checkCache(pool, resolvedQuery, options?.filter).catch(() => null);
   if (cached) {
+    const liveSearch = await liveWebSearch(resolvedQuery).catch(() => ({
+      webResults: [],
+      supplementaryContext: '',
+    }));
+
     return {
       answer: cached.answer,
       citations: (cached.citations ?? []) as Citation[],
@@ -64,6 +76,11 @@ export async function queryPipeline(
       latencyMs: Date.now() - start,
       model: 'cached',
       cached: true,
+      webSources: liveSearch.webResults.map((w) => ({
+        title: w.title,
+        url: w.url,
+        source: w.source,
+      })),
       cost: estimateQueryCost({ cached: true }),
     };
   }
@@ -71,14 +88,14 @@ export async function queryPipeline(
   // 1. Run query expansion + primary search + live web search in parallel
   //    The original query search starts immediately while expansion runs
   const [primaryResults, expandedQueries, webSearch] = await Promise.all([
-    hybridSearch(pool, query, { filter: options?.filter, topK: topK * 2 }),
-    useExpansion ? expandQuery(query) : Promise.resolve([query]),
-    liveWebSearch(query),
+    hybridSearch(pool, resolvedQuery, { filter: options?.filter, topK: topK * 2 }),
+    useExpansion ? expandQuery(resolvedQuery) : Promise.resolve([resolvedQuery]),
+    liveWebSearch(resolvedQuery),
   ]);
 
   // 2. If expansion produced extra queries, search those and fuse with primary
   let allResults: SearchResult[];
-  const extraQueries = expandedQueries.filter((q) => q !== query);
+  const extraQueries = expandedQueries.filter((q) => q !== resolvedQuery);
   if (extraQueries.length > 0) {
     const extraResults = await Promise.all(
       extraQueries.map((q) =>
@@ -94,13 +111,13 @@ export async function queryPipeline(
   // 3. Rerank (optional)
   let reranked: SearchResult[];
   if (useReranker && allResults.length > 0) {
-    reranked = await rerank(query, allResults, { topK });
+    reranked = await rerank(resolvedQuery, allResults, { topK });
   } else {
     reranked = allResults.slice(0, topK);
   }
 
   // 4. Generate answer with citations
-  const generation = await generateAnswer(query, reranked, {
+  const generation = await generateAnswer(resolvedQuery, reranked, {
     supplementaryContext: webSearch.supplementaryContext,
   });
 
@@ -119,7 +136,7 @@ export async function queryPipeline(
   const [faithfulness, auditId] = await Promise.all([
     options?.skipFaithfulness
       ? Promise.resolve({ score: -1, reasoning: 'Skipped', flaggedClaims: [] } as FaithfulnessResult)
-      : scoreFaithfulness(query, generation.answer, reranked),
+      : scoreFaithfulness(resolvedQuery, generation.answer, reranked),
     logQueryAudit(pool, {
       query,
       filters: options?.filter as Record<string, unknown>,
@@ -134,7 +151,7 @@ export async function queryPipeline(
   ]);
 
   // 8. Write to semantic cache (non-blocking)
-  writeCache(pool, query, finalAnswer, generation.citations, reranked, options?.filter?.department).catch(() => {});
+  writeCache(pool, resolvedQuery, finalAnswer, generation.citations, reranked, options?.filter?.department).catch(() => {});
 
   // 9. Track cost
   const cost = estimateQueryCost({
