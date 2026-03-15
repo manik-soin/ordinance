@@ -375,6 +375,12 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 }
 .answer-bubble ul,.answer-bubble ol{margin:8px 0 8px 20px}
 .answer-bubble li{margin-bottom:4px}
+.answer-bubble .citation{
+  font-size:12px;color:var(--primary);background:var(--primary-subtle);
+  padding:1px 6px;border-radius:4px;font-family:var(--font-mono);
+  white-space:nowrap;
+}
+.answer-content{}
 .copy-btn{
   position:absolute;top:10px;right:10px;
   background:var(--border-light);border:1px solid var(--border);
@@ -926,9 +932,11 @@ document.addEventListener('keydown', function(e) {
 
 // ─── Chat management ───
 function clearChat() {
-  chatInner.innerHTML = '';
-  chatInner.appendChild(landingState);
-  landingState.style.display = 'flex';
+  // Remove all messages but keep landing state
+  const messages = chatInner.querySelectorAll('.message');
+  messages.forEach(m => m.remove());
+  // Show landing state (it's still in DOM)
+  if (landingState) landingState.style.display = 'flex';
   queryInput.focus();
 }
 
@@ -1024,7 +1032,11 @@ async function sendQuery() {
             if (!answerEl) {
               answerEl = document.createElement('div');
               answerEl.className = 'answer-bubble';
-              answerEl.innerHTML = '<button class="copy-btn" onclick="copyAnswer(this)">Copy</button>';
+              const btn = document.createElement('button');
+              btn.className = 'copy-btn';
+              btn.textContent = 'Copy';
+              btn.onclick = function() { copyAnswer(btn); };
+              answerEl.appendChild(btn);
               msgEl.appendChild(answerEl);
             }
             return answerEl;
@@ -1033,9 +1045,13 @@ async function sendQuery() {
       }
     }
 
-    // After stream completes, fetch full response for quality metrics
+    // Stream complete — show disclaimer (no redundant API call)
     statusEl.remove();
-    fetchQualityMetrics(query, body.filter, answerText, msgEl);
+    const disc = document.createElement('div');
+    disc.className = 'disclaimer';
+    disc.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>This is for reference only — not legal advice. Always verify with the relevant HK government department and consult qualified professionals.</span>';
+    msgEl.appendChild(disc);
+    scrollToBottom();
 
   } catch (err) {
     statusEl.innerHTML = `<span style="color:var(--danger)">Error: ${err.message}</span>`;
@@ -1071,16 +1087,21 @@ function handleStreamEvent(event, msgEl, statusEl, getAnswerEl, appendText) {
       scrollToBottom();
       break;
 
-    case 'token':
-      const el = getAnswerEl();
+    case 'token': {
+      const ansEl = getAnswerEl();
       appendText(event.content);
-      el._rawText = (el._rawText || '') + event.content;
-      // Keep copy button, update content
-      const copyBtn = el.querySelector('.copy-btn');
-      el.innerHTML = formatMarkdown(el._rawText);
-      if (copyBtn) el.prepend(copyBtn);
+      ansEl._rawText = (ansEl._rawText || '') + event.content;
+      // Update content area only (preserve copy button)
+      let contentDiv = ansEl.querySelector('.answer-content');
+      if (!contentDiv) {
+        contentDiv = document.createElement('div');
+        contentDiv.className = 'answer-content';
+        ansEl.appendChild(contentDiv);
+      }
+      contentDiv.innerHTML = formatMarkdown(ansEl._rawText);
       scrollToBottom();
       break;
+    }
 
     case 'done':
       break;
@@ -1089,66 +1110,6 @@ function handleStreamEvent(event, msgEl, statusEl, getAnswerEl, appendText) {
       statusEl.innerHTML = `<span style="color:var(--danger)">Error: ${event.message}</span>`;
       break;
   }
-}
-
-async function fetchQualityMetrics(query, filter, answerText, msgEl) {
-  try {
-    const body = { query };
-    if (filter) body.filter = filter;
-    const res = await fetch('/api/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-
-    // Quality bar
-    const qualBar = document.createElement('div');
-    qualBar.className = 'quality-bar';
-
-    const faith = data.quality?.faithfulness ?? -1;
-    const citAcc = data.quality?.citationAccuracy ?? -1;
-    const phantom = data.quality?.phantomCitations ?? 0;
-    const uncited = data.quality?.uncitedClaims ?? 0;
-
-    if (faith >= 0) {
-      const cls = faith >= 7 ? 'good' : faith >= 4 ? 'warn' : 'bad';
-      qualBar.innerHTML += `<span class="quality-badge ${cls}">
-        <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-        Faithfulness ${faith.toFixed(1)}/10
-      </span>`;
-    }
-    if (citAcc >= 0) {
-      const cls = citAcc >= 0.95 ? 'good' : citAcc >= 0.7 ? 'warn' : 'bad';
-      qualBar.innerHTML += `<span class="quality-badge ${cls}">
-        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
-        Citations ${Math.round(citAcc * 100)}%
-      </span>`;
-    }
-    if (phantom > 0) {
-      qualBar.innerHTML += `<span class="quality-badge bad">
-        <svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        ${phantom} phantom
-      </span>`;
-    }
-    if (data.latency_ms) {
-      qualBar.innerHTML += `<span class="quality-meta">${(data.latency_ms / 1000).toFixed(1)}s latency</span>`;
-    }
-
-    if (qualBar.innerHTML) msgEl.appendChild(qualBar);
-
-    // Disclaimer
-    const disc = document.createElement('div');
-    disc.className = 'disclaimer';
-    disc.innerHTML = `
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <span>This information is for reference only and does not constitute legal or professional advice. Regulations may have been amended since last ingestion. Always verify with the relevant HK government department and consult qualified Authorized Persons (APs), Registered Structural Engineers (RSEs), or legal professionals.</span>
-    `;
-    msgEl.appendChild(disc);
-
-  } catch {}
-  scrollToBottom();
 }
 
 // ─── Helpers ───
@@ -1173,22 +1134,45 @@ function escapeHtml(str) {
 }
 
 function formatMarkdown(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\[(.*?)\]/g, '<code>[$1]</code>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
-    .replace(/^/, '<p>').replace(/$/, '</p>')
-    .replace(/<p><\/p>/g, '');
+  // Escape HTML first
+  let html = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Citations in brackets — style them distinctly
+  html = html.replace(/\[([^\]]{5,})\]/g, '<span class="citation">[$1]</span>');
+  // Numbered lists
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
+  // Bullet lists
+  html = html.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
+  // Wrap consecutive <li> in <ul>/<ol>
+  html = html.replace(/((?:<li[^>]*>.*?<\/li>\n?)+)/g, '<ul>$1</ul>');
+  // Paragraphs
+  html = html.replace(/\n\n+/g, '</p><p>');
+  html = html.replace(/\n/g, '<br>');
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p><\/p>/g, '');
+  return html;
 }
 
 function copyAnswer(btn) {
   const bubble = btn.closest('.answer-bubble');
-  const text = bubble._rawText || bubble.textContent;
+  const text = bubble._rawText || bubble.querySelector('.answer-content')?.textContent || bubble.textContent;
   navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
   });
