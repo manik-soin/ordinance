@@ -51,9 +51,9 @@ describe('storeChunks', () => {
   });
 
   it('inserts each chunk and returns generated IDs', async () => {
+    // Batched insert returns all IDs in one query
     pool.query
-      .mockResolvedValueOnce({ rows: [{ id: 'uuid-1' }], rowCount: 1 })
-      .mockResolvedValueOnce({ rows: [{ id: 'uuid-2' }], rowCount: 1 });
+      .mockResolvedValueOnce({ rows: [{ id: 'uuid-1' }, { id: 'uuid-2' }], rowCount: 2 });
 
     const chunks = [
       makeEmbeddedChunk(),
@@ -63,7 +63,7 @@ describe('storeChunks', () => {
     const ids = await storeChunks(pool as unknown as pg.Pool, chunks);
 
     expect(ids).toEqual(['uuid-1', 'uuid-2']);
-    expect(pool.query).toHaveBeenCalledTimes(2);
+    expect(pool.query).toHaveBeenCalledTimes(1); // Batched into single INSERT
   });
 
   it('passes correct SQL and parameters for a chunk', async () => {

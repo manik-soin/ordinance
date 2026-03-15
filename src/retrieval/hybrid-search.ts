@@ -1,6 +1,27 @@
 import type pg from 'pg';
 import { embedQuery } from '../embedder/index.js';
 
+// ─── Embedding cache (avoids redundant OpenAI API calls) ─────────────────────
+const embeddingCache = new Map<string, { embedding: number[]; expiresAt: number }>();
+const EMBEDDING_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getCachedEmbedding(query: string): Promise<number[]> {
+  const cached = embeddingCache.get(query);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.embedding;
+  }
+  const embedding = await embedQuery(query);
+  embeddingCache.set(query, { embedding, expiresAt: Date.now() + EMBEDDING_CACHE_TTL });
+  // Evict old entries
+  if (embeddingCache.size > 200) {
+    const now = Date.now();
+    for (const [key, val] of embeddingCache) {
+      if (val.expiresAt < now) embeddingCache.delete(key);
+    }
+  }
+  return embedding;
+}
+
 export interface SearchFilter {
   department?: string;
   documentType?: string;
@@ -61,7 +82,7 @@ export async function vectorSearch(
   filter: SearchFilter,
   precomputedEmbedding?: number[]
 ): Promise<SearchResult[]> {
-  const embedding = precomputedEmbedding ?? await embedQuery(query);
+  const embedding = precomputedEmbedding ?? await getCachedEmbedding(query);
   const { whereClause, params } = buildWhereClause(filter, 2);
 
   const embeddingStr = `[${embedding.join(',')}]`;

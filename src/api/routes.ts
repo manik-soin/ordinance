@@ -92,15 +92,15 @@ router.post('/query/stream', async (req: Request, res: Response) => {
   try {
     const pool = getPool();
 
-    // Retrieve context first
+    // Retrieve context (skip query expansion for faster TTFB)
     res.write(`data: ${JSON.stringify({ type: 'status', message: 'Retrieving relevant regulations...' })}\n\n`);
 
     const context = await hybridSearch(pool, validation.data.query, {
       filter: validation.data.filter,
-      topK: 10,
+      topK: 12,
     });
 
-    const reranked = await rerank(validation.data.query, context, { topK: 5 });
+    const reranked = await rerank(validation.data.query, context, { topK: 6 });
 
     res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy })) })}\n\n`);
 

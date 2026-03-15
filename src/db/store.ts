@@ -3,23 +3,27 @@ import type { EmbeddedChunk } from '../embedder/index.js';
 
 /**
  * Store embedded chunks in the regulation_chunks table.
+ * Uses batched inserts for performance (10 at a time).
  */
 export async function storeChunks(
   pool: pg.Pool,
   chunks: EmbeddedChunk[]
 ): Promise<string[]> {
   const ids: string[] = [];
+  const BATCH_SIZE = 10;
 
-  for (const chunk of chunks) {
-    const embeddingStr = `[${chunk.embedding.join(',')}]`;
-    const { rows } = await pool.query(
-      `INSERT INTO regulation_chunks (
-        content, embedding, source_department, document_type, document_name,
-        version, effective_date, section_hierarchy, page_number,
-        is_current, cross_references, content_hash, ingested_at
-      ) VALUES ($1, $2::vector, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-      RETURNING id`,
-      [
+  for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+    const batch = chunks.slice(i, i + BATCH_SIZE);
+    const values: string[] = [];
+    const params: unknown[] = [];
+    let paramIdx = 1;
+
+    for (const chunk of batch) {
+      const embeddingStr = `[${chunk.embedding.join(',')}]`;
+      values.push(
+        `($${paramIdx}, $${paramIdx + 1}::vector, $${paramIdx + 2}, $${paramIdx + 3}, $${paramIdx + 4}, $${paramIdx + 5}, $${paramIdx + 6}, $${paramIdx + 7}, $${paramIdx + 8}, $${paramIdx + 9}, $${paramIdx + 10}, $${paramIdx + 11}, $${paramIdx + 12})`
+      );
+      params.push(
         chunk.content,
         embeddingStr,
         chunk.metadata.source_department,
@@ -33,9 +37,20 @@ export async function storeChunks(
         chunk.metadata.cross_references,
         chunk.metadata.content_hash,
         chunk.metadata.ingested_at,
-      ]
+      );
+      paramIdx += 13;
+    }
+
+    const { rows } = await pool.query(
+      `INSERT INTO regulation_chunks (
+        content, embedding, source_department, document_type, document_name,
+        version, effective_date, section_hierarchy, page_number,
+        is_current, cross_references, content_hash, ingested_at
+      ) VALUES ${values.join(', ')}
+      RETURNING id`,
+      params
     );
-    ids.push(rows[0].id as string);
+    ids.push(...rows.map((r: Record<string, unknown>) => r.id as string));
   }
 
   return ids;

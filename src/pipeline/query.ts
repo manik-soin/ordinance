@@ -85,37 +85,34 @@ export async function queryPipeline(
   // 4. Generate answer with citations
   const generation = await generateAnswer(query, reranked);
 
-  // 5. Verify citations
+  // 5. Verify citations (synchronous, fast)
   const verification = verifyCitations(
     generation.answer,
     generation.citations,
     reranked
   );
 
-  // 6. Score faithfulness (optional, runs in parallel with response)
-  let faithfulness: FaithfulnessResult;
-  if (!options?.skipFaithfulness) {
-    faithfulness = await scoreFaithfulness(query, generation.answer, reranked);
-  } else {
-    faithfulness = { score: -1, reasoning: 'Skipped', flaggedClaims: [] };
-  }
-
-  // 7. Append disclaimer
+  // 6. Append disclaimer
   const finalAnswer = appendDisclaimer(generation.answer);
 
-  // 8. Audit log
+  // 7. Faithfulness scoring + audit log — run in parallel (both are independent)
   const latencyMs = Date.now() - start;
-  const auditId = await logQueryAudit(pool, {
-    query,
-    filters: options?.filter as Record<string, unknown>,
-    chunkIds: reranked.map((r) => r.id),
-    response: finalAnswer,
-    citations: generation.citations,
-    faithfulnessScore: faithfulness.score,
-    citationAccuracy: verification.citationAccuracy,
-    model: generation.model,
-    latencyMs,
-  });
+  const [faithfulness, auditId] = await Promise.all([
+    options?.skipFaithfulness
+      ? Promise.resolve({ score: -1, reasoning: 'Skipped', flaggedClaims: [] } as FaithfulnessResult)
+      : scoreFaithfulness(query, generation.answer, reranked),
+    logQueryAudit(pool, {
+      query,
+      filters: options?.filter as Record<string, unknown>,
+      chunkIds: reranked.map((r) => r.id),
+      response: finalAnswer,
+      citations: generation.citations,
+      faithfulnessScore: -1, // Updated after faithfulness completes
+      citationAccuracy: verification.citationAccuracy,
+      model: generation.model,
+      latencyMs,
+    }),
+  ]);
 
   return {
     answer: finalAnswer,

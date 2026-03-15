@@ -7,6 +7,20 @@ const BD_DATA_BASE = 'https://static.data.gov.hk/bd/opendata';
 const GEODATA_BASE = 'https://geodata.gov.hk/gs/api/v1.0.0';
 const REQUEST_TIMEOUT = 10000;
 
+// ─── TTL Cache for gov data (avoids hammering data.gov.hk) ──────────────────
+const dataCache = new Map<string, { data: unknown; expiresAt: number }>();
+const DATA_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function getCached<T>(key: string): T | null {
+  const cached = dataCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return cached.data as T;
+  return null;
+}
+
+function setCache(key: string, data: unknown): void {
+  dataCache.set(key, { data, expiresAt: Date.now() + DATA_CACHE_TTL });
+}
+
 // ─── BD Central Data Bank: Approved Building Components ──────────────────────
 
 export interface FireDoorset {
@@ -103,9 +117,12 @@ function parseCsvLine(line: string): string[] {
 }
 
 /**
- * Fetch a CSV dataset from data.gov.hk.
+ * Fetch a CSV dataset from data.gov.hk (with TTL cache).
  */
 async function fetchBDCsv(path: string): Promise<Record<string, string>[]> {
+  const cached = getCached<Record<string, string>[]>(path);
+  if (cached) return cached;
+
   const url = `${BD_DATA_BASE}/${path}`;
   const response = await fetch(url, {
     headers: { 'User-Agent': 'HK-Compliance-RAG/1.0' },
@@ -113,7 +130,9 @@ async function fetchBDCsv(path: string): Promise<Record<string, string>[]> {
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}: ${url}`);
   const text = await response.text();
-  return parseCsv(text);
+  const result = parseCsv(text);
+  setCache(path, result);
+  return result;
 }
 
 /**
