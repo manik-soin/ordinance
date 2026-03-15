@@ -479,11 +479,9 @@ button,input,select,textarea{font:inherit}
 .chat-area{
   flex:1;
   overflow-y:auto;
-  padding:0 28px 140px;
-  contain:content;
+  padding:0 28px 160px;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
-  scroll-padding-bottom:180px;
 }
 .chat-area::-webkit-scrollbar{width:7px}
 .chat-area::-webkit-scrollbar-track{background:transparent}
@@ -2302,7 +2300,13 @@ function scrollToBottom() {
   if (_scrollRAF) return;
   _scrollRAF = requestAnimationFrame(() => {
     _scrollRAF = 0;
-    chatArea.scrollTop = chatArea.scrollHeight;
+    // Use scrollTo with smooth behavior for better mobile support
+    chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'auto' });
+    // Fallback: also try scrolling the last message into view
+    const lastMsg = chatInner.lastElementChild;
+    if (lastMsg && lastMsg.scrollIntoView) {
+      lastMsg.scrollIntoView({ block: 'end', behavior: 'auto' });
+    }
   });
 }
 
