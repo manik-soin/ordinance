@@ -1532,6 +1532,12 @@ button,input,select,textarea{font:inherit}
   .answer-bubble p{font-size:13px;line-height:1.7}
   .mobile-filter-chip{padding:7px 10px;font-size:11px}
 }
+.keyboard-open .input-bar{
+  padding-bottom:4px;
+}
+.keyboard-open .chat-area{
+  padding-bottom:100px;
+}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{
     animation-duration:0.01ms !important;
@@ -1842,8 +1848,12 @@ const DEPTS = {
 };
 
 function syncViewportHeight() {
-  const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  const vv = window.visualViewport;
+  const viewportHeight = vv ? vv.height : window.innerHeight;
   document.documentElement.style.setProperty('--viewport-height', viewportHeight + 'px');
+  // Detect keyboard open: visual viewport significantly smaller than window
+  const keyboardOpen = vv && (window.innerHeight - vv.height) > 100;
+  document.documentElement.classList.toggle('keyboard-open', !!keyboardOpen);
 }
 
 syncViewportHeight();
