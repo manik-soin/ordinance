@@ -3,826 +3,1705 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HK Compliance RAG — Regulatory Intelligence</title>
+<title>HK Compliance - Regulatory Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --primary:#1a56db;--primary-light:#3b82f6;--primary-subtle:#dbeafe;--primary-dark:#1e40af;
-  --success:#059669;--success-light:#d1fae5;--success-subtle:#ecfdf5;
-  --warning:#d97706;--warning-light:#fef3c7;
-  --danger:#dc2626;--danger-light:#fee2e2;
-  --bg:#f8fafc;--bg-chat:#ffffff;--sidebar:#0b1120;--sidebar-hover:#151e33;
-  --text:#0f172a;--text-secondary:#475569;--text-muted:#94a3b8;
-  --border:#e2e8f0;--border-light:#f1f5f9;
-  --font-display:'DM Serif Display',Georgia,serif;
-  --font-body:'IBM Plex Sans',-apple-system,sans-serif;
+  --bg:#eeece3;
+  --bg-soft:#f7f5ef;
+  --surface:rgba(255,255,255,.74);
+  --surface-strong:#ffffff;
+  --surface-dark:#101211;
+  --surface-muted:rgba(255,255,255,.54);
+  --ink:#141614;
+  --ink-soft:#3f433d;
+  --ink-muted:#6d7269;
+  --line:rgba(20,22,20,.09);
+  --line-strong:rgba(20,22,20,.16);
+  --accent:#0f8a6a;
+  --accent-soft:rgba(15,138,106,.10);
+  --accent-strong:#0d5b46;
+  --success:#207659;
+  --warning:#9a6928;
+  --danger:#a03c33;
+  --shadow-sm:0 8px 24px rgba(16,18,17,.05);
+  --shadow-md:0 20px 48px rgba(16,18,17,.08);
+  --shadow-lg:0 28px 90px rgba(16,18,17,.10);
+  --radius-sm:16px;
+  --radius:22px;
+  --radius-lg:30px;
+  --radius-xl:40px;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-display:'Newsreader',Georgia,serif;
   --font-mono:'IBM Plex Mono','SF Mono',monospace;
-  --radius:8px;--radius-lg:12px;--radius-xl:16px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
-  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
-  --shadow-lg:0 10px 25px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
-  /* Department colors */
-  --bd:#1a56db;--fsd:#dc2626;--epd:#059669;--emsd:#d97706;--ha:#7c3aed;--leg:#64748b;
+  --bd:#295e90;
+  --fsd:#944236;
+  --epd:#2f7358;
+  --emsd:#8f6728;
+  --ha:#625286;
+  --leg:#5e696f;
 }
-html,body{height:100%;overflow:hidden}
-body{font-family:var(--font-body);color:var(--text);background:var(--bg);display:flex}
+html,body{height:100%}
+body{
+  min-height:100%;
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:linear-gradient(180deg,#f5f3ec 0%,#ece8de 100%);
+  display:flex;
+  overflow:hidden;
+  position:relative;
+}
+body::before{
+  content:'';
+  position:fixed;
+  top:-22rem;
+  right:-10rem;
+  width:52rem;
+  height:52rem;
+  border-radius:50%;
+  background:radial-gradient(circle at center,rgba(15,138,106,.18) 0%,rgba(15,138,106,.08) 34%,transparent 68%);
+  filter:blur(14px);
+  pointer-events:none;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.16) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.16) 1px,transparent 1px);
+  background-size:72px 72px;
+  opacity:.28;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.28),transparent 78%);
+  pointer-events:none;
+}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+[hidden]{display:none !important}
 
-/* ─── SIDEBAR ─── */
 .sidebar{
-  width:300px;min-width:300px;background:var(--sidebar);color:#e2e8f0;
-  display:flex;flex-direction:column;padding:0;overflow:hidden;
-  border-right:1px solid rgba(255,255,255,.06);
-  transition:transform .3s ease;z-index:100;
+  width:328px;
+  min-width:328px;
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  backdrop-filter:blur(18px);
+  border-right:1px solid var(--line);
+  box-shadow:var(--shadow-sm);
+  position:relative;
+  z-index:2;
 }
 .sidebar-header{
-  padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:24px;
+  border-bottom:1px solid var(--line);
 }
-.sidebar-brand{display:flex;align-items:center;gap:12px;margin-bottom:2px}
-.sidebar-brand svg{flex-shrink:0}
-.sidebar-brand h1{font-family:var(--font-display);font-size:19px;font-weight:400;color:#fff;letter-spacing:-.01em}
-.sidebar-subtitle{font-size:11px;color:#64748b;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;font-weight:500}
-.sidebar-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
-.sidebar-scroll::-webkit-scrollbar{width:4px}
-.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
-.sidebar-section{padding:16px 20px 8px}
+.sidebar-brand{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  text-decoration:none;
+}
+.brand-mark-shell{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+  background:rgba(255,255,255,.66);
+  border:1px solid rgba(20,22,20,.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ink);
+  box-shadow:0 12px 28px rgba(16,18,17,.06);
+  flex-shrink:0;
+}
+.brand-mark-shell svg{width:30px;height:30px}
+.brand-copy h1{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-.04em;
+  line-height:1;
+  margin-bottom:7px;
+}
+.sidebar-subtitle{
+  font-size:13px;
+  line-height:1.6;
+  color:var(--ink-soft);
+  max-width:20ch;
+}
+.new-chat-btn{
+  width:100%;
+  margin-top:20px;
+  border:none;
+  border-radius:18px;
+  background:var(--surface-dark);
+  color:#f4f5f0;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+  box-shadow:0 18px 34px rgba(16,18,17,.14);
+}
+.new-chat-btn:hover{
+  transform:translateY(-1px);
+  background:#171a18;
+  box-shadow:0 22px 42px rgba(16,18,17,.16);
+}
+.sidebar-scroll{
+  flex:1;
+  overflow-y:auto;
+  padding:20px 20px 12px;
+}
+.sidebar-scroll::-webkit-scrollbar{width:6px}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(20,22,20,.12);border-radius:999px}
+.sidebar-section{
+  padding:0 0 18px;
+}
+.sidebar-panel{
+  background:var(--surface-muted);
+  border:1px solid rgba(20,22,20,.07);
+  border-radius:24px;
+  padding:18px;
+}
 .sidebar-section-title{
-  font-size:10px;color:#475569;letter-spacing:.1em;
-  text-transform:uppercase;font-weight:600;margin-bottom:10px;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:14px;
+}
+.filter-shell{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.filter-label{
+  font-size:13px;
+  color:var(--ink-soft);
 }
 .filter-select{
-  width:100%;background:#151e33;border:1px solid rgba(255,255,255,.1);
-  border-radius:var(--radius);color:#e2e8f0;padding:9px 12px;font-size:13px;
-  font-family:var(--font-body);cursor:pointer;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b'%3E%3Cpath d='M6 8.825l-4.6-4.6L2.825 2.8 6 5.975 9.175 2.8l1.425 1.425z'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;
-  transition:border-color .2s;
+  width:100%;
+  appearance:none;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.76)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3.5 5.25L7 8.75L10.5 5.25' stroke='%236d7269' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+  color:var(--ink);
+  padding:14px 42px 14px 14px;
+  outline:none;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
 }
-.filter-select:hover{border-color:rgba(255,255,255,.2)}
-.filter-select:focus{outline:none;border-color:var(--primary-light)}
-.filter-select option{background:#151e33;color:#e2e8f0}
-
-/* Sidebar departments */
-.dept-list{display:flex;flex-direction:column;gap:6px}
+.filter-select:hover{border-color:var(--line-strong)}
+.filter-select:focus{
+  border-color:rgba(15,138,106,.38);
+  box-shadow:0 0 0 4px rgba(15,138,106,.08);
+}
+.filter-select option{color:var(--ink)}
+.dept-list{
+  display:grid;
+  gap:10px;
+}
 .dept-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 12px;border-radius:var(--radius);
-  cursor:pointer;transition:background .2s;font-size:12px;
+  width:100%;
+  border:1px solid transparent;
+  background:rgba(255,255,255,.58);
+  border-radius:18px;
+  padding:12px 13px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+  text-align:left;
+  color:inherit;
 }
-.dept-item:hover{background:rgba(255,255,255,.05)}
-.dept-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.dept-name{color:#cbd5e1;font-weight:500;flex:1}
-.dept-count{color:#475569;font-family:var(--font-mono);font-size:11px}
-
-/* Sources list */
-.source-item{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;font-size:12px;
-}
-.source-item-dept{color:#94a3b8;font-weight:500}
-.source-item-stats{color:#475569;font-family:var(--font-mono);font-size:11px}
-
-/* System status */
-.sidebar-status{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
-.status-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0}
-.status-label{color:#64748b}
-.status-value{color:#94a3b8;font-family:var(--font-mono);font-size:11px}
-.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;position:relative;top:-1px}
-.status-dot.healthy{background:var(--success);box-shadow:0 0 6px rgba(5,150,105,.4)}
-.status-dot.unhealthy{background:var(--danger);box-shadow:0 0 6px rgba(220,38,38,.4)}
-.status-dot.checking{background:var(--warning);animation:pulse 1.5s ease infinite}
-
-/* Sidebar new chat button */
-.new-chat-btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin:12px 20px;padding:10px;border-radius:var(--radius);
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  color:#cbd5e1;font-size:13px;font-weight:500;cursor:pointer;
-  transition:all .2s;font-family:var(--font-body);
-}
-.new-chat-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
-
-.sidebar-footer{
-  padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);
-  font-size:11px;color:#475569;display:flex;justify-content:space-between;align-items:center;
-}
-.sidebar-footer a{color:#64748b;text-decoration:none}
-.sidebar-footer a:hover{color:#94a3b8}
-
-/* ─── MAIN AREA ─── */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-
-/* Top bar */
-.topbar{
-  display:flex;align-items:center;padding:12px 24px;
-  border-bottom:1px solid var(--border);background:var(--bg-chat);
-  min-height:52px;gap:12px;
-}
-.topbar-menu{
-  display:none;background:none;border:none;color:var(--text);cursor:pointer;
-  padding:6px;border-radius:6px;
-}
-.topbar-menu:hover{background:var(--border-light)}
-.topbar-title{font-size:13px;color:var(--text-secondary);font-weight:500}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.topbar-badge{
-  font-size:11px;color:var(--text-muted);
-  font-family:var(--font-mono);background:var(--border-light);
-  padding:3px 10px;border-radius:20px;
-}
-.topbar-info-btn{
-  background:none;border:1px solid var(--border);border-radius:var(--radius);
-  color:var(--text-muted);cursor:pointer;padding:5px 10px;font-size:11px;
-  font-family:var(--font-body);font-weight:500;transition:all .2s;
-  display:flex;align-items:center;gap:5px;
-}
-.topbar-info-btn:hover{border-color:var(--primary-light);color:var(--primary)}
-
-/* ─── CHAT AREA ─── */
-.chat-area{flex:1;overflow-y:auto;padding:0;scroll-behavior:smooth}
-.chat-inner{max-width:860px;margin:0 auto;padding:24px 24px 100px}
-
-/* ─── LANDING / EMPTY STATE ─── */
-.landing{
-  display:flex;flex-direction:column;align-items:center;
-  padding:32px 20px;animation:fadeUp .6s ease;
-}
-
-/* Hero */
-.landing-hero{
-  text-align:center;max-width:640px;margin-bottom:36px;
-}
-.landing-icon{
-  width:72px;height:72px;border-radius:18px;
-  background:linear-gradient(135deg,#1a56db,#7c3aed);
-  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
-  box-shadow:0 8px 24px rgba(26,86,219,.25);
-}
-.landing-hero h2{
-  font-family:var(--font-display);font-size:30px;font-weight:400;
-  margin-bottom:10px;color:var(--text);line-height:1.2;
-}
-.landing-hero p{
-  color:var(--text-secondary);font-size:15px;line-height:1.7;max-width:500px;margin:0 auto;
-}
-
-/* Stats bar */
-.stats-bar{
-  display:flex;gap:1px;background:var(--border);border-radius:var(--radius-lg);
-  overflow:hidden;margin-bottom:36px;width:100%;max-width:640px;
+.dept-item:hover{
+  transform:translateY(-1px);
+  border-color:var(--line);
   box-shadow:var(--shadow-sm);
 }
+.dept-item.is-active{
+  background:rgba(255,255,255,.9);
+  border-color:var(--dept-color,var(--line-strong));
+  box-shadow:0 18px 34px rgba(16,18,17,.07);
+}
+.dept-dot{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  flex-shrink:0;
+  box-shadow:0 0 0 5px var(--dept-tint,rgba(20,22,20,.06));
+}
+.dept-name{
+  font-size:13px;
+  font-weight:600;
+  color:var(--ink);
+  flex:1;
+}
+.dept-count{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.source-list-empty,
+.source-list-error{
+  font-size:12px;
+  color:var(--ink-muted);
+  line-height:1.6;
+}
+.source-doc-group{padding-bottom:12px}
+.source-doc-group:last-child{padding-bottom:0}
+.source-doc-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.source-doc-dept{
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-soft);
+}
+.source-doc-count{
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.source-doc-link,
+.source-doc-name{
+  display:block;
+  padding:7px 0;
+  font-size:12px;
+  line-height:1.45;
+  color:var(--ink-soft);
+  text-decoration:none;
+  border-bottom:1px solid rgba(20,22,20,.05);
+}
+.source-doc-link:hover{color:var(--ink)}
+.source-doc-group > *:last-child{border-bottom:none}
+.source-doc-more{
+  margin-top:7px;
+  border:none;
+  background:none;
+  color:var(--accent-strong);
+  padding:0;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+.source-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(20,22,20,.05);
+}
+.source-item:last-child{border-bottom:none}
+.source-item-dept{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--ink-soft);
+}
+.source-item-stats{
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.sidebar-status{
+  padding:0 20px 20px;
+}
+.status-panel{
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(20,22,20,.07);
+  border-radius:24px;
+  padding:18px;
+}
+.status-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:6px 0;
+  font-size:12px;
+}
+.status-label{color:var(--ink-muted)}
+.status-value{
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-align:right;
+}
+.status-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  margin-right:8px;
+  vertical-align:middle;
+}
+.status-dot.healthy{background:var(--success);box-shadow:0 0 0 6px rgba(32,118,89,.10)}
+.status-dot.unhealthy{background:var(--danger);box-shadow:0 0 0 6px rgba(160,60,51,.10)}
+.status-dot.checking{background:var(--warning);animation:pulse 1.4s ease infinite}
+.sidebar-footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 24px 22px;
+  font-size:11px;
+  color:var(--ink-muted);
+}
+.signature-link{
+  color:var(--ink-muted);
+  text-decoration:none;
+  opacity:.72;
+  transition:opacity .18s ease,color .18s ease;
+  white-space:nowrap;
+}
+.signature-link:hover{
+  opacity:1;
+  color:var(--ink-soft);
+}
+
+.main{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:20px 28px 14px;
+}
+.topbar-menu{
+  display:none;
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.62);
+  color:var(--ink);
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+}
+.topbar-copy{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.topbar-title{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+}
+.topbar-context{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:-.02em;
+  color:var(--ink);
+}
+.topbar-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.topbar-badge{
+  border-radius:999px;
+  background:rgba(255,255,255,.58);
+  border:1px solid var(--line);
+  padding:10px 14px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--ink-soft);
+}
+.topbar-info-btn{
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.58);
+  color:var(--ink);
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.topbar-info-btn:hover{
+  transform:translateY(-1px);
+  border-color:var(--line-strong);
+  box-shadow:var(--shadow-sm);
+}
+
+.chat-area{
+  flex:1;
+  overflow-y:auto;
+  scroll-behavior:smooth;
+  padding:0 28px 140px;
+}
+.chat-area::-webkit-scrollbar{width:7px}
+.chat-area::-webkit-scrollbar-track{background:transparent}
+.chat-area::-webkit-scrollbar-thumb{background:rgba(20,22,20,.10);border-radius:999px}
+.chat-inner{
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.landing{
+  display:grid;
+  gap:20px;
+  padding-bottom:24px;
+  animation:fadeUp .45s ease;
+}
+.hero-panel,
+.dept-explorer,
+.how-section,
+.starter-section{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.64);
+  border-radius:32px;
+  box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(16px);
+}
+.hero-panel{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(280px,.95fr);
+  gap:20px;
+  padding:30px;
+}
+.hero-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin-bottom:18px;
+}
+.hero-title{
+  font-family:var(--font-display);
+  font-size:clamp(44px,6vw,68px);
+  line-height:.96;
+  letter-spacing:-.055em;
+  max-width:11ch;
+  margin-bottom:18px;
+}
+.hero-title span{
+  font-style:italic;
+  color:var(--accent-strong);
+}
+.hero-copy p{
+  max-width:58ch;
+  font-size:16px;
+  line-height:1.8;
+  color:var(--ink-soft);
+}
+.hero-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:24px;
+}
+.hero-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(20,22,20,.08);
+  font-size:12px;
+  color:var(--ink-soft);
+}
+.hero-pill strong{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--accent-strong);
+}
+.hero-preview{
+  display:flex;
+  align-items:stretch;
+}
+.preview-card{
+  width:100%;
+  border-radius:28px;
+  background:linear-gradient(180deg,#171917 0%,#101211 100%);
+  color:#eef1ec;
+  padding:22px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 26px 56px rgba(16,18,17,.18);
+}
+.preview-card::before{
+  content:'';
+  position:absolute;
+  inset:auto -40px -84px auto;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle at center,rgba(15,138,106,.42),transparent 66%);
+  opacity:.6;
+}
+.preview-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  position:relative;
+}
+.preview-mark{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f4f6f1;
+}
+.preview-mark svg{width:24px;height:24px}
+.preview-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:rgba(244,246,241,.54);
+}
+.preview-question{
+  margin-top:18px;
+  font-size:12px;
+  color:rgba(244,246,241,.62);
+  line-height:1.7;
+}
+.preview-answer{
+  margin:14px 0 18px;
+  font-size:15px;
+  line-height:1.8;
+  color:#f4f6f1;
+  max-width:36ch;
+}
+.preview-citations{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  position:relative;
+}
+.preview-citations span{
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:rgba(244,246,241,.74);
+}
+
+.metrics-row{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
 .stat-item{
-  flex:1;padding:16px 20px;background:var(--bg-chat);text-align:center;
+  padding:22px;
+  border-radius:28px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.6);
+  box-shadow:var(--shadow-sm);
 }
-.stat-number{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--primary)}
-.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:500}
+.stat-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:14px;
+}
+.stat-number{
+  font-size:38px;
+  line-height:1;
+  letter-spacing:-.05em;
+  font-weight:800;
+  color:var(--ink);
+}
+.stat-foot{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.65;
+  color:var(--ink-soft);
+}
 
-/* Department explorer */
-.dept-explorer{width:100%;max-width:860px;margin-bottom:36px}
-.dept-explorer-title{
-  font-size:11px;color:var(--text-muted);text-transform:uppercase;
-  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+.overview-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);
+  gap:20px;
 }
-.dept-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.dept-explorer,
+.how-section,
+.starter-section{
+  padding:24px;
+}
+.dept-explorer-title,
+.how-title,
+.starter-title{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:18px;
+}
+.dept-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
+}
+.dept-card,
+.starter-card{
+  position:relative;
+  border:1px solid rgba(20,22,20,.08);
+  background:rgba(255,255,255,.74);
+  cursor:pointer;
+  overflow:hidden;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
 .dept-card{
-  padding:16px 14px;border-radius:var(--radius-lg);
-  border:1px solid var(--border);background:var(--bg-chat);
-  text-align:center;cursor:pointer;transition:all .25s;
-  position:relative;overflow:hidden;
+  padding:18px 16px;
+  border-radius:24px;
+  text-align:left;
 }
-.dept-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  transition:height .25s;
+.dept-card::before,
+.starter-card::before{
+  content:'';
+  position:absolute;
+  inset:auto 16px 0 16px;
+  height:3px;
+  border-radius:999px;
+  background:var(--dept-color,var(--accent));
+  opacity:.75;
 }
-.dept-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.dept-card:hover::before{height:4px}
-.dept-card[data-dept="BD"]::before{background:var(--bd)}
-.dept-card[data-dept="FSD"]::before{background:var(--fsd)}
-.dept-card[data-dept="EPD"]::before{background:var(--epd)}
-.dept-card[data-dept="EMSD"]::before{background:var(--emsd)}
-.dept-card[data-dept="HA"]::before{background:var(--ha)}
+.dept-card:hover,
+.dept-card.is-active,
+.starter-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--dept-color,var(--line-strong));
+  box-shadow:0 22px 44px rgba(16,18,17,.08);
+}
+.dept-card.is-active{
+  background:#ffffff;
+}
 .dept-card-icon{
-  width:40px;height:40px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 10px;font-size:18px;
+  width:48px;
+  height:48px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--dept-tint,rgba(20,22,20,.06));
+  color:var(--dept-color,var(--ink));
+  margin-bottom:16px;
 }
-.dept-card[data-dept="BD"] .dept-card-icon{background:#dbeafe;color:var(--bd)}
-.dept-card[data-dept="FSD"] .dept-card-icon{background:#fee2e2;color:var(--fsd)}
-.dept-card[data-dept="EPD"] .dept-card-icon{background:#d1fae5;color:var(--epd)}
-.dept-card[data-dept="EMSD"] .dept-card-icon{background:#fef3c7;color:var(--emsd)}
-.dept-card[data-dept="HA"] .dept-card-icon{background:#ede9fe;color:var(--ha)}
-.dept-card-code{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.dept-card-name{font-size:10px;color:var(--text-muted);line-height:1.3}
+.dept-card-icon svg{width:22px;height:22px}
+.dept-card-code{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:6px;
+}
+.dept-card-name{
+  font-size:13px;
+  line-height:1.5;
+  color:var(--ink);
+  font-weight:600;
+}
 
-/* How it works */
-.how-section{width:100%;max-width:720px;margin-bottom:36px}
-.how-title{
-  font-size:11px;color:var(--text-muted);text-transform:uppercase;
-  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+.how-steps{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
 }
-.how-steps{display:flex;align-items:flex-start;gap:0}
-.how-step{flex:1;text-align:center;position:relative;padding:0 12px}
-.how-step:not(:last-child)::after{
-  content:'';position:absolute;top:20px;right:-4px;
-  width:8px;height:8px;border-top:2px solid var(--border);
-  border-right:2px solid var(--border);transform:rotate(45deg);
+.how-step{
+  border-radius:22px;
+  padding:16px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(20,22,20,.08);
 }
 .how-step-num{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--primary-subtle);color:var(--primary);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-size:14px;font-weight:600;
-  margin:0 auto 10px;
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--accent-strong);
+  font-family:var(--font-mono);
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:12px;
 }
-.how-step-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.how-step-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+.how-step-title{
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.02em;
+  margin-bottom:6px;
+}
+.how-step-desc{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--ink-soft);
+}
 
-/* Starter questions */
-.starter-section{width:100%;max-width:720px}
-.starter-title{
-  font-size:11px;color:var(--text-muted);text-transform:uppercase;
-  letter-spacing:.08em;font-weight:600;margin-bottom:14px;text-align:center;
+.starter-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
 }
-.starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .starter-card{
-  text-align:left;padding:14px 16px;border-radius:var(--radius);
-  border:1px solid var(--border);background:var(--bg-chat);cursor:pointer;
-  font-size:13px;color:var(--text-secondary);line-height:1.5;
-  transition:all .2s;position:relative;overflow:hidden;
+  border-radius:24px;
+  padding:18px 18px 20px;
+  text-align:left;
+  font-size:14px;
+  line-height:1.65;
+  color:var(--ink-soft);
 }
-.starter-card::before{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
-}
-.starter-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
-.starter-card[data-dept="BD"]::before{background:var(--bd)}
-.starter-card[data-dept="FSD"]::before{background:var(--fsd)}
-.starter-card[data-dept="EPD"]::before{background:var(--epd)}
-.starter-card[data-dept="EMSD"]::before{background:var(--emsd)}
-.starter-card[data-dept="HA"]::before{background:var(--ha)}
-.starter-card[data-dept="LEG"]::before{background:var(--leg)}
-.starter-card .starter-dept{
-  font-size:10px;font-weight:600;color:var(--text-muted);
-  text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;
+.starter-dept{
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--dept-color,var(--ink-muted));
+  margin-bottom:8px;
 }
 
-/* ─── INFO MODAL ─── */
+.message{
+  margin-bottom:22px;
+  animation:fadeUp .32s ease;
+}
+.message-user{
+  display:flex;
+  justify-content:flex-end;
+}
+.message-user .message-bubble{
+  max-width:720px;
+  padding:15px 18px;
+  border-radius:24px 24px 10px 24px;
+  background:var(--surface-dark);
+  color:#f4f6f1;
+  font-size:15px;
+  line-height:1.75;
+  box-shadow:0 18px 38px rgba(16,18,17,.14);
+}
+.message-assistant{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.sources-strip{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:2px 2px 6px;
+  scroll-snap-type:x proximity;
+}
+.sources-strip::-webkit-scrollbar{height:6px}
+.sources-strip::-webkit-scrollbar-thumb{background:rgba(20,22,20,.10);border-radius:999px}
+.source-card,
+.source-card-static{
+  flex:0 0 268px;
+  min-height:132px;
+  padding:16px;
+  border-radius:22px;
+  border:1px solid rgba(20,22,20,.08);
+  background:rgba(255,255,255,.74);
+  color:inherit;
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+  scroll-snap-align:start;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.source-card::before,
+.source-card-static::before{
+  content:'';
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:var(--dept-color,var(--accent));
+}
+.source-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--dept-color,var(--line-strong));
+  box-shadow:var(--shadow-sm);
+}
+.source-card-static{cursor:default}
+.source-card-dept{
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--dept-color,var(--ink-muted));
+  margin-bottom:10px;
+}
+.source-card-name{
+  font-size:13px;
+  line-height:1.55;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:8px;
+}
+.source-card-section{
+  font-size:12px;
+  line-height:1.65;
+  color:var(--ink-muted);
+}
+.source-card-link{
+  margin-top:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--accent-strong);
+}
+
+.stream-status{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 2px;
+  font-size:12px;
+  color:var(--ink-muted);
+}
+.dot-pulse{
+  display:flex;
+  gap:4px;
+}
+.dot-pulse span{
+  width:5px;
+  height:5px;
+  border-radius:999px;
+  background:var(--accent);
+  animation:pulse 1.1s ease infinite;
+}
+.dot-pulse span:nth-child(2){animation-delay:.15s}
+.dot-pulse span:nth-child(3){animation-delay:.3s}
+
+.answer-bubble{
+  position:relative;
+  background:rgba(255,255,255,.82);
+  border:1px solid var(--line);
+  border-radius:30px;
+  padding:22px 22px 20px;
+  box-shadow:var(--shadow-md);
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+.answer-content{
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+.answer-bubble p{
+  font-size:15px;
+  line-height:1.9;
+  color:var(--ink);
+  margin-bottom:12px;
+}
+.answer-bubble p:last-child{margin-bottom:0}
+.answer-bubble strong{font-weight:700}
+.answer-bubble code{
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--ink);
+  background:rgba(20,22,20,.05);
+  padding:3px 7px;
+  border-radius:8px;
+}
+.answer-bubble ul,
+.answer-bubble ol{
+  margin:10px 0 10px 22px;
+}
+.answer-bubble li{
+  margin-bottom:6px;
+  line-height:1.8;
+}
+.citation{
+  display:inline-flex;
+  align-items:center;
+  margin:0 2px;
+  padding:3px 7px;
+  border-radius:10px;
+  background:var(--accent-soft);
+  border:1px solid rgba(15,138,106,.14);
+  color:var(--accent-strong);
+  font-family:var(--font-mono);
+  font-size:11px;
+  line-height:1.75;
+}
+.citation-link{
+  text-decoration:none;
+  transition:transform .15s ease,background .15s ease,color .15s ease;
+}
+.citation-link:hover{
+  background:var(--accent);
+  color:#f6fbf8;
+  transform:translateY(-1px);
+}
+.copy-btn{
+  position:absolute;
+  top:14px;
+  right:14px;
+  border:none;
+  border-radius:12px;
+  background:rgba(20,22,20,.05);
+  color:var(--ink-muted);
+  padding:8px 10px;
+  font-size:11px;
+  font-family:var(--font-mono);
+  cursor:pointer;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .15s ease,background .15s ease,color .15s ease;
+}
+.answer-bubble:hover .copy-btn{
+  opacity:1;
+  pointer-events:auto;
+}
+.copy-btn:hover{
+  background:var(--accent-soft);
+  color:var(--accent-strong);
+}
+.disclaimer{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.64);
+  border:1px solid rgba(20,22,20,.08);
+  font-size:12px;
+  line-height:1.65;
+  color:var(--ink-soft);
+}
+.disclaimer svg{
+  color:var(--warning);
+  flex-shrink:0;
+  margin-top:1px;
+}
+.web-sources{
+  margin-top:4px;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(255,255,255,.64);
+  border:1px solid rgba(20,22,20,.08);
+}
+.web-sources-title{
+  font-family:var(--font-mono);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:8px;
+}
+.web-source-link{
+  display:block;
+  padding:6px 0;
+  color:var(--accent-strong);
+  text-decoration:none;
+  font-size:12px;
+  line-height:1.55;
+}
+.web-source-link span{
+  color:var(--ink-muted);
+}
+
+.input-bar{
+  position:sticky;
+  bottom:0;
+  padding:18px 28px 24px;
+  background:linear-gradient(180deg,rgba(236,232,222,0) 0%,rgba(236,232,222,.82) 26%,rgba(236,232,222,.96) 100%);
+  backdrop-filter:blur(12px);
+}
+.input-wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:14px 14px 14px 18px;
+  border-radius:30px;
+  border:1px solid var(--line-strong);
+  background:rgba(255,255,255,.84);
+  box-shadow:var(--shadow-lg);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.input-wrap:focus-within{
+  border-color:rgba(15,138,106,.34);
+  box-shadow:var(--shadow-lg),0 0 0 4px rgba(15,138,106,.08);
+}
+.input-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 4px;
+}
+.input-meta-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+}
+.input-meta-filter{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  border:1px solid rgba(15,138,106,.12);
+  color:var(--accent-strong);
+  font-size:12px;
+  font-weight:700;
+}
+.composer-row{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+}
+.input-wrap textarea{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:var(--ink);
+  font-size:16px;
+  line-height:1.7;
+  resize:none;
+  min-height:56px;
+  max-height:140px;
+  padding:2px 0 0;
+}
+.input-wrap textarea::placeholder{color:var(--ink-muted)}
+.send-btn{
+  width:54px;
+  height:54px;
+  border:none;
+  border-radius:20px;
+  background:var(--surface-dark);
+  color:#f4f6f1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+  flex-shrink:0;
+}
+.send-btn:hover{
+  transform:translateY(-1px);
+  background:#171a18;
+  box-shadow:0 20px 34px rgba(16,18,17,.18);
+}
+.send-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+.input-hint{
+  max-width:1100px;
+  margin:10px auto 0;
+  padding:0 6px;
+  font-size:12px;
+  color:var(--ink-muted);
+  line-height:1.55;
+}
+
 .modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
-  z-index:200;align-items:center;justify-content:center;
-  animation:fadeIn .2s ease;
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(12,14,13,.34);
+  backdrop-filter:blur(8px);
+  z-index:200;
 }
 .modal-overlay.open{display:flex}
 .modal{
-  background:var(--bg-chat);border-radius:var(--radius-xl);
-  width:90%;max-width:700px;max-height:85vh;overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .3s ease;
-  display:flex;flex-direction:column;
+  width:min(760px,92vw);
+  max-height:86vh;
+  overflow:hidden;
+  border-radius:32px;
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(20,22,20,.10);
+  box-shadow:0 38px 96px rgba(12,14,13,.20);
+  display:flex;
+  flex-direction:column;
+  animation:fadeUp .26s ease;
 }
 .modal-header{
-  padding:20px 24px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:24px 26px 18px;
+  border-bottom:1px solid rgba(20,22,20,.08);
 }
-.modal-header h3{font-family:var(--font-display);font-size:20px;font-weight:400}
+.modal-kicker{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ink-muted);
+  margin-bottom:8px;
+}
+.modal-header h3{
+  font-family:var(--font-display);
+  font-size:34px;
+  line-height:1;
+  letter-spacing:-.04em;
+}
 .modal-close{
-  background:none;border:none;cursor:pointer;color:var(--text-muted);
-  padding:6px;border-radius:6px;transition:all .2s;
+  width:42px;
+  height:42px;
+  border:none;
+  border-radius:14px;
+  background:rgba(20,22,20,.05);
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
-.modal-close:hover{background:var(--border-light);color:var(--text)}
-.modal-body{padding:24px;overflow-y:auto;font-size:14px;line-height:1.7;color:var(--text-secondary)}
-.modal-body h4{font-size:15px;font-weight:600;color:var(--text);margin:20px 0 8px}
+.modal-body{
+  overflow-y:auto;
+  padding:24px 26px 28px;
+  color:var(--ink-soft);
+  font-size:14px;
+  line-height:1.8;
+}
+.modal-body h4{
+  color:var(--ink);
+  font-size:16px;
+  letter-spacing:-.02em;
+  margin:24px 0 8px;
+}
 .modal-body h4:first-child{margin-top:0}
 .modal-body p{margin-bottom:12px}
 .modal-body ul{margin:0 0 12px 20px}
-.modal-body li{margin-bottom:4px}
+.modal-body li{margin-bottom:6px}
 .modal-body code{
-  font-family:var(--font-mono);font-size:12px;
-  background:var(--border-light);padding:2px 6px;border-radius:4px;
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:3px 7px;
+  border-radius:8px;
+  background:rgba(20,22,20,.05);
+  color:var(--ink);
 }
-.modal-body .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-.modal-body .info-card{padding:14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg)}
-.modal-body .info-card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
-.modal-body .info-card-desc{font-size:12px;color:var(--text-muted)}
-
-/* ─── MESSAGES ─── */
-.message{margin-bottom:24px;animation:fadeUp .35s ease}
-.message-user{display:flex;justify-content:flex-end}
-.message-user .message-bubble{
-  background:var(--primary);color:#fff;border-radius:var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
-  padding:12px 16px;max-width:600px;font-size:14px;line-height:1.6;
+.info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:14px 0 12px;
 }
-
-.message-assistant{display:flex;flex-direction:column;gap:10px}
-
-/* Source cards */
-.sources-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scroll-snap-type:x mandatory}
-.source-card{
-  flex-shrink:0;scroll-snap-align:start;
-  border:1px solid var(--border);border-radius:var(--radius);
-  padding:10px 14px;background:var(--bg-chat);min-width:210px;max-width:270px;
-  transition:all .2s;cursor:pointer;position:relative;overflow:hidden;
-  text-decoration:none;display:block;
+.info-card{
+  padding:16px;
+  border-radius:20px;
+  border:1px solid rgba(20,22,20,.08);
+  background:rgba(255,255,255,.62);
 }
-.source-card-link{font-size:10px;color:var(--primary-light);margin-top:4px;display:flex;align-items:center;gap:3px}
-.source-card::before{
-  content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+.info-card-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:6px;
 }
-.source-card[data-dept="BD"]::before{background:var(--bd)}
-.source-card[data-dept="FSD"]::before{background:var(--fsd)}
-.source-card[data-dept="EPD"]::before{background:var(--epd)}
-.source-card[data-dept="EMSD"]::before{background:var(--emsd)}
-.source-card[data-dept="HA"]::before{background:var(--ha)}
-.source-card:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
-.source-card-dept{
-  font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;
-  margin-bottom:4px;
-}
-.source-card[data-dept="BD"] .source-card-dept{color:var(--bd)}
-.source-card[data-dept="FSD"] .source-card-dept{color:var(--fsd)}
-.source-card[data-dept="EPD"] .source-card-dept{color:var(--epd)}
-.source-card[data-dept="EMSD"] .source-card-dept{color:var(--emsd)}
-.source-card[data-dept="HA"] .source-card-dept{color:var(--ha)}
-.source-card-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px}
-.source-card-section{font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
-
-/* Status indicator during streaming */
-.stream-status{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:12px;color:var(--text-muted);padding:6px 0;
-}
-.stream-status .dot-pulse{display:flex;gap:3px}
-.stream-status .dot-pulse span{
-  width:4px;height:4px;border-radius:50%;background:var(--primary-light);
-  animation:pulse 1.2s ease infinite;
-}
-.stream-status .dot-pulse span:nth-child(2){animation-delay:.2s}
-.stream-status .dot-pulse span:nth-child(3){animation-delay:.4s}
-
-/* Answer bubble */
-.answer-bubble{
-  background:var(--bg-chat);border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:16px 20px;
-  font-size:14px;line-height:1.75;color:var(--text);
-  box-shadow:var(--shadow-sm);position:relative;
-}
-.answer-bubble p{margin-bottom:10px}
-.answer-bubble p:last-child{margin-bottom:0}
-.answer-bubble strong{font-weight:600}
-.answer-bubble code{
-  font-family:var(--font-mono);font-size:12px;
-  background:var(--border-light);padding:2px 6px;border-radius:4px;
-}
-.answer-bubble ul,.answer-bubble ol{margin:8px 0 8px 20px}
-.answer-bubble li{margin-bottom:4px}
-.answer-bubble .citation{
-  font-size:11px;color:var(--primary);background:var(--primary-subtle);
-  padding:2px 6px;border-radius:4px;font-family:var(--font-mono);
-  display:inline;word-break:break-word;line-height:1.8;
-}
-.answer-bubble .citation-link{
-  text-decoration:none;cursor:pointer;
-  border-bottom:1px dashed var(--primary-light);
-  transition:all .15s;
-}
-.answer-bubble .citation-link:hover{
-  background:var(--primary);color:#fff;
-  border-bottom-color:transparent;
-}
-.answer-content{overflow-wrap:break-word;word-break:break-word}
-.answer-bubble{overflow-wrap:break-word;word-break:break-word;overflow:hidden}
-.copy-btn{
-  position:absolute;top:10px;right:10px;
-  background:var(--border-light);border:1px solid var(--border);
-  border-radius:6px;padding:4px 8px;cursor:pointer;
-  font-size:10px;color:var(--text-muted);transition:all .2s;
-  font-family:var(--font-body);opacity:0;pointer-events:none;
-  z-index:2;
-}
-.answer-bubble:hover .copy-btn{opacity:1;pointer-events:auto}
-.copy-btn:hover{background:var(--primary-subtle);color:var(--primary);border-color:var(--primary-light)}
-
-/* Quality bar */
-.quality-bar{
-  display:flex;align-items:center;gap:10px;padding:8px 0 0;flex-wrap:wrap;
-}
-.quality-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:11px;font-weight:500;padding:4px 10px;
-  border-radius:20px;font-family:var(--font-mono);
-}
-.quality-badge.good{background:var(--success-light);color:#065f46}
-.quality-badge.warn{background:var(--warning-light);color:#92400e}
-.quality-badge.bad{background:var(--danger-light);color:#991b1b}
-.quality-meta{font-size:11px;color:var(--text-muted)}
-
-/* Disclaimer */
-.disclaimer{
-  margin-top:12px;padding:10px 14px;border-radius:var(--radius);
-  background:#fefce8;border:1px solid #fde68a;
-  font-size:11px;color:#92400e;line-height:1.5;
-  display:flex;align-items:flex-start;gap:8px;
-}
-.disclaimer svg{flex-shrink:0;margin-top:1px}
-
-/* ─── INPUT BAR ─── */
-.input-bar{
-  position:sticky;bottom:0;
-  background:linear-gradient(transparent,var(--bg) 24%);
-  padding:16px 24px 20px;
-}
-.input-wrap{
-  max-width:860px;margin:0 auto;
-  display:flex;align-items:flex-end;gap:10px;
-  background:var(--bg-chat);border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:8px 8px 8px 16px;
-  box-shadow:var(--shadow-lg);transition:border-color .2s;
-}
-.input-wrap:focus-within{border-color:var(--primary-light);box-shadow:var(--shadow-lg),0 0 0 3px rgba(26,86,219,.08)}
-.input-wrap textarea{
-  flex:1;border:none;outline:none;resize:none;
-  font-family:var(--font-body);font-size:14px;color:var(--text);
-  background:transparent;line-height:1.5;max-height:120px;
-  padding:6px 0;
-}
-.input-wrap textarea::placeholder{color:var(--text-muted)}
-.send-btn{
-  flex-shrink:0;width:36px;height:36px;border-radius:var(--radius);
-  background:var(--primary);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .2s;
-}
-.send-btn:hover{background:var(--primary-light);transform:scale(1.05)}
-.send-btn:disabled{background:var(--border);cursor:not-allowed;transform:none}
-.send-btn svg{color:#fff}
-.input-hint{
-  text-align:center;font-size:11px;color:var(--text-muted);
-  margin-top:8px;max-width:860px;margin-left:auto;margin-right:auto;
+.info-card-desc{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--ink-soft);
 }
 
-/* ─── MOBILE ─── */
 .sidebar-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
-  z-index:99;opacity:0;transition:opacity .3s;
+  position:fixed;
+  inset:0;
+  background:rgba(12,14,13,.28);
+  backdrop-filter:blur(4px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:90;
 }
-@media(max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%)}
+.sidebar-overlay.open{
+  opacity:1;
+  pointer-events:auto;
+}
+
+[data-dept="BD"]{--dept-color:var(--bd);--dept-tint:rgba(41,94,144,.10)}
+[data-dept="FSD"]{--dept-color:var(--fsd);--dept-tint:rgba(148,66,54,.10)}
+[data-dept="EPD"]{--dept-color:var(--epd);--dept-tint:rgba(47,115,88,.10)}
+[data-dept="EMSD"]{--dept-color:var(--emsd);--dept-tint:rgba(143,103,40,.10)}
+[data-dept="HA"]{--dept-color:var(--ha);--dept-tint:rgba(98,82,134,.10)}
+[data-dept="LEG"]{--dept-color:var(--leg);--dept-tint:rgba(94,105,111,.10)}
+
+@media(max-width:1180px){
+  .hero-panel{grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr)}
+  .dept-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:980px){
+  body{display:block}
+  .sidebar{
+    position:fixed;
+    top:12px;
+    left:12px;
+    bottom:12px;
+    width:min(360px,calc(100vw - 24px));
+    min-width:unset;
+    border-radius:28px;
+    border:1px solid rgba(20,22,20,.08);
+    transform:translateX(calc(-100% - 24px));
+    transition:transform .24s ease;
+    z-index:120;
+    box-shadow:var(--shadow-lg);
+  }
   .sidebar.open{transform:translateX(0)}
-  .sidebar-overlay.open{display:block;opacity:1}
   .topbar-menu{display:flex}
+  .topbar{padding:16px 18px 10px}
+  .chat-area{padding:0 16px 150px}
+  .hero-panel,
+  .overview-grid,
+  .metrics-row{grid-template-columns:1fr}
   .starter-grid{grid-template-columns:1fr}
-  .dept-grid{grid-template-columns:repeat(3,1fr)}
-  .how-steps{flex-wrap:wrap}
-  .how-step{min-width:calc(33% - 8px)}
-  .how-step:not(:last-child)::after{display:none}
-  .chat-inner{padding:16px 16px 100px}
-  .input-bar{padding:12px 16px 16px}
-  .stats-bar{flex-wrap:wrap}
-  .stat-item{min-width:calc(33% - 1px)}
-  .landing-hero h2{font-size:24px}
-  .modal{width:95%;max-height:90vh}
+  .input-bar{padding:16px}
 }
-@media(max-width:480px){
-  .dept-grid{grid-template-columns:repeat(2,1fr)}
-  .how-step{min-width:calc(50% - 8px)}
-  .modal-body .info-grid{grid-template-columns:1fr}
+@media(max-width:720px){
+  .brand-copy h1{font-size:18px}
+  .topbar-context{font-size:14px}
+  .topbar-badge{display:none}
+  .hero-panel,
+  .dept-explorer,
+  .how-section,
+  .starter-section{padding:22px}
+  .hero-title{font-size:42px}
+  .hero-copy p{font-size:15px}
+  .preview-card{padding:20px}
+  .dept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .how-steps{grid-template-columns:1fr}
+  .input-meta{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .composer-row{gap:10px}
+  .message-user .message-bubble{font-size:14px}
+  .answer-bubble{padding:20px 18px 18px}
+  .modal-header h3{font-size:28px}
+  .info-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .hero-title{font-size:38px}
+  .dept-grid{grid-template-columns:1fr}
+  .source-card,
+  .source-card-static{flex-basis:236px}
 }
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
-@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-
-/* Scrollbar */
-.chat-area::-webkit-scrollbar{width:6px}
-.chat-area::-webkit-scrollbar-track{background:transparent}
-.chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.chat-area::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
-.sources-strip::-webkit-scrollbar{height:4px}
-.sources-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes pulse{
+  0%,100%{opacity:.28;transform:translateY(0)}
+  50%{opacity:1;transform:translateY(-1px)}
+}
 </style>
 </head>
 <body>
-
-<!-- Sidebar overlay (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-brand">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="8" fill="url(#brandGrad)"/>
-        <path d="M9 10h14M9 16h9M9 22h11" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-        <defs><linearGradient id="brandGrad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#1a56db"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
-      </svg>
-      <h1>HK Compliance</h1>
+      <div class="brand-mark-shell" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none">
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4"/>
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(60 24 24)"/>
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(120 24 24)"/>
+        </svg>
+      </div>
+      <div class="brand-copy">
+        <h1>HK Compliance</h1>
+        <div class="sidebar-subtitle">Minimal regulatory intelligence for Hong Kong building teams.</div>
+      </div>
     </div>
-    <div class="sidebar-subtitle">Regulatory Intelligence Platform</div>
-  </div>
 
-  <button class="new-chat-btn">
-    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    New Conversation
-  </button>
+    <button class="new-chat-btn" type="button">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      New thread
+    </button>
+  </div>
 
   <div class="sidebar-scroll">
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Department Filter</div>
-      <select class="filter-select" id="deptFilter">
-        <option value="">All Departments</option>
-        <option value="BD">BD — Buildings Department</option>
-        <option value="FSD">FSD — Fire Services</option>
-        <option value="EPD">EPD — Environmental Protection</option>
-        <option value="EMSD">EMSD — Electrical &amp; Mechanical</option>
-        <option value="HA">HA — Housing Authority</option>
-      </select>
+      <div class="sidebar-panel">
+        <div class="sidebar-section-title">Search Scope</div>
+        <label class="filter-shell" for="deptFilter">
+          <span class="filter-label">Focus retrieval on one department when you need a narrower answer.</span>
+          <select class="filter-select" id="deptFilter">
+            <option value="">All departments</option>
+            <option value="BD">BD - Buildings Department</option>
+            <option value="FSD">FSD - Fire Services Department</option>
+            <option value="EPD">EPD - Environmental Protection Department</option>
+            <option value="EMSD">EMSD - Electrical &amp; Mechanical Services Department</option>
+            <option value="HA">HA - Housing Authority</option>
+          </select>
+        </label>
+      </div>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Departments</div>
-      <div class="dept-list">
-        <div class="dept-item">
-          <span class="dept-dot" style="background:var(--bd)"></span>
-          <span class="dept-name">Buildings Dept</span>
-          <span class="dept-count" id="deptCountBD">—</span>
-        </div>
-        <div class="dept-item">
-          <span class="dept-dot" style="background:var(--fsd)"></span>
-          <span class="dept-name">Fire Services</span>
-          <span class="dept-count" id="deptCountFSD">—</span>
-        </div>
-        <div class="dept-item">
-          <span class="dept-dot" style="background:var(--epd)"></span>
-          <span class="dept-name">Environmental Protection</span>
-          <span class="dept-count" id="deptCountEPD">—</span>
-        </div>
-        <div class="dept-item">
-          <span class="dept-dot" style="background:var(--emsd)"></span>
-          <span class="dept-name">Electrical &amp; Mechanical</span>
-          <span class="dept-count" id="deptCountEMSD">—</span>
-        </div>
-        <div class="dept-item">
-          <span class="dept-dot" style="background:var(--ha)"></span>
-          <span class="dept-name">Housing Authority</span>
-          <span class="dept-count" id="deptCountHA">—</span>
+      <div class="sidebar-panel">
+        <div class="sidebar-section-title">Departments</div>
+        <div class="dept-list">
+          <button class="dept-item" data-dept="BD" type="button">
+            <span class="dept-dot" style="background:var(--bd)"></span>
+            <span class="dept-name">Buildings Department</span>
+            <span class="dept-count" id="deptCountBD">-</span>
+          </button>
+          <button class="dept-item" data-dept="FSD" type="button">
+            <span class="dept-dot" style="background:var(--fsd)"></span>
+            <span class="dept-name">Fire Services</span>
+            <span class="dept-count" id="deptCountFSD">-</span>
+          </button>
+          <button class="dept-item" data-dept="EPD" type="button">
+            <span class="dept-dot" style="background:var(--epd)"></span>
+            <span class="dept-name">Environmental Protection</span>
+            <span class="dept-count" id="deptCountEPD">-</span>
+          </button>
+          <button class="dept-item" data-dept="EMSD" type="button">
+            <span class="dept-dot" style="background:var(--emsd)"></span>
+            <span class="dept-name">Electrical &amp; Mechanical</span>
+            <span class="dept-count" id="deptCountEMSD">-</span>
+          </button>
+          <button class="dept-item" data-dept="HA" type="button">
+            <span class="dept-dot" style="background:var(--ha)"></span>
+            <span class="dept-name">Housing Authority</span>
+            <span class="dept-count" id="deptCountHA">-</span>
+          </button>
         </div>
       </div>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Ingested Sources</div>
-      <div id="sourcesList" style="font-size:12px;color:#64748b;padding:4px 0">
-        Loading...
+      <div class="sidebar-panel">
+        <div class="sidebar-section-title">Current Corpus</div>
+        <div id="sourcesList" class="source-list-empty">Loading official source documents...</div>
       </div>
     </div>
   </div>
 
   <div class="sidebar-status" id="systemStatus">
-    <div class="status-row">
-      <span class="status-label"><span class="status-dot checking" id="statusDot"></span>System</span>
-      <span class="status-value" id="statusText">Checking...</span>
-    </div>
-    <div class="status-row">
-      <span class="status-label">Documents</span>
-      <span class="status-value" id="docCount">—</span>
-    </div>
-    <div class="status-row">
-      <span class="status-label">Last Scrape</span>
-      <span class="status-value" id="lastScrape">—</span>
+    <div class="status-panel">
+      <div class="sidebar-section-title">System</div>
+      <div class="status-row">
+        <span class="status-label"><span class="status-dot checking" id="statusDot"></span>Status</span>
+        <span class="status-value" id="statusText">Checking</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Indexed clauses</span>
+        <span class="status-value" id="docCount">-</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Last scrape</span>
+        <span class="status-value" id="lastScrape">-</span>
+      </div>
     </div>
   </div>
 
   <div class="sidebar-footer">
     <span>HK Compliance RAG v0.2.0</span>
-    <span>MIT License</span>
+    <a class="signature-link" href="https://maniksoin.com">made with love by maniksoin.com</a>
   </div>
 </aside>
 
-<!-- Info Modal -->
 <div class="modal-overlay" id="infoModal">
   <div class="modal">
     <div class="modal-header">
-      <h3>About HK Compliance RAG</h3>
-      <button class="modal-close">
+      <div>
+        <div class="modal-kicker">Method</div>
+        <h3>How this assistant is built</h3>
+      </div>
+      <button class="modal-close" type="button" aria-label="Close">
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
     </div>
     <div class="modal-body">
-      <h4>What is this?</h4>
-      <p>HK Compliance RAG is an AI-powered knowledge base that answers questions about Hong Kong building regulations with <strong>exact clause citations</strong>. Every answer is grounded in official government codes of practice, ordinances, and practice notes.</p>
+      <h4>What it does</h4>
+      <p>HK Compliance RAG answers questions about Hong Kong building regulations with clause-level citations from official documents. The interface is intentionally minimal, but the pipeline behind it is not.</p>
 
-      <h4>Regulatory Sources</h4>
+      <h4>Source coverage</h4>
       <div class="info-grid">
         <div class="info-card">
           <div class="info-card-title">Codes of Practice</div>
-          <div class="info-card-desc">Fire safety, structural steel, concrete, foundations, wind effects, demolition, site supervision</div>
+          <div class="info-card-desc">Fire safety, structural steel, concrete, foundations, wind effects, demolition, site supervision and more.</div>
         </div>
         <div class="info-card">
-          <div class="info-card-title">Practice Notes (PNAPs)</div>
-          <div class="info-card-desc">Authorized Persons, Registered Structural Engineers, and Registered Geotechnical Engineers guidance</div>
+          <div class="info-card-title">Practice Notes</div>
+          <div class="info-card-desc">Guidance for Authorized Persons, Registered Structural Engineers and Registered Geotechnical Engineers.</div>
         </div>
         <div class="info-card">
           <div class="info-card-title">Legislation</div>
-          <div class="info-card-desc">Buildings Ordinance (Cap. 123), Building (Planning) Regulations (Cap. 123F), Cap. 572</div>
+          <div class="info-card-desc">Buildings Ordinance, Building (Planning) Regulations, fire safety legislation and related statutory material.</div>
         </div>
         <div class="info-card">
           <div class="info-card-title">Design Manuals</div>
-          <div class="info-card-desc">Barrier-free access, energy efficiency, environmental assessment, fire engineering</div>
+          <div class="info-card-desc">Barrier-free access, energy efficiency, environmental assessment, fire engineering and housing guidance.</div>
         </div>
       </div>
 
-      <h4>How It Works</h4>
-      <p>The system uses a <strong>Retrieval-Augmented Generation (RAG)</strong> pipeline:</p>
+      <h4>Pipeline</h4>
+      <p>The system ingests PDFs from official sources, preserves document hierarchy during chunking, stores embeddings in PostgreSQL, retrieves with hybrid search, reranks for relevance, and streams an answer from grounded context.</p>
       <ul>
-        <li><strong>Ingestion</strong> — PDFs are fetched from government websites, parsed, and split into structure-aware chunks preserving Part &gt; Section &gt; Clause hierarchy</li>
-        <li><strong>Embedding</strong> — Each chunk is embedded using OpenAI text-embedding-3-large (3072 dimensions) and stored in PostgreSQL with pgvector</li>
-        <li><strong>Retrieval</strong> — Hybrid search combines vector similarity with BM25 full-text search, fused via Reciprocal Rank Fusion</li>
-        <li><strong>Reranking</strong> — Top results are reranked using Cohere Rerank for precision</li>
-        <li><strong>Generation</strong> — GPT-4o generates citation-grounded answers with mandatory clause references</li>
-        <li><strong>Verification</strong> — Every answer is checked for phantom citations and faithfulness to source material</li>
+        <li><strong>Ingestion:</strong> PDFs are fetched, parsed and split while retaining section hierarchy.</li>
+        <li><strong>Retrieval:</strong> Vector similarity and keyword search are fused for stronger recall.</li>
+        <li><strong>Generation:</strong> The answer is streamed with exact clause references where possible.</li>
+        <li><strong>Verification:</strong> Citation and faithfulness checks reduce unsupported claims.</li>
       </ul>
 
-      <h4>Safety &amp; Quality</h4>
-      <p>Every query goes through prompt injection detection, and every answer is verified for:</p>
-      <ul>
-        <li><strong>Faithfulness Score</strong> — LLM judge rates how well the answer reflects retrieved context (0-10)</li>
-        <li><strong>Citation Accuracy</strong> — Percentage of cited clauses that actually appear in context</li>
-        <li><strong>Phantom Citations</strong> — Citations made up by the model (flagged and counted)</li>
-        <li><strong>Uncited Claims</strong> — Factual statements that should have citations but don't</li>
-      </ul>
+      <h4>Safety and quality</h4>
+      <p>Queries pass through prompt-injection detection, and the answer pipeline tracks citation accuracy, phantom citations, uncited claims and overall grounding quality.</p>
 
-      <h4>Change Detection</h4>
-      <p>The system periodically checks government sources for regulation updates via SHA-256 content hashing, ensuring the knowledge base stays current with the latest amendments.</p>
+      <h4>Freshness</h4>
+      <p>The corpus periodically checks official sources for content changes using hashing so new or amended material can be re-ingested when required.</p>
     </div>
   </div>
 </div>
 
-<!-- Main -->
 <div class="main">
   <div class="topbar">
-    <button class="topbar-menu" aria-label="Menu">
-      <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <button class="topbar-menu" type="button" aria-label="Open navigation">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
-    <span class="topbar-title">Hong Kong Building Regulations Assistant</span>
+
+    <div class="topbar-copy">
+      <span class="topbar-title">Hong Kong Building Regulations Assistant</span>
+      <span class="topbar-context">Official-source answers with clause citations.</span>
+    </div>
+
     <div class="topbar-right">
-      <span class="topbar-badge" id="topbarBadge">0 chunks indexed</span>
-      <button class="topbar-info-btn">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        About
+      <span class="topbar-badge" id="topbarBadge">Checking corpus</span>
+      <button class="topbar-info-btn" type="button">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11.5v4m0-7h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Method
       </button>
     </div>
   </div>
 
   <div class="chat-area" id="chatArea">
     <div class="chat-inner" id="chatInner">
-      <!-- Landing state -->
       <div class="landing" id="landingState">
-        <div class="landing-hero">
-          <div class="landing-icon">
-            <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <h2>Hong Kong Regulatory Intelligence</h2>
-          <p>Ask questions about HK building regulations and receive AI-generated answers grounded in official codes of practice, ordinances, and practice notes — with exact clause citations and quality verification.</p>
-        </div>
+        <section class="hero-panel">
+          <div class="hero-copy">
+            <div>
+              <div class="hero-eyebrow">Official-source reasoning for Hong Kong building codes</div>
+              <h2 class="hero-title">Compliance answers, <span>pared back.</span></h2>
+              <p>Ask about ordinances, codes of practice, practice notes, fire services, accessibility, energy and environmental requirements. Answers stream from ingested government PDFs with exact clause citations.</p>
+            </div>
 
-        <!-- Stats bar -->
-        <div class="stats-bar">
+            <div class="hero-pills">
+              <div class="hero-pill"><strong>Grounded</strong> Clause-aware retrieval from official documents</div>
+              <div class="hero-pill"><strong>Verified</strong> Citation and faithfulness checks</div>
+              <div class="hero-pill"><strong>Focused</strong> Department filter when you need a tighter scope</div>
+            </div>
+          </div>
+
+          <div class="hero-preview">
+            <div class="preview-card">
+              <div class="preview-top">
+                <div class="preview-mark" aria-hidden="true">
+                  <svg viewBox="0 0 48 48" fill="none">
+                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4"/>
+                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(60 24 24)"/>
+                    <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(120 24 24)"/>
+                  </svg>
+                </div>
+                <div class="preview-label">Sample answer structure</div>
+              </div>
+              <div class="preview-question">For buildings above 25 m, required fire resistance periods depend on occupancy, element type and the applicable fire resisting construction tables.</div>
+              <p class="preview-answer">The interface stays quiet so the evidence is easier to scan: retrieve the clause, read the answer, open the PDF, verify the section.</p>
+              <div class="preview-citations">
+                <span>Code of Practice for Fire Safety in Buildings</span>
+                <span>Building (Planning) Regulations</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="metrics-row">
           <div class="stat-item">
+            <div class="stat-label">Departments covered</div>
             <div class="stat-number" id="statDepts">5</div>
-            <div class="stat-label">Departments</div>
+            <div class="stat-foot">Buildings, fire services, environment, electrical and mechanical, and housing.</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number" id="statDocs">—</div>
-            <div class="stat-label">Documents</div>
+            <div class="stat-label">Current documents</div>
+            <div class="stat-number" id="statDocs">-</div>
+            <div class="stat-foot">The live corpus is pulled from current document versions stored in the knowledge base.</div>
           </div>
           <div class="stat-item">
-            <div class="stat-number" id="statChunks">—</div>
-            <div class="stat-label">Indexed Chunks</div>
+            <div class="stat-label">Indexed clauses</div>
+            <div class="stat-number" id="statChunks">-</div>
+            <div class="stat-foot">Chunked for retrieval while keeping the original section hierarchy intact.</div>
           </div>
+        </section>
+
+        <div class="overview-grid">
+          <section class="dept-explorer">
+            <div class="dept-explorer-title">Browse by department</div>
+            <div class="dept-grid">
+              <div class="dept-card" data-dept="BD">
+                <div class="dept-card-icon">
+                  <svg fill="none" viewBox="0 0 24 24"><path d="M2 22h20M6 18V2l12 4v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10h4m-4 4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+                <div class="dept-card-code">BD</div>
+                <div class="dept-card-name">Buildings Department</div>
+              </div>
+              <div class="dept-card" data-dept="FSD">
+                <div class="dept-card-icon">
+                  <svg fill="none" viewBox="0 0 24 24"><path d="M12 2c1 3 4 5.5 4 9a4 4 0 11-8 0c0-3.5 3-6 4-9z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+                <div class="dept-card-code">FSD</div>
+                <div class="dept-card-name">Fire Services Department</div>
+              </div>
+              <div class="dept-card" data-dept="EPD">
+                <div class="dept-card-icon">
+                  <svg fill="none" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/></svg>
+                </div>
+                <div class="dept-card-code">EPD</div>
+                <div class="dept-card-name">Environmental Protection</div>
+              </div>
+              <div class="dept-card" data-dept="EMSD">
+                <div class="dept-card-icon">
+                  <svg fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="dept-card-code">EMSD</div>
+                <div class="dept-card-name">Electrical &amp; Mechanical</div>
+              </div>
+              <div class="dept-card" data-dept="HA">
+                <div class="dept-card-icon">
+                  <svg fill="none" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-6h6v6m-6-10h.01M15 11h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </div>
+                <div class="dept-card-code">HA</div>
+                <div class="dept-card-name">Housing Authority</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="how-section">
+            <div class="how-title">How answers are built</div>
+            <div class="how-steps">
+              <div class="how-step">
+                <div class="how-step-num">1</div>
+                <div class="how-step-title">Ask</div>
+                <div class="how-step-desc">Enter a regulation or compliance question in natural language.</div>
+              </div>
+              <div class="how-step">
+                <div class="how-step-num">2</div>
+                <div class="how-step-title">Retrieve</div>
+                <div class="how-step-desc">Hybrid search finds relevant clauses across the ingested corpus.</div>
+              </div>
+              <div class="how-step">
+                <div class="how-step-num">3</div>
+                <div class="how-step-title">Rerank</div>
+                <div class="how-step-desc">High-signal chunks are reordered before answer generation.</div>
+              </div>
+              <div class="how-step">
+                <div class="how-step-num">4</div>
+                <div class="how-step-title">Generate</div>
+                <div class="how-step-desc">The answer is streamed with citations attached to the evidence used.</div>
+              </div>
+              <div class="how-step">
+                <div class="how-step-num">5</div>
+                <div class="how-step-title">Verify</div>
+                <div class="how-step-desc">Use the linked PDFs to confirm the clause, section and wording directly.</div>
+              </div>
+            </div>
+          </section>
         </div>
 
-        <!-- Department explorer -->
-        <div class="dept-explorer">
-          <div class="dept-explorer-title">Covered Government Departments</div>
-          <div class="dept-grid">
-            <div class="dept-card" data-dept="BD">
-              <div class="dept-card-icon">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M2 22h20M6 18V2l12 4v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10h4m-4 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </div>
-              <div class="dept-card-code">BD</div>
-              <div class="dept-card-name">Buildings Department</div>
-            </div>
-            <div class="dept-card" data-dept="FSD">
-              <div class="dept-card-icon">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 2c1 3 4 5.5 4 9a4 4 0 11-8 0c0-3.5 3-6 4-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </div>
-              <div class="dept-card-code">FSD</div>
-              <div class="dept-card-name">Fire Services</div>
-            </div>
-            <div class="dept-card" data-dept="EPD">
-              <div class="dept-card-icon">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
-              </div>
-              <div class="dept-card-code">EPD</div>
-              <div class="dept-card-name">Environmental Protection</div>
-            </div>
-            <div class="dept-card" data-dept="EMSD">
-              <div class="dept-card-icon">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-              <div class="dept-card-code">EMSD</div>
-              <div class="dept-card-name">Electrical &amp; Mechanical</div>
-            </div>
-            <div class="dept-card" data-dept="HA">
-              <div class="dept-card-icon">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-6h6v6m-6-10h.01M15 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </div>
-              <div class="dept-card-code">HA</div>
-              <div class="dept-card-name">Housing Authority</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- How it works -->
-        <div class="how-section">
-          <div class="how-title">How It Works</div>
-          <div class="how-steps">
-            <div class="how-step">
-              <div class="how-step-num">1</div>
-              <div class="how-step-title">Ask</div>
-              <div class="how-step-desc">Type a question about HK building regulations</div>
-            </div>
-            <div class="how-step">
-              <div class="how-step-num">2</div>
-              <div class="how-step-title">Retrieve</div>
-              <div class="how-step-desc">Hybrid search finds relevant clauses from official codes</div>
-            </div>
-            <div class="how-step">
-              <div class="how-step-num">3</div>
-              <div class="how-step-title">Rerank</div>
-              <div class="how-step-desc">AI reranks results for maximum relevance</div>
-            </div>
-            <div class="how-step">
-              <div class="how-step-num">4</div>
-              <div class="how-step-title">Generate</div>
-              <div class="how-step-desc">GPT-4o creates a cited answer from source text</div>
-            </div>
-            <div class="how-step">
-              <div class="how-step-num">5</div>
-              <div class="how-step-title">Verify</div>
-              <div class="how-step-desc">Citations and faithfulness are automatically checked</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Starter questions -->
-        <div class="starter-section">
-          <div class="starter-title">Try asking about</div>
+        <section class="starter-section">
+          <div class="starter-title">Try a high-signal prompt</div>
           <div class="starter-grid">
             <div class="starter-card" data-dept="BD">
-              <div class="starter-dept">BD — Fire Safety</div>
-              What is the minimum fire resistance period for structural elements in buildings over 25m?
+              <div class="starter-dept">BD - Fire safety</div>
+              What is the minimum fire resistance period for structural elements in buildings over 25 m?
             </div>
             <div class="starter-card" data-dept="BD">
-              <div class="starter-dept">BD — Structural</div>
-              What are the wind load design requirements for buildings over 200m tall?
+              <div class="starter-dept">BD - Structural</div>
+              What are the wind load design requirements for buildings over 200 m tall?
             </div>
             <div class="starter-card" data-dept="FSD">
-              <div class="starter-dept">FSD — Fire Services</div>
+              <div class="starter-dept">FSD - Fire services</div>
               What are the fire service installation requirements for composite buildings?
             </div>
             <div class="starter-card" data-dept="BD">
-              <div class="starter-dept">BD — Accessibility</div>
+              <div class="starter-dept">BD - Accessibility</div>
               What barrier-free access provisions are required for new commercial buildings?
             </div>
             <div class="starter-card" data-dept="EPD">
-              <div class="starter-dept">EPD — Environment</div>
+              <div class="starter-dept">EPD - Environment</div>
               What are the noise assessment requirements during construction in residential areas?
             </div>
             <div class="starter-card" data-dept="BD">
-              <div class="starter-dept">BD — Planning</div>
+              <div class="starter-dept">BD - Planning</div>
               What are the site coverage and plot ratio limits under Building (Planning) Regulations?
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   </div>
 
-  <!-- Input -->
   <div class="input-bar">
     <div class="input-wrap">
-      <textarea id="queryInput" rows="1" placeholder="Ask about HK building regulations..."></textarea>
-      <button class="send-btn" id="sendBtn" aria-label="Send">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+      <div class="input-meta">
+        <span class="input-meta-label">Ask anything about Hong Kong building compliance</span>
+        <span class="input-meta-filter" id="activeDeptPill">All departments</span>
+      </div>
+      <div class="composer-row">
+        <textarea id="queryInput" rows="1" placeholder="Ask about HK building regulations..."></textarea>
+        <button class="send-btn" id="sendBtn" type="button" aria-label="Send">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="input-hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for new line · Answers include exact clause citations</div>
+    <div class="input-hint">Press Enter to send. Use Shift+Enter for a new line. Answers link back to source PDFs when available.</div>
   </div>
 </div>
 
@@ -837,214 +1716,266 @@ const queryInput = $('queryInput');
 const sendBtn = $('sendBtn');
 const landingState = $('landingState');
 const deptFilter = $('deptFilter');
+const activeDeptPill = $('activeDeptPill');
+const sidebar = $('sidebar');
+const sidebarOverlay = $('sidebarOverlay');
+const infoModal = $('infoModal');
+const deptCards = Array.from(document.querySelectorAll('.dept-card'));
+const deptItems = Array.from(document.querySelectorAll('.dept-item'));
 
 let isStreaming = false;
 
 const DEPTS = {
-  BD: { name: 'Buildings Department', color: '#1a56db' },
-  FSD: { name: 'Fire Services Department', color: '#dc2626' },
-  EPD: { name: 'Environmental Protection Department', color: '#059669' },
-  EMSD: { name: 'Electrical & Mechanical Services', color: '#d97706' },
-  HA: { name: 'Housing Authority', color: '#7c3aed' },
+  BD: { name: 'Buildings Department', color: '#295e90' },
+  FSD: { name: 'Fire Services Department', color: '#944236' },
+  EPD: { name: 'Environmental Protection Department', color: '#2f7358' },
+  EMSD: { name: 'Electrical & Mechanical Services Department', color: '#8f6728' },
+  HA: { name: 'Housing Authority', color: '#625286' },
 };
 
-// ─── Bind ALL event handlers via addEventListener (CSP-safe) ───
-
-// Send button
 sendBtn.addEventListener('click', () => sendQuery());
 
-// Enter to send
-queryInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuery(); }
+queryInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendQuery();
+  }
 });
 
-// Auto-resize textarea
 queryInput.addEventListener('input', () => {
   queryInput.style.height = 'auto';
-  queryInput.style.height = Math.min(queryInput.scrollHeight, 120) + 'px';
+  queryInput.style.height = Math.min(queryInput.scrollHeight, 140) + 'px';
 });
 
-// Sidebar toggle
-$('sidebarOverlay').addEventListener('click', toggleSidebar);
+sidebarOverlay.addEventListener('click', closeSidebar);
 document.querySelector('.topbar-menu')?.addEventListener('click', toggleSidebar);
 document.querySelector('.new-chat-btn')?.addEventListener('click', clearChat);
 
-// Modal
 document.querySelector('.topbar-info-btn')?.addEventListener('click', openModal);
 document.querySelector('.modal-close')?.addEventListener('click', closeModal);
-$('infoModal').addEventListener('click', (e) => { if (e.target === $('infoModal')) closeModal(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-// Department filter
-deptFilter.addEventListener('change', () => {});
-
-// Department cards
-document.querySelectorAll('.dept-card').forEach(card => {
-  card.addEventListener('click', () => selectDept(card.dataset.dept));
+infoModal.addEventListener('click', (event) => {
+  if (event.target === infoModal) closeModal();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeModal();
+    closeSidebar();
+  }
 });
 
-// Department sidebar items
-document.querySelectorAll('.dept-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const dot = item.querySelector('.dept-dot');
-    const style = dot?.getAttribute('style') || '';
-    const deptMap = { '--bd': 'BD', '--fsd': 'FSD', '--epd': 'EPD', '--emsd': 'EMSD', '--ha': 'HA' };
-    for (const [v, d] of Object.entries(deptMap)) {
-      if (style.includes(v)) { selectDept(d); break; }
-    }
-  });
+deptFilter.addEventListener('change', syncDepartmentUI);
+
+deptCards.forEach((card) => {
+  card.addEventListener('click', () => selectDept(card.dataset.dept || ''));
 });
 
-// Starter cards
-document.querySelectorAll('.starter-card').forEach(card => {
+deptItems.forEach((item) => {
+  item.addEventListener('click', () => selectDept(item.dataset.dept || ''));
+});
+
+document.querySelectorAll('.starter-card').forEach((card) => {
   card.addEventListener('click', () => askQuestion(card));
 });
 
-// ─── Health & Sources ───
+syncDepartmentUI();
+checkHealth();
+loadSources();
+setInterval(checkHealth, 60000);
+
 async function checkHealth() {
   try {
-    const res = await fetch('/api/health');
-    const data = await res.json();
-    const dot = $('statusDot'), text = $('statusText'), docs = $('docCount');
-    const scrape = $('lastScrape'), badge = $('topbarBadge');
+    const response = await fetch('/api/health');
+    const data = await response.json();
+    const dot = $('statusDot');
+    const text = $('statusText');
+    const docs = $('docCount');
+    const scrape = $('lastScrape');
+    const badge = $('topbarBadge');
+    const chunks = data.documentChunks || 0;
 
     dot.className = data.status === 'healthy' ? 'status-dot healthy' : 'status-dot unhealthy';
     text.textContent = data.status === 'healthy' ? 'Healthy' : 'Unhealthy';
+    docs.textContent = chunks > 0 ? chunks.toLocaleString() : '-';
+    badge.textContent = chunks > 0 ? chunks.toLocaleString() + ' clauses indexed' : 'Corpus not indexed';
 
-    const chunks = data.documentChunks || 0;
-    docs.textContent = chunks.toLocaleString();
-    badge.textContent = chunks.toLocaleString() + ' chunks indexed';
+    const statChunks = $('statChunks');
+    if (statChunks) statChunks.textContent = chunks > 0 ? chunks.toLocaleString() : '-';
 
-    const sc = $('statChunks'), sd = $('statDocs');
-    if (sc) sc.textContent = chunks > 0 ? chunks.toLocaleString() : '—';
-    if (sd) sd.textContent = chunks > 0 ? Math.ceil(chunks / 50).toLocaleString() : '—';
-    scrape.textContent = data.lastScrape ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year:'numeric', month:'short', day:'numeric' }) : 'Never';
+    scrape.textContent = data.lastScrape
+      ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' })
+      : 'Never';
   } catch {
     $('statusDot').className = 'status-dot unhealthy';
     $('statusText').textContent = 'Offline';
+    $('topbarBadge').textContent = 'Health check unavailable';
   }
 }
 
 async function loadSources() {
   try {
-    // Load department summary
-    const res = await fetch('/api/sources');
-    const data = await res.json();
-    const el = $('sourcesList');
+    const response = await fetch('/api/sources');
+    const data = await response.json();
+    const sourceList = $('sourcesList');
+
     if (!data.sources || data.sources.length === 0) {
-      el.innerHTML = '<div style="color:#475569;font-size:11px">No documents ingested</div>';
+      sourceList.innerHTML = '<div class="source-list-empty">No documents have been ingested yet.</div>';
       return;
     }
-    for (const s of data.sources) {
-      const c = $('deptCount' + s.department);
-      if (c) c.textContent = s.chunk_count;
+
+    for (const source of data.sources) {
+      const countEl = $('deptCount' + source.department);
+      if (countEl) countEl.textContent = (source.chunk_count || 0).toLocaleString();
     }
-    // Load individual documents with PDF links
-    const docsRes = await fetch('/api/documents');
-    const docsData = await docsRes.json();
-    if (docsData.documents && docsData.documents.length > 0) {
+
+    let documents = [];
+    try {
+      const docsResponse = await fetch('/api/documents');
+      const docsData = await docsResponse.json();
+      documents = docsData.documents || [];
+    } catch {}
+
+    if (documents.length > 0) {
       const byDept = {};
-      for (const d of docsData.documents) {
-        const dept = d.source_department || 'BD';
+      for (const document of documents) {
+        const dept = document.source_department || 'BD';
         if (!byDept[dept]) byDept[dept] = [];
-        byDept[dept].push(d);
+        byDept[dept].push(document);
       }
+
+      const deptOrder = ['BD', 'FSD', 'EPD', 'EMSD', 'HA'];
+      const groups = Object.keys(byDept).sort((a, b) => deptOrder.indexOf(a) - deptOrder.indexOf(b));
+
+      $('statDocs').textContent = documents.length.toLocaleString();
+      $('statDepts').textContent = groups.length.toLocaleString();
+
       let html = '';
-      for (const [dept, docs] of Object.entries(byDept)) {
-        html += '<div style="margin-bottom:8px">';
-        html += '<div style="color:#94a3b8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">' + dept + ' — ' + docs.length + ' documents</div>';
-        for (const d of docs.slice(0, 8)) {
-          const name = (d.document_name || '').length > 40 ? d.document_name.slice(0,40) + '...' : d.document_name;
-          if (d.pdf_url) {
-            html += '<a href="' + d.pdf_url + '" target="_blank" rel="noopener" style="display:block;color:#64748b;font-size:11px;padding:2px 0;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</a>';
-          } else {
-            html += '<div style="color:#475569;font-size:11px;padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</div>';
-          }
+      for (const dept of groups) {
+        const deptDocs = byDept[dept];
+        html += '<div class="source-doc-group">';
+        html += '<div class="source-doc-header"><span class="source-doc-dept">' + escapeHtml(dept + ' - ' + (DEPTS[dept]?.name || dept)) + '</span><span class="source-doc-count">' + deptDocs.length + ' docs</span></div>';
+
+        for (const document of deptDocs.slice(0, 6)) {
+          html += renderDocumentLink(document);
         }
-        if (docs.length > 8) {
-          const moreId = 'more-' + dept;
+
+        if (deptDocs.length > 6) {
           const hiddenId = 'hidden-' + dept;
-          html += '<div id="' + hiddenId + '" style="display:none">';
-          for (const d of docs.slice(8)) {
-            const name = (d.document_name || '').length > 40 ? d.document_name.slice(0,40) + '...' : d.document_name;
-            if (d.pdf_url) {
-              html += '<a href="' + d.pdf_url + '" target="_blank" rel="noopener" style="display:block;color:#64748b;font-size:11px;padding:2px 0;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</a>';
-            } else {
-              html += '<div style="color:#475569;font-size:11px;padding:2px 0">' + name + '</div>';
-            }
+          const buttonId = 'more-' + dept;
+          html += '<div id="' + hiddenId + '" hidden>';
+          for (const document of deptDocs.slice(6)) {
+            html += renderDocumentLink(document);
           }
           html += '</div>';
-          html += '<div id="' + moreId + '" style="color:var(--primary-light);font-size:10px;padding:3px 0;cursor:pointer;font-weight:500">+ ' + (docs.length - 8) + ' more documents</div>';
+          html += '<button class="source-doc-more" id="' + buttonId + '" type="button">+ ' + (deptDocs.length - 6) + ' more documents</button>';
         }
+
         html += '</div>';
       }
-      el.innerHTML = html;
-      // Bind "more" toggles
-      for (const [dept] of Object.entries(byDept)) {
-        const moreBtn = $('more-' + dept);
-        const hiddenDiv = $('hidden-' + dept);
-        if (moreBtn && hiddenDiv) {
-          moreBtn.addEventListener('click', () => {
-            if (hiddenDiv.style.display === 'none') {
-              hiddenDiv.style.display = 'block';
-              moreBtn.textContent = '− Collapse';
-            } else {
-              hiddenDiv.style.display = 'none';
-              moreBtn.textContent = '+ ' + (byDept[dept].length - 8) + ' more documents';
-            }
+
+      sourceList.innerHTML = html;
+
+      for (const dept of groups) {
+        const button = $('more-' + dept);
+        const hidden = $('hidden-' + dept);
+        if (button && hidden) {
+          button.addEventListener('click', () => {
+            const expanded = !hidden.hidden;
+            hidden.hidden = expanded;
+            button.textContent = expanded ? '+ ' + (byDept[dept].length - 6) + ' more documents' : 'Collapse';
           });
         }
       }
-    } else {
-      el.innerHTML = data.sources.map(s =>
-        '<div class="source-item"><span class="source-item-dept">' + s.department +
-        '</span><span class="source-item-stats">' + s.document_count + ' docs</span></div>'
-      ).join('');
+      return;
     }
+
+    sourceList.innerHTML = data.sources.map((source) => {
+      return '<div class="source-item"><span class="source-item-dept">' + escapeHtml(source.department) + '</span><span class="source-item-stats">' + escapeHtml(String(source.document_count || 0)) + ' docs</span></div>';
+    }).join('');
   } catch {
-    $('sourcesList').innerHTML = '<div style="color:#475569">Could not load</div>';
+    $('sourcesList').innerHTML = '<div class="source-list-error">Could not load source metadata.</div>';
   }
 }
 
-checkHealth();
-loadSources();
-setInterval(checkHealth, 60000);
+function renderDocumentLink(document) {
+  const documentName = truncate(document.document_name || 'Untitled document', 54);
+  const title = escapeHtml(document.document_name || 'Untitled document');
+  if (document.pdf_url) {
+    return '<a class="source-doc-link" href="' + escapeAttribute(document.pdf_url) + '" target="_blank" rel="noopener" title="' + title + '">' + escapeHtml(documentName) + '</a>';
+  }
+  return '<div class="source-doc-name" title="' + title + '">' + escapeHtml(documentName) + '</div>';
+}
 
-// ─── Core functions ───
+function syncDepartmentUI() {
+  const selected = deptFilter.value;
+  deptCards.forEach((card) => {
+    card.classList.toggle('is-active', card.dataset.dept === selected);
+  });
+  deptItems.forEach((item) => {
+    item.classList.toggle('is-active', item.dataset.dept === selected);
+  });
+  activeDeptPill.textContent = selected ? selected + ' only' : 'All departments';
+}
+
 function selectDept(dept) {
-  deptFilter.value = dept;
-  if (window.innerWidth <= 768) toggleSidebar();
+  deptFilter.value = deptFilter.value === dept ? '' : dept;
+  syncDepartmentUI();
+  if (window.innerWidth <= 980 && sidebar.classList.contains('open')) closeSidebar();
+  queryInput.focus();
+}
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('open');
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('open');
 }
 
 function toggleSidebar() {
-  $('sidebar').classList.toggle('open');
-  $('sidebarOverlay').classList.toggle('open');
+  if (sidebar.classList.contains('open')) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
 }
 
-function openModal() { $('infoModal').classList.add('open'); }
-function closeModal() { $('infoModal').classList.remove('open'); }
+function openModal() {
+  infoModal.classList.add('open');
+}
+
+function closeModal() {
+  infoModal.classList.remove('open');
+}
+
+function setLandingVisible(visible) {
+  landingState.hidden = !visible;
+}
 
 function clearChat() {
-  chatInner.querySelectorAll('.message').forEach(m => m.remove());
-  if (landingState) landingState.style.display = 'flex';
+  chatInner.querySelectorAll('.message').forEach((message) => message.remove());
+  setLandingVisible(true);
   queryInput.focus();
 }
 
 function askQuestion(card) {
-  const dept = card.querySelector('.starter-dept')?.textContent || '';
-  const code = dept.match(/^(\w+)/)?.[1] || '';
-  if (code) deptFilter.value = code;
-  queryInput.value = card.textContent.replace(dept, '').trim();
+  const dept = card.dataset.dept || '';
+  if (dept) {
+    deptFilter.value = dept;
+    syncDepartmentUI();
+  }
+  const label = card.querySelector('.starter-dept')?.textContent || '';
+  queryInput.value = card.textContent.replace(label, '').trim();
   queryInput.dispatchEvent(new Event('input'));
   sendQuery();
 }
 
-// ─── Send query (SSE streaming) ───
 async function sendQuery() {
   const query = queryInput.value.trim();
   if (!query || isStreaming) return;
 
-  if (landingState) landingState.style.display = 'none';
+  setLandingVisible(false);
   appendMessage('user', query);
   queryInput.value = '';
   queryInput.style.height = 'auto';
@@ -1055,59 +1986,61 @@ async function sendQuery() {
   const body = { query };
   if (dept) body.filter = { department: dept };
 
-  const msgEl = document.createElement('div');
-  msgEl.className = 'message message-assistant';
-  chatInner.appendChild(msgEl);
+  const assistantMessage = document.createElement('div');
+  assistantMessage.className = 'message message-assistant';
+  chatInner.appendChild(assistantMessage);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'stream-status';
-  statusEl.innerHTML = '<div class="dot-pulse"><span></span><span></span><span></span></div><span>Connecting...</span>';
-  msgEl.appendChild(statusEl);
+  statusEl.innerHTML = '<div class="dot-pulse"><span></span><span></span><span></span></div><span>Connecting</span>';
+  assistantMessage.appendChild(statusEl);
   scrollToBottom();
 
   let answerEl = null;
   let rawText = '';
-  const pdfUrlMap = {}; // document_name → pdf_url
+  const pdfUrlMap = {};
 
   function getOrCreateAnswer() {
     if (!answerEl) {
-      // Hide status indicator once answer starts
       statusEl.style.display = 'none';
       answerEl = document.createElement('div');
       answerEl.className = 'answer-bubble';
-      // Copy button
-      const btn = document.createElement('button');
-      btn.className = 'copy-btn';
-      btn.textContent = 'Copy';
-      btn.addEventListener('click', () => {
+
+      const copyButton = document.createElement('button');
+      copyButton.className = 'copy-btn';
+      copyButton.type = 'button';
+      copyButton.textContent = 'Copy';
+      copyButton.addEventListener('click', () => {
         navigator.clipboard.writeText(rawText).then(() => {
-          btn.textContent = 'Copied!';
-          setTimeout(() => btn.textContent = 'Copy', 1500);
+          copyButton.textContent = 'Copied';
+          setTimeout(() => {
+            copyButton.textContent = 'Copy';
+          }, 1400);
         }).catch(() => {});
       });
-      answerEl.appendChild(btn);
-      // Content area
+
       const content = document.createElement('div');
       content.className = 'answer-content';
+      answerEl.appendChild(copyButton);
       answerEl.appendChild(content);
-      msgEl.appendChild(answerEl);
+      assistantMessage.appendChild(answerEl);
     }
     return answerEl;
   }
 
   try {
-    const res = await fetch('/api/query/stream', {
+    const response = await fetch('/api/query/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Request failed' }));
-      throw new Error(err.error || 'HTTP ' + res.status);
+    if (!response.ok) {
+      const errorPayload = await response.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(errorPayload.error || 'HTTP ' + response.status);
     }
 
-    const reader = res.body.getReader();
+    const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
 
@@ -1120,78 +2053,65 @@ async function sendQuery() {
 
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
-        try {
-          const ev = JSON.parse(line.slice(6));
 
-          if (ev.type === 'status') {
-            const span = statusEl.querySelector('span:last-child');
-            if (span) span.textContent = ev.message;
+        try {
+          const event = JSON.parse(line.slice(6));
+
+          if (event.type === 'status') {
+            const label = statusEl.querySelector('span:last-child');
+            if (label) label.textContent = event.message;
             scrollToBottom();
-          }
-          else if (ev.type === 'sources' && ev.sources?.length) {
-            // Store PDF URLs for citation linking
-            for (const s of ev.sources) {
-              if (s.pdf_url && s.document_name) pdfUrlMap[s.document_name] = s.pdf_url;
+          } else if (event.type === 'sources' && event.sources?.length) {
+            for (const source of event.sources) {
+              if (source.pdf_url && source.document_name) {
+                pdfUrlMap[source.document_name] = source.pdf_url;
+              }
             }
+
             const strip = document.createElement('div');
             strip.className = 'sources-strip';
-            // Deduplicate by document name
             const seen = new Set();
-            const unique = ev.sources.filter(s => {
-              if (seen.has(s.document_name)) return false;
-              seen.add(s.document_name);
+            const uniqueSources = event.sources.filter((source) => {
+              if (seen.has(source.document_name)) return false;
+              seen.add(source.document_name);
               return true;
             });
-            strip.innerHTML = unique.map(s => {
-              const d = s.department || 'BD';
-              const url = s.pdf_url || '#';
-              const hasUrl = s.pdf_url ? true : false;
-              return '<a class="source-card" data-dept="' + d + '" href="' + url + '" target="_blank" rel="noopener"' + (hasUrl ? '' : ' style="cursor:default"') + '>' +
-                '<div class="source-card-dept">' + d + ' — ' + (DEPTS[d]?.name || d) + '</div>' +
-                '<div class="source-card-name">' + (s.document_name || 'Regulation') + '</div>' +
-                '<div class="source-card-section">' + (s.section || []).join(' &rsaquo; ') + '</div>' +
-                (hasUrl ? '<div class="source-card-link"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Open PDF</div>' : '') +
-                '</a>';
+
+            strip.innerHTML = uniqueSources.map(renderSourceCard).join('');
+            assistantMessage.insertBefore(strip, statusEl);
+            scrollToBottom();
+          } else if (event.type === 'token') {
+            const bubble = getOrCreateAnswer();
+            rawText += event.content;
+            bubble.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
+            scrollToBottom();
+          } else if (event.type === 'web_sources' && event.sources?.length) {
+            const webSources = document.createElement('div');
+            webSources.className = 'web-sources';
+            webSources.innerHTML = '<div class="web-sources-title">Live web sources</div>' + event.sources.map((source) => {
+              const href = escapeAttribute(source.url || '#');
+              const title = escapeHtml(source.title || 'Untitled source');
+              const host = escapeHtml(source.source || 'External');
+              return '<a class="web-source-link" href="' + href + '" target="_blank" rel="noopener">' + title + ' <span>(' + host + ')</span></a>';
             }).join('');
-            msgEl.insertBefore(strip, statusEl);
+            assistantMessage.appendChild(webSources);
             scrollToBottom();
+          } else if (event.type === 'error') {
+            statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + escapeHtml(event.message || 'Request failed') + '</span>';
           }
-          else if (ev.type === 'token') {
-            const el = getOrCreateAnswer();
-            rawText += ev.content;
-            el.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
-            scrollToBottom();
-          }
-          else if (ev.type === 'web_sources' && ev.sources?.length) {
-            const webDiv = document.createElement('div');
-            webDiv.style.cssText = 'margin-top:8px;padding:8px 12px;background:var(--border-light);border-radius:var(--radius);font-size:11px';
-            webDiv.innerHTML = '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Live Web Sources</div>' +
-              ev.sources.map(s => {
-                const isExternal = s.url.startsWith('http');
-                return '<a href="' + s.url + '"' + (isExternal ? ' target="_blank" rel="noopener"' : '') +
-                  ' style="display:block;color:var(--primary);font-size:11px;text-decoration:none;padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + s.title + '">' +
-                  s.title + ' <span style="color:var(--text-muted)">(' + s.source + ')</span></a>';
-              }).join('');
-            msgEl.appendChild(webDiv);
-            scrollToBottom();
-          }
-          else if (ev.type === 'error') {
-            statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + ev.message + '</span>';
-          }
-        } catch(e) {}
+        } catch {}
       }
     }
 
-    // Stream done
     statusEl.remove();
-    const disc = document.createElement('div');
-    disc.className = 'disclaimer';
-    disc.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>For reference only — not legal advice. Verify with the relevant HK government department.</span>';
-    msgEl.appendChild(disc);
+    const disclaimer = document.createElement('div');
+    disclaimer.className = 'disclaimer';
+    disclaimer.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>For reference only. Verify the cited clause and confirm with the relevant Hong Kong government authority where required.</span>';
+    assistantMessage.appendChild(disclaimer);
     scrollToBottom();
-
-  } catch (err) {
-    statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + (err.message || 'Connection failed') + '</span>';
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Connection failed';
+    statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + escapeHtml(message) + '</span>';
   } finally {
     isStreaming = false;
     sendBtn.disabled = false;
@@ -1199,50 +2119,87 @@ async function sendQuery() {
   }
 }
 
-// ─── Helpers ───
+function renderSourceCard(source) {
+  const dept = source.department || 'BD';
+  const deptName = escapeHtml(DEPTS[dept]?.name || dept);
+  const documentName = escapeHtml(source.document_name || 'Regulation');
+  const sectionText = escapeHtml((source.section || []).join(' > '));
+  const link = source.pdf_url ? escapeAttribute(source.pdf_url) : '';
+
+  const inner = '<div class="source-card-dept">' + escapeHtml(dept) + ' - ' + deptName + '</div>' +
+    '<div class="source-card-name">' + documentName + '</div>' +
+    '<div class="source-card-section">' + sectionText + '</div>' +
+    (source.pdf_url ? '<div class="source-card-link"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Open PDF</div>' : '');
+
+  if (!source.pdf_url) {
+    return '<article class="source-card-static" data-dept="' + escapeAttribute(dept) + '">' + inner + '</article>';
+  }
+
+  return '<a class="source-card" data-dept="' + escapeAttribute(dept) + '" href="' + link + '" target="_blank" rel="noopener">' + inner + '</a>';
+}
+
 function appendMessage(role, text) {
-  const msg = document.createElement('div');
-  msg.className = 'message message-' + role;
+  const message = document.createElement('div');
+  message.className = 'message message-' + role;
   const bubble = document.createElement('div');
   bubble.className = 'message-bubble';
   bubble.textContent = text;
-  msg.appendChild(bubble);
-  chatInner.appendChild(msg);
+  message.appendChild(bubble);
+  chatInner.appendChild(message);
   scrollToBottom();
 }
 
 function scrollToBottom() {
-  requestAnimationFrame(() => chatArea.scrollTop = chatArea.scrollHeight);
+  requestAnimationFrame(() => {
+    chatArea.scrollTop = chatArea.scrollHeight;
+  });
 }
 
 function formatMarkdown(text, urlMap) {
-  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Citations: make them clickable links to source PDFs
-  h = h.replace(/\[([^\]]{5,})\]/g, function(match, inner) {
+  let html = escapeHtml(text);
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/\[([^\]]{5,})\]/g, (match, inner) => {
     if (!urlMap) return '<span class="citation">[' + inner + ']</span>';
-    // Try to find a matching document name in the citation text
     let url = null;
-    for (const [docName, pdfUrl] of Object.entries(urlMap)) {
-      // Match if the citation contains a substantial part of the document name
-      const shortName = docName.split(' ').slice(0, 4).join(' ');
-      if (inner.includes(docName) || inner.includes(shortName) || docName.includes(inner.split(',')[0].trim())) {
+    for (const [documentName, pdfUrl] of Object.entries(urlMap)) {
+      const shortName = documentName.split(' ').slice(0, 4).join(' ');
+      const prefix = inner.split(',')[0].trim();
+      if (inner.includes(documentName) || inner.includes(shortName) || documentName.includes(prefix)) {
         url = pdfUrl;
         break;
       }
     }
     if (url) {
-      return '<a class="citation citation-link" href="' + url + '" target="_blank" rel="noopener" title="Open source PDF">[' + inner + ']</a>';
+      return '<a class="citation citation-link" href="' + escapeAttribute(url) + '" target="_blank" rel="noopener" title="Open source PDF">[' + inner + ']</a>';
     }
     return '<span class="citation">[' + inner + ']</span>';
   });
-  h = h.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
-  h = h.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
-  h = h.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
-  h = h.replace(/\n\n+/g, '</p><p>');
-  h = h.replace(/\n/g, '<br>');
-  return '<p>' + h + '</p>';
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
+  html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+  html = html.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+  html = html.replace(/\n\n+/g, '</p><p>');
+  html = html.replace(/\n/g, '<br>');
+  return '<p>' + html + '</p>';
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
+}
+
+function truncate(value, length) {
+  const string = String(value);
+  if (string.length <= length) return string;
+  return string.slice(0, length - 3) + '...';
 }
 
 })();
