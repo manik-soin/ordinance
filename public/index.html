@@ -86,51 +86,22 @@ button,input,select,textarea{font:inherit}
 [hidden]{display:none !important}
 
 .sidebar{
-  width:328px;
-  min-width:328px;
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  width:min(380px,88vw);
   display:flex;
   flex-direction:column;
-  background:var(--surface);
+  background:rgba(255,255,255,.96);
   backdrop-filter:blur(18px);
   border-right:1px solid var(--line);
-  box-shadow:var(--shadow-sm);
-  position:relative;
-  z-index:2;
-  transition:width .22s ease,min-width .22s ease;
+  box-shadow:var(--shadow-lg);
+  z-index:120;
+  transform:translateX(-102%);
+  transition:transform .24s ease;
 }
-.sidebar.collapsed{
-  width:0;
-  min-width:0;
-  overflow:hidden;
-  border-right:none;
-}
-.sidebar-collapse-btn{
-  position:fixed;
-  top:50%;
-  left:316px;
-  width:24px;
-  height:24px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:var(--surface-strong);
-  color:var(--ink-muted);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  z-index:3;
-  box-shadow:var(--shadow-sm);
-  transition:left .22s ease;
-}
-.sidebar.collapsed + .sidebar-collapse-btn{
-  left:8px;
-}
-.sidebar-collapse-btn:hover{
-  color:var(--ink);
-}
-.sidebar.collapsed + .sidebar-collapse-btn svg{
-  transform:rotate(180deg);
-}
+.sidebar.open{transform:translateX(0)}
 .sidebar-header{
   padding:24px;
   border-bottom:1px solid var(--line);
@@ -429,7 +400,7 @@ button,input,select,textarea{font:inherit}
   padding:20px 28px 14px;
 }
 .topbar-menu{
-  display:none;
+  display:flex;
   width:44px;
   height:44px;
   border-radius:16px;
@@ -1054,30 +1025,34 @@ button,input,select,textarea{font:inherit}
   color:#f6fbf8;
   transform:translateY(-1px);
 }
-.copy-btn{
-  position:absolute;
-  top:14px;
-  right:14px;
+.answer-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+  margin-bottom:8px;
+  opacity:0;
+  transition:opacity .15s ease;
+}
+.answer-bubble:hover .answer-actions{
+  opacity:1;
+}
+.copy-btn,
+.share-btn{
   display:inline-flex;
   align-items:center;
-  justify-content:center;
+  gap:5px;
   border:none;
   border-radius:12px;
   background:rgba(20,22,20,.05);
   color:var(--ink-muted);
-  padding:8px 10px;
+  padding:7px 10px;
   font-size:11px;
   font-family:var(--font-mono);
   cursor:pointer;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .15s ease,background .15s ease,color .15s ease;
+  transition:background .15s ease,color .15s ease;
 }
-.answer-bubble:hover .copy-btn{
-  opacity:1;
-  pointer-events:auto;
-}
-.copy-btn:hover{
+.copy-btn:hover,
+.share-btn:hover{
   background:var(--accent-soft);
   color:var(--accent-strong);
 }
@@ -1399,29 +1374,11 @@ button,input,select,textarea{font:inherit}
   body::before{display:none}
   body::after{display:none}
   .main{min-height:var(--viewport-height)}
-  .sidebar{
-    position:fixed;
-    top:0;
-    left:0;
-    bottom:0;
-    width:min(380px,88vw);
-    min-width:unset;
-    border-radius:0 28px 28px 0;
-    border:1px solid rgba(20,22,20,.08);
-    transform:translateX(-102%);
-    transition:transform .24s ease;
-    z-index:120;
-    box-shadow:var(--shadow-lg);
-    backdrop-filter:none;
-    background:rgba(255,255,255,.96);
-  }
-  .sidebar.open{transform:translateX(0)}
+  .sidebar{border-radius:0 28px 28px 0}
   .sidebar-header{padding:20px 18px 16px}
   .sidebar-scroll{padding:16px 16px 10px}
   .sidebar-status{padding:0 16px 16px}
   .sidebar-footer{padding:0 18px calc(18px + env(safe-area-inset-bottom))}
-  .topbar-menu{display:flex}
-  .sidebar-collapse-btn{display:none}
   .topbar{padding:10px 16px 6px}
   .topbar-title{display:none}
   .chat-area{padding:0 14px calc(120px + env(safe-area-inset-bottom))}
@@ -1450,12 +1407,8 @@ button,input,select,textarea{font:inherit}
   .answer-bubble,
   .source-card,
   .source-card-static{backdrop-filter:none}
-  .copy-btn{
-    position:static;
+  .answer-actions{
     opacity:1;
-    pointer-events:auto;
-    margin-left:auto;
-    margin-bottom:10px;
   }
   .landing{gap:10px;padding-bottom:12px}
   .starter-section{padding:16px;border-radius:24px}
@@ -1695,10 +1648,6 @@ button,input,select,textarea{font:inherit}
   </div>
 </aside>
 
-<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" aria-label="Toggle sidebar">
-  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-</button>
-
 <div class="modal-overlay" id="infoModal">
   <div class="modal">
     <div class="modal-header">
@@ -1910,9 +1859,6 @@ queryInput.addEventListener('focus', () => {
 
 sidebarOverlay.addEventListener('click', closeSidebar);
 document.querySelector('.topbar-menu')?.addEventListener('click', toggleSidebar);
-$('sidebarCollapseBtn')?.addEventListener('click', () => {
-  sidebar.classList.toggle('collapsed');
-});
 document.querySelector('.new-chat-btn')?.addEventListener('click', clearChat);
 
 document.querySelector('.topbar-info-btn')?.addEventListener('click', openModal);
@@ -2208,9 +2154,31 @@ async function sendQuery() {
         }).catch(() => {});
       });
 
+      const shareButton = document.createElement('button');
+      shareButton.className = 'share-btn';
+      shareButton.type = 'button';
+      shareButton.innerHTML = '<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4-4 4m4-4v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Share';
+      shareButton.addEventListener('click', () => {
+        const shareText = rawText + '\n\n— Ordinance (ordinance.maniksoin.com)';
+        if (navigator.share) {
+          navigator.share({ text: shareText }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(shareText).then(() => {
+            shareButton.textContent = 'Copied link';
+            setTimeout(() => {
+              shareButton.innerHTML = '<svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4-4 4m4-4v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Share';
+            }, 1400);
+          }).catch(() => {});
+        }
+      });
+
       const content = document.createElement('div');
       content.className = 'answer-content';
-      answerEl.appendChild(copyButton);
+      const actionRow = document.createElement('div');
+      actionRow.className = 'answer-actions';
+      actionRow.appendChild(copyButton);
+      actionRow.appendChild(shareButton);
+      answerEl.appendChild(actionRow);
       answerEl.appendChild(content);
       assistantMessage.appendChild(answerEl);
     }
