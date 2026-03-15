@@ -398,9 +398,10 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   background:var(--border-light);border:1px solid var(--border);
   border-radius:6px;padding:4px 8px;cursor:pointer;
   font-size:10px;color:var(--text-muted);transition:all .2s;
-  font-family:var(--font-body);opacity:0;
+  font-family:var(--font-body);opacity:0;pointer-events:none;
+  z-index:2;
 }
-.answer-bubble:hover .copy-btn{opacity:1}
+.answer-bubble:hover .copy-btn{opacity:1;pointer-events:auto}
 .copy-btn:hover{background:var(--primary-subtle);color:var(--primary);border-color:var(--primary-light)}
 
 /* Quality bar */
@@ -961,11 +962,39 @@ async function loadSources() {
           }
         }
         if (docs.length > 8) {
-          html += '<div style="color:#475569;font-size:10px;padding:2px 0">+ ' + (docs.length - 8) + ' more documents</div>';
+          const moreId = 'more-' + dept;
+          const hiddenId = 'hidden-' + dept;
+          html += '<div id="' + hiddenId + '" style="display:none">';
+          for (const d of docs.slice(8)) {
+            const name = (d.document_name || '').length > 40 ? d.document_name.slice(0,40) + '...' : d.document_name;
+            if (d.pdf_url) {
+              html += '<a href="' + d.pdf_url + '" target="_blank" rel="noopener" style="display:block;color:#64748b;font-size:11px;padding:2px 0;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</a>';
+            } else {
+              html += '<div style="color:#475569;font-size:11px;padding:2px 0">' + name + '</div>';
+            }
+          }
+          html += '</div>';
+          html += '<div id="' + moreId + '" style="color:var(--primary-light);font-size:10px;padding:3px 0;cursor:pointer;font-weight:500">+ ' + (docs.length - 8) + ' more documents</div>';
         }
         html += '</div>';
       }
       el.innerHTML = html;
+      // Bind "more" toggles
+      for (const [dept] of Object.entries(byDept)) {
+        const moreBtn = $('more-' + dept);
+        const hiddenDiv = $('hidden-' + dept);
+        if (moreBtn && hiddenDiv) {
+          moreBtn.addEventListener('click', () => {
+            if (hiddenDiv.style.display === 'none') {
+              hiddenDiv.style.display = 'block';
+              moreBtn.textContent = '− Collapse';
+            } else {
+              hiddenDiv.style.display = 'none';
+              moreBtn.textContent = '+ ' + (byDept[dept].length - 8) + ' more documents';
+            }
+          });
+        }
+      }
     } else {
       el.innerHTML = data.sources.map(s =>
         '<div class="source-item"><span class="source-item-dept">' + s.department +
@@ -1042,6 +1071,8 @@ async function sendQuery() {
 
   function getOrCreateAnswer() {
     if (!answerEl) {
+      // Hide status indicator once answer starts
+      statusEl.style.display = 'none';
       answerEl = document.createElement('div');
       answerEl.className = 'answer-bubble';
       // Copy button
