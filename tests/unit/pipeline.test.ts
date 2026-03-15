@@ -173,8 +173,8 @@ describe('queryPipeline', () => {
     // 1. Query expansion called
     expect(expandQuery).toHaveBeenCalledWith('What is the fire resistance requirement?');
 
-    // 2. Hybrid search called for each expanded query
-    expect(hybridSearch).toHaveBeenCalledTimes(2);
+    // 2. Hybrid search: primary query + expanded queries in parallel
+    expect(hybridSearch).toHaveBeenCalledTimes(3);
 
     // 3. RRF fusion called to merge results
     expect(rrfFuse).toHaveBeenCalledTimes(1);

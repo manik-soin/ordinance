@@ -45,33 +45,26 @@ export async function queryPipeline(
   const useReranker = options?.useReranker ?? true;
   const topK = options?.topK ?? 5;
 
-  // 1. Query expansion (optional)
-  let queries: string[];
-  if (useExpansion) {
-    queries = await expandQuery(query);
-  } else {
-    queries = [query];
-  }
+  // 1. Run query expansion AND primary search in parallel
+  //    The original query search starts immediately while expansion runs
+  const [primaryResults, expandedQueries] = await Promise.all([
+    hybridSearch(pool, query, { filter: options?.filter, topK: topK * 2 }),
+    useExpansion ? expandQuery(query) : Promise.resolve([query]),
+  ]);
 
-  // 2. Hybrid retrieval (run for each expanded query, then fuse)
-  let allResults: SearchResult[] = [];
-  if (queries.length === 1) {
-    allResults = await hybridSearch(pool, queries[0], {
-      filter: options?.filter,
-      topK: topK * 2,
-    });
-  } else {
-    const perQueryResults = await Promise.all(
-      queries.map((q) =>
-        hybridSearch(pool, q, {
-          filter: options?.filter,
-          topK: topK,
-        })
+  // 2. If expansion produced extra queries, search those and fuse with primary
+  let allResults: SearchResult[];
+  const extraQueries = expandedQueries.filter((q) => q !== query);
+  if (extraQueries.length > 0) {
+    const extraResults = await Promise.all(
+      extraQueries.map((q) =>
+        hybridSearch(pool, q, { filter: options?.filter, topK: topK })
       )
     );
-    // Merge all results with RRF
-    const flat = perQueryResults.flat();
+    const flat = [...primaryResults, ...extraResults.flat()];
     allResults = rrfFuse(flat, [], topK * 2);
+  } else {
+    allResults = primaryResults;
   }
 
   // 3. Rerank (optional)
