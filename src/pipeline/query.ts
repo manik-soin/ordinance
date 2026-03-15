@@ -8,7 +8,7 @@ import { scoreFaithfulness } from '../safety/faithfulness.js';
 import { logQueryAudit } from '../db/store.js';
 import { rrfFuse } from '../retrieval/hybrid-search.js';
 import { liveWebSearch } from '../retrieval/web-search.js';
-import { checkCache, writeCache } from '../cache/semantic-cache.js';
+import { checkExactCache, checkSemanticCache, writeCache } from '../cache/semantic-cache.js';
 import { estimateQueryCost } from '../observability/cost-tracker.js';
 import { contextualizeFollowUpQuery } from '../retrieval/follow-up-context.js';
 import type { SearchFilter, SearchResult } from '../retrieval/hybrid-search.js';
@@ -16,6 +16,7 @@ import type { Citation } from '../generator/index.js';
 import type { VerificationResult } from '../safety/citation-verifier.js';
 import type { FaithfulnessResult } from '../safety/faithfulness.js';
 import type { ConversationTurn } from '../retrieval/follow-up-context.js';
+import { embedQuery } from '../embedder/index.js';
 
 export interface QueryPipelineResult {
   answer: string;
@@ -58,18 +59,18 @@ export async function queryPipeline(
     options?.history ?? []
   ).catch(() => query);
 
-  // 0. Check semantic cache first (500x speedup on cache hit)
-  const cached = await checkCache(pool, resolvedQuery, options?.filter).catch(() => null);
-  if (cached) {
+  // 0. Exact-match cache avoids any model call on repeated queries.
+  const exactCached = await checkExactCache(pool, resolvedQuery, options?.filter).catch(() => null);
+  if (exactCached) {
     const liveSearch = await liveWebSearch(resolvedQuery).catch(() => ({
       webResults: [],
       supplementaryContext: '',
     }));
 
     return {
-      answer: cached.answer,
-      citations: (cached.citations ?? []) as Citation[],
-      sources: (cached.sources ?? []) as SearchResult[],
+      answer: exactCached.answer,
+      citations: (exactCached.citations ?? []) as Citation[],
+      sources: (exactCached.sources ?? []) as SearchResult[],
       verification: { totalCitations: 0, verifiedCitations: 0, citationAccuracy: 1, phantomCitations: [], uncitedClaims: [] } as VerificationResult,
       faithfulness: { score: -1, reasoning: 'Cached', flaggedClaims: [] },
       auditId: 'cached',
@@ -81,19 +82,63 @@ export async function queryPipeline(
         url: w.url,
         source: w.source,
       })),
-      cost: estimateQueryCost({ cached: true }),
+      cost: estimateQueryCost({ cached: true, embeddingTokens: 0 }),
     };
   }
 
-  // 1. Run query expansion + primary search + live web search in parallel
+  let queryEmbedding: number[] | undefined;
+  try {
+    queryEmbedding = await embedQuery(resolvedQuery);
+  } catch {
+    // Fall back to retrieval-layer embedding if the eager lookup fails.
+  }
+
+  // 1. Semantic cache still saves the generation path, but only after reusing the
+  //    already-computed query embedding.
+  const semanticCached = queryEmbedding
+    ? await checkSemanticCache(pool, resolvedQuery, options?.filter, {
+      queryEmbedding,
+    }).catch(() => null)
+    : null;
+
+  if (semanticCached) {
+    const liveSearch = await liveWebSearch(resolvedQuery).catch(() => ({
+      webResults: [],
+      supplementaryContext: '',
+    }));
+
+    return {
+      answer: semanticCached.answer,
+      citations: (semanticCached.citations ?? []) as Citation[],
+      sources: (semanticCached.sources ?? []) as SearchResult[],
+      verification: { totalCitations: 0, verifiedCitations: 0, citationAccuracy: 1, phantomCitations: [], uncitedClaims: [] } as VerificationResult,
+      faithfulness: { score: -1, reasoning: 'Cached', flaggedClaims: [] },
+      auditId: 'cached',
+      latencyMs: Date.now() - start,
+      model: 'cached',
+      cached: true,
+      webSources: liveSearch.webResults.map((w) => ({
+        title: w.title,
+        url: w.url,
+        source: w.source,
+      })),
+      cost: estimateQueryCost({ cached: true, embeddingTokens: 50 }),
+    };
+  }
+
+  // 2. Run query expansion + primary search + live web search in parallel
   //    The original query search starts immediately while expansion runs
   const [primaryResults, expandedQueries, webSearch] = await Promise.all([
-    hybridSearch(pool, resolvedQuery, { filter: options?.filter, topK: topK * 2 }),
+    hybridSearch(pool, resolvedQuery, {
+      filter: options?.filter,
+      topK: topK * 2,
+      queryEmbedding,
+    }),
     useExpansion ? expandQuery(resolvedQuery) : Promise.resolve([resolvedQuery]),
     liveWebSearch(resolvedQuery),
   ]);
 
-  // 2. If expansion produced extra queries, search those and fuse with primary
+  // 3. If expansion produced extra queries, search those and fuse with primary
   let allResults: SearchResult[];
   const extraQueries = expandedQueries.filter((q) => q !== resolvedQuery);
   if (extraQueries.length > 0) {
@@ -108,7 +153,7 @@ export async function queryPipeline(
     allResults = primaryResults;
   }
 
-  // 3. Rerank (optional)
+  // 4. Rerank (optional)
   let reranked: SearchResult[];
   if (useReranker && allResults.length > 0) {
     reranked = await rerank(resolvedQuery, allResults, { topK });
@@ -116,22 +161,22 @@ export async function queryPipeline(
     reranked = allResults.slice(0, topK);
   }
 
-  // 4. Generate answer with citations
+  // 5. Generate answer with citations
   const generation = await generateAnswer(resolvedQuery, reranked, {
     supplementaryContext: webSearch.supplementaryContext,
   });
 
-  // 5. Verify citations (synchronous, fast)
+  // 6. Verify citations (synchronous, fast)
   const verification = verifyCitations(
     generation.answer,
     generation.citations,
     reranked
   );
 
-  // 6. Append disclaimer
+  // 7. Append disclaimer
   const finalAnswer = appendDisclaimer(generation.answer);
 
-  // 7. Faithfulness scoring + audit log — run in parallel (both are independent)
+  // 8. Faithfulness scoring + audit log — run in parallel (both are independent)
   const latencyMs = Date.now() - start;
   const [faithfulness, auditId] = await Promise.all([
     options?.skipFaithfulness
@@ -150,10 +195,12 @@ export async function queryPipeline(
     }),
   ]);
 
-  // 8. Write to semantic cache (non-blocking)
-  writeCache(pool, resolvedQuery, finalAnswer, generation.citations, reranked, options?.filter?.department).catch(() => {});
+  // 9. Write to cache (non-blocking).
+  writeCache(pool, resolvedQuery, finalAnswer, generation.citations, reranked, options?.filter, {
+    queryEmbedding,
+  }).catch(() => {});
 
-  // 9. Track cost
+  // 10. Track cost
   const cost = estimateQueryCost({
     generationModel: generation.model,
     promptTokens: generation.prompt_tokens,

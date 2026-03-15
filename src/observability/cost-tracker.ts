@@ -63,24 +63,26 @@ export function estimateQueryCost(options: {
   promptTokens?: number;
   completionTokens?: number;
   cached?: boolean;
+  embeddingTokens?: number;
 }): QueryCost {
   const model = options.generationModel ?? 'gpt-4o';
   const cached = options.cached ?? false;
+  const embeddingTokens = options.embeddingTokens ?? 50;
 
   if (cached) {
-    // Cache hit: only embedding cost
-    const embCost = calcCost('text-embedding-3-large', 50, 0);
+    // Cache hit: exact matches can be free; semantic matches still pay embedding cost.
+    const embCost = calcCost('text-embedding-3-large', embeddingTokens, 0);
     stats.totalQueries++;
     stats.cacheHits++;
     stats.totalCostUsd += embCost;
-    stats.totalTokens += 50;
+    stats.totalTokens += embeddingTokens;
 
     return {
       model: 'cached',
       promptTokens: 0,
       completionTokens: 0,
-      embeddingTokens: 50,
-      totalTokens: 50,
+      embeddingTokens,
+      totalTokens: embeddingTokens,
       costUsd: embCost,
       breakdown: { expansion: 0, embedding: embCost, generation: 0, faithfulness: 0 },
     };
@@ -89,31 +91,31 @@ export function estimateQueryCost(options: {
   // Estimates for each pipeline stage
   const expansionIn = 200;
   const expansionOut = 100;
-  const embeddingTokens = 50; // query embedding
+  const queryEmbeddingTokens = embeddingTokens;
   const genIn = options.promptTokens ?? 4000;
   const genOut = options.completionTokens ?? 500;
   const faithIn = 3000;
   const faithOut = 200;
 
   const expansionCost = calcCost('gpt-4o-mini', expansionIn, expansionOut);
-  const embeddingCost = calcCost('text-embedding-3-large', embeddingTokens, 0);
+  const embeddingCost = calcCost('text-embedding-3-large', queryEmbeddingTokens, 0);
   const generationCost = calcCost(model, genIn, genOut);
   const faithfulnessCost = calcCost('gpt-4o-mini', faithIn, faithOut);
   const totalCost = expansionCost + embeddingCost + generationCost + faithfulnessCost;
 
-  const totalTokens = expansionIn + expansionOut + embeddingTokens + genIn + genOut + faithIn + faithOut;
+  const totalTokens = expansionIn + expansionOut + queryEmbeddingTokens + genIn + genOut + faithIn + faithOut;
 
   stats.totalQueries++;
   stats.totalCostUsd += totalCost;
   stats.totalTokens += totalTokens;
 
   return {
-    model,
-    promptTokens: genIn,
-    completionTokens: genOut,
-    embeddingTokens,
-    totalTokens,
-    costUsd: totalCost,
+      model,
+      promptTokens: genIn,
+      completionTokens: genOut,
+      embeddingTokens: queryEmbeddingTokens,
+      totalTokens,
+      costUsd: totalCost,
     breakdown: {
       expansion: expansionCost,
       embedding: embeddingCost,

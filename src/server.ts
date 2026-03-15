@@ -11,6 +11,7 @@ import { runMigrations } from './db/migrate.js';
 import { ensureCacheTable } from './cache/semantic-cache.js';
 import { getPool } from './db/pool.js';
 import { startScheduler } from './scheduler/index.js';
+import { createRateLimitMiddleware } from './security/rate-limit.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +19,18 @@ dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? '3000', 10);
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+function envInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) {
+    return fallback;
+  }
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+app.set('trust proxy', IS_PRODUCTION ? 1 : false);
 
 // Middleware
 app.use(helmet({
@@ -63,45 +76,58 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Rate limiter: 8 requests per minute + 50 per day per IP
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const dailyBudgetMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 8;
-const DAILY_LIMIT_MAX = 50;
-const DAILY_WINDOW_MS = 24 * 60 * 60_000;
+const burstRateLimitMiddleware = createRateLimitMiddleware([
+  {
+    name: 'query-minute',
+    match: (req) => req.method === 'POST' && req.path === '/api/query',
+    windowMs: envInt('QUERY_RATE_LIMIT_WINDOW_MS', 60_000),
+    maxRequests: envInt('QUERY_RATE_LIMIT_MAX', 8),
+    concurrencyLimit: envInt('QUERY_CONCURRENCY_LIMIT', 2),
+    errorMessage: 'Too many requests. Please wait a moment before asking again.',
+  },
+  {
+    name: 'query-daily',
+    match: (req) => req.method === 'POST' && req.path === '/api/query',
+    windowMs: envInt('QUERY_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
+    maxRequests: envInt('QUERY_DAILY_LIMIT_MAX', 50),
+    errorMessage: 'Daily query limit reached. Please try again tomorrow.',
+  },
+  {
+    name: 'query-stream-minute',
+    match: (req) => req.method === 'POST' && req.path === '/api/query/stream',
+    windowMs: envInt('QUERY_STREAM_RATE_LIMIT_WINDOW_MS', 60_000),
+    maxRequests: envInt('QUERY_STREAM_RATE_LIMIT_MAX', 4),
+    concurrencyLimit: envInt('QUERY_STREAM_CONCURRENCY_LIMIT', 1),
+    errorMessage: 'Streaming rate limit exceeded. Please wait a moment before trying again.',
+  },
+  {
+    name: 'query-stream-daily',
+    match: (req) => req.method === 'POST' && req.path === '/api/query/stream',
+    windowMs: envInt('QUERY_STREAM_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
+    maxRequests: envInt('QUERY_STREAM_DAILY_LIMIT_MAX', 25),
+    errorMessage: 'Daily streaming limit reached. Please try again tomorrow.',
+  },
+]);
 
-function rateLimiter(req: Request, res: Response, next: NextFunction): void {
-  const ip = req.ip ?? req.socket.remoteAddress ?? 'unknown';
-  const now = Date.now();
+const dailyRateLimitMiddleware = createRateLimitMiddleware([
+  {
+    name: 'query-daily',
+    match: (req) => req.method === 'POST' && req.path === '/api/query',
+    windowMs: envInt('QUERY_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
+    maxRequests: envInt('QUERY_DAILY_LIMIT_MAX', 50),
+    errorMessage: 'Daily query limit reached. Please try again tomorrow.',
+  },
+  {
+    name: 'query-stream-daily',
+    match: (req) => req.method === 'POST' && req.path === '/api/query/stream',
+    windowMs: envInt('QUERY_STREAM_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
+    maxRequests: envInt('QUERY_STREAM_DAILY_LIMIT_MAX', 25),
+    errorMessage: 'Daily streaming limit reached. Please try again tomorrow.',
+  },
+]);
 
-  // Per-minute check
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-  } else if (entry.count >= RATE_LIMIT_MAX) {
-    res.status(429).json({ error: 'Too many requests. Please wait a moment before asking again.' });
-    return;
-  } else {
-    entry.count++;
-  }
-
-  // Daily budget check
-  const daily = dailyBudgetMap.get(ip);
-  if (!daily || now > daily.resetAt) {
-    dailyBudgetMap.set(ip, { count: 1, resetAt: now + DAILY_WINDOW_MS });
-  } else if (daily.count >= DAILY_LIMIT_MAX) {
-    res.status(429).json({ error: 'Daily query limit reached. Please try again tomorrow.' });
-    return;
-  } else {
-    daily.count++;
-  }
-
-  next();
-}
-
-// Apply rate limiting to query endpoints
-app.use('/api/query', rateLimiter);
+app.use(burstRateLimitMiddleware);
+app.use(dailyRateLimitMiddleware);
 
 // Routes
 app.use('/api', router);
@@ -146,16 +172,6 @@ async function start(): Promise<void> {
     console.error('[Server] Scheduler error (non-fatal):', err);
   }
 
-  // Cleanup rate limit maps periodically
-  setInterval(() => {
-    const now = Date.now();
-    for (const [ip, entry] of rateLimitMap) {
-      if (now > entry.resetAt) rateLimitMap.delete(ip);
-    }
-    for (const [ip, entry] of dailyBudgetMap) {
-      if (now > entry.resetAt) dailyBudgetMap.delete(ip);
-    }
-  }, RATE_LIMIT_WINDOW_MS);
 }
 
 start().catch(console.error);
