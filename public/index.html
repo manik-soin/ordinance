@@ -464,8 +464,10 @@ button,input,select,textarea{font:inherit}
   padding:10px 14px;
   display:flex;
   align-items:center;
+  justify-content:center;
   gap:8px;
   cursor:pointer;
+  flex-shrink:0;
   transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease;
 }
 .topbar-info-btn:hover{
@@ -1401,6 +1403,8 @@ button,input,select,textarea{font:inherit}
     min-height:40px;
   }
   .landing{gap:10px;padding-bottom:12px}
+  .hero-panel{padding:24px 20px;border-radius:24px}
+  .hero-panel,.starter-section{border-radius:24px}
   .starter-section{padding:16px;border-radius:24px}
 }
 @media(max-width:720px){
