@@ -496,7 +496,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 <body>
 
 <!-- Sidebar overlay (mobile) -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
@@ -512,7 +512,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
     <div class="sidebar-subtitle">Regulatory Intelligence Platform</div>
   </div>
 
-  <button class="new-chat-btn" onclick="clearChat()">
+  <button class="new-chat-btn">
     <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     New Conversation
   </button>
@@ -520,7 +520,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   <div class="sidebar-scroll">
     <div class="sidebar-section">
       <div class="sidebar-section-title">Department Filter</div>
-      <select class="filter-select" id="deptFilter" onchange="onDeptFilterChange()">
+      <select class="filter-select" id="deptFilter">
         <option value="">All Departments</option>
         <option value="BD">BD — Buildings Department</option>
         <option value="FSD">FSD — Fire Services</option>
@@ -533,27 +533,27 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
     <div class="sidebar-section">
       <div class="sidebar-section-title">Departments</div>
       <div class="dept-list">
-        <div class="dept-item" onclick="selectDept('BD')">
+        <div class="dept-item">
           <span class="dept-dot" style="background:var(--bd)"></span>
           <span class="dept-name">Buildings Dept</span>
           <span class="dept-count" id="deptCountBD">—</span>
         </div>
-        <div class="dept-item" onclick="selectDept('FSD')">
+        <div class="dept-item">
           <span class="dept-dot" style="background:var(--fsd)"></span>
           <span class="dept-name">Fire Services</span>
           <span class="dept-count" id="deptCountFSD">—</span>
         </div>
-        <div class="dept-item" onclick="selectDept('EPD')">
+        <div class="dept-item">
           <span class="dept-dot" style="background:var(--epd)"></span>
           <span class="dept-name">Environmental Protection</span>
           <span class="dept-count" id="deptCountEPD">—</span>
         </div>
-        <div class="dept-item" onclick="selectDept('EMSD')">
+        <div class="dept-item">
           <span class="dept-dot" style="background:var(--emsd)"></span>
           <span class="dept-name">Electrical &amp; Mechanical</span>
           <span class="dept-count" id="deptCountEMSD">—</span>
         </div>
-        <div class="dept-item" onclick="selectDept('HA')">
+        <div class="dept-item">
           <span class="dept-dot" style="background:var(--ha)"></span>
           <span class="dept-name">Housing Authority</span>
           <span class="dept-count" id="deptCountHA">—</span>
@@ -595,7 +595,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   <div class="modal">
     <div class="modal-header">
       <h3>About HK Compliance RAG</h3>
-      <button class="modal-close" onclick="closeModal()">
+      <button class="modal-close">
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
     </div>
@@ -652,13 +652,13 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 <!-- Main -->
 <div class="main">
   <div class="topbar">
-    <button class="topbar-menu" onclick="toggleSidebar()" aria-label="Menu">
+    <button class="topbar-menu" aria-label="Menu">
       <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </button>
     <span class="topbar-title">Hong Kong Building Regulations Assistant</span>
     <div class="topbar-right">
       <span class="topbar-badge" id="topbarBadge">0 chunks indexed</span>
-      <button class="topbar-info-btn" onclick="openModal()">
+      <button class="topbar-info-btn">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         About
       </button>
@@ -697,35 +697,35 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
         <div class="dept-explorer">
           <div class="dept-explorer-title">Covered Government Departments</div>
           <div class="dept-grid">
-            <div class="dept-card" data-dept="BD" onclick="selectDept('BD')">
+            <div class="dept-card" data-dept="BD">
               <div class="dept-card-icon">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M2 22h20M6 18V2l12 4v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10h4m-4 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
               <div class="dept-card-code">BD</div>
               <div class="dept-card-name">Buildings Department</div>
             </div>
-            <div class="dept-card" data-dept="FSD" onclick="selectDept('FSD')">
+            <div class="dept-card" data-dept="FSD">
               <div class="dept-card-icon">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 2c1 3 4 5.5 4 9a4 4 0 11-8 0c0-3.5 3-6 4-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
               <div class="dept-card-code">FSD</div>
               <div class="dept-card-name">Fire Services</div>
             </div>
-            <div class="dept-card" data-dept="EPD" onclick="selectDept('EPD')">
+            <div class="dept-card" data-dept="EPD">
               <div class="dept-card-icon">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
               </div>
               <div class="dept-card-code">EPD</div>
               <div class="dept-card-name">Environmental Protection</div>
             </div>
-            <div class="dept-card" data-dept="EMSD" onclick="selectDept('EMSD')">
+            <div class="dept-card" data-dept="EMSD">
               <div class="dept-card-icon">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <div class="dept-card-code">EMSD</div>
               <div class="dept-card-name">Electrical &amp; Mechanical</div>
             </div>
-            <div class="dept-card" data-dept="HA" onclick="selectDept('HA')">
+            <div class="dept-card" data-dept="HA">
               <div class="dept-card-icon">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-6h6v6m-6-10h.01M15 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
@@ -771,27 +771,27 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
         <div class="starter-section">
           <div class="starter-title">Try asking about</div>
           <div class="starter-grid">
-            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD — Fire Safety</div>
               What is the minimum fire resistance period for structural elements in buildings over 25m?
             </div>
-            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD — Structural</div>
               What are the wind load design requirements for buildings over 200m tall?
             </div>
-            <div class="starter-card" data-dept="FSD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="FSD">
               <div class="starter-dept">FSD — Fire Services</div>
               What are the fire service installation requirements for composite buildings?
             </div>
-            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD — Accessibility</div>
               What barrier-free access provisions are required for new commercial buildings?
             </div>
-            <div class="starter-card" data-dept="EPD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="EPD">
               <div class="starter-dept">EPD — Environment</div>
               What are the noise assessment requirements during construction in residential areas?
             </div>
-            <div class="starter-card" data-dept="BD" onclick="askQuestion(this)">
+            <div class="starter-card" data-dept="BD">
               <div class="starter-dept">BD — Planning</div>
               What are the site coverage and plot ratio limits under Building (Planning) Regulations?
             </div>
@@ -804,8 +804,8 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   <!-- Input -->
   <div class="input-bar">
     <div class="input-wrap">
-      <textarea id="queryInput" rows="1" placeholder="Ask about HK building regulations..." onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendQuery()" aria-label="Send">
+      <textarea id="queryInput" rows="1" placeholder="Ask about HK building regulations..."></textarea>
+      <button class="send-btn" id="sendBtn" aria-label="Send">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -814,16 +814,19 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 </div>
 
 <script>
-const chatInner = document.getElementById('chatInner');
-const chatArea = document.getElementById('chatArea');
-const queryInput = document.getElementById('queryInput');
-const sendBtn = document.getElementById('sendBtn');
-const landingState = document.getElementById('landingState');
-const deptFilter = document.getElementById('deptFilter');
+(function() {
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+const chatInner = $('chatInner');
+const chatArea = $('chatArea');
+const queryInput = $('queryInput');
+const sendBtn = $('sendBtn');
+const landingState = $('landingState');
+const deptFilter = $('deptFilter');
 
 let isStreaming = false;
 
-// ─── Department data ───
 const DEPTS = {
   BD: { name: 'Buildings Department', color: '#1a56db' },
   FSD: { name: 'Fire Services Department', color: '#dc2626' },
@@ -832,38 +835,80 @@ const DEPTS = {
   HA: { name: 'Housing Authority', color: '#7c3aed' },
 };
 
+// ─── Bind ALL event handlers via addEventListener (CSP-safe) ───
+
+// Send button
+sendBtn.addEventListener('click', () => sendQuery());
+
+// Enter to send
+queryInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuery(); }
+});
+
+// Auto-resize textarea
+queryInput.addEventListener('input', () => {
+  queryInput.style.height = 'auto';
+  queryInput.style.height = Math.min(queryInput.scrollHeight, 120) + 'px';
+});
+
+// Sidebar toggle
+$('sidebarOverlay').addEventListener('click', toggleSidebar);
+document.querySelector('.topbar-menu')?.addEventListener('click', toggleSidebar);
+document.querySelector('.new-chat-btn')?.addEventListener('click', clearChat);
+
+// Modal
+document.querySelector('.topbar-info-btn')?.addEventListener('click', openModal);
+document.querySelector('.modal-close')?.addEventListener('click', closeModal);
+$('infoModal').addEventListener('click', (e) => { if (e.target === $('infoModal')) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// Department filter
+deptFilter.addEventListener('change', () => {});
+
+// Department cards
+document.querySelectorAll('.dept-card').forEach(card => {
+  card.addEventListener('click', () => selectDept(card.dataset.dept));
+});
+
+// Department sidebar items
+document.querySelectorAll('.dept-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const dot = item.querySelector('.dept-dot');
+    const style = dot?.getAttribute('style') || '';
+    const deptMap = { '--bd': 'BD', '--fsd': 'FSD', '--epd': 'EPD', '--emsd': 'EMSD', '--ha': 'HA' };
+    for (const [v, d] of Object.entries(deptMap)) {
+      if (style.includes(v)) { selectDept(d); break; }
+    }
+  });
+});
+
+// Starter cards
+document.querySelectorAll('.starter-card').forEach(card => {
+  card.addEventListener('click', () => askQuestion(card));
+});
+
 // ─── Health & Sources ───
 async function checkHealth() {
   try {
     const res = await fetch('/api/health');
     const data = await res.json();
-    const dot = document.getElementById('statusDot');
-    const text = document.getElementById('statusText');
-    const docs = document.getElementById('docCount');
-    const scrape = document.getElementById('lastScrape');
-    const badge = document.getElementById('topbarBadge');
+    const dot = $('statusDot'), text = $('statusText'), docs = $('docCount');
+    const scrape = $('lastScrape'), badge = $('topbarBadge');
 
-    if (data.status === 'healthy') {
-      dot.className = 'status-dot healthy';
-      text.textContent = 'Healthy';
-    } else {
-      dot.className = 'status-dot unhealthy';
-      text.textContent = 'Unhealthy';
-    }
+    dot.className = data.status === 'healthy' ? 'status-dot healthy' : 'status-dot unhealthy';
+    text.textContent = data.status === 'healthy' ? 'Healthy' : 'Unhealthy';
+
     const chunks = data.documentChunks || 0;
     docs.textContent = chunks.toLocaleString();
-    badge.textContent = `${chunks.toLocaleString()} chunks indexed`;
+    badge.textContent = chunks.toLocaleString() + ' chunks indexed';
 
-    // Update landing stats
-    const statChunks = document.getElementById('statChunks');
-    const statDocs = document.getElementById('statDocs');
-    if (statChunks) statChunks.textContent = chunks.toLocaleString() || '—';
-    if (statDocs) statDocs.textContent = chunks > 0 ? Math.ceil(chunks / 50).toLocaleString() : '—';
-
-    scrape.textContent = data.lastScrape ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Never';
+    const sc = $('statChunks'), sd = $('statDocs');
+    if (sc) sc.textContent = chunks > 0 ? chunks.toLocaleString() : '—';
+    if (sd) sd.textContent = chunks > 0 ? Math.ceil(chunks / 50).toLocaleString() : '—';
+    scrape.textContent = data.lastScrape ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year:'numeric', month:'short', day:'numeric' }) : 'Never';
   } catch {
-    document.getElementById('statusDot').className = 'status-dot unhealthy';
-    document.getElementById('statusText').textContent = 'Offline';
+    $('statusDot').className = 'status-dot unhealthy';
+    $('statusText').textContent = 'Offline';
   }
 }
 
@@ -871,26 +916,22 @@ async function loadSources() {
   try {
     const res = await fetch('/api/sources');
     const data = await res.json();
-    const el = document.getElementById('sourcesList');
+    const el = $('sourcesList');
     if (!data.sources || data.sources.length === 0) {
-      el.innerHTML = '<div style="color:#475569;font-size:11px">No documents ingested yet. Run <code style="font-size:10px;background:#1e293b;padding:1px 4px;border-radius:3px;color:#94a3b8">npm run ingest</code> to start.</div>';
+      el.innerHTML = '<div style="color:#475569;font-size:11px">No documents ingested</div>';
       return;
     }
-
-    // Update department counts in sidebar
     for (const s of data.sources) {
-      const countEl = document.getElementById('deptCount' + s.department);
-      if (countEl) countEl.textContent = `${s.chunk_count}`;
+      const c = $('deptCount' + s.department);
+      if (c) c.textContent = s.chunk_count;
     }
-
-    el.innerHTML = data.sources.map(s => `
-      <div class="source-item">
-        <span class="source-item-dept">${s.department}</span>
-        <span class="source-item-stats">${s.document_count} docs · ${s.chunk_count} chunks</span>
-      </div>
-    `).join('');
+    el.innerHTML = data.sources.map(s =>
+      '<div class="source-item"><span class="source-item-dept">' + s.department +
+      '</span><span class="source-item-stats">' + s.document_count + ' docs &middot; ' +
+      s.chunk_count + ' chunks</span></div>'
+    ).join('');
   } catch {
-    document.getElementById('sourcesList').innerHTML = '<div style="color:#475569">Could not load sources</div>';
+    $('sourcesList').innerHTML = '<div style="color:#475569">Could not load</div>';
   }
 }
 
@@ -898,105 +939,87 @@ checkHealth();
 loadSources();
 setInterval(checkHealth, 60000);
 
-// ─── Department selection ───
+// ─── Core functions ───
 function selectDept(dept) {
   deptFilter.value = dept;
-  onDeptFilterChange();
-  // Close sidebar on mobile
   if (window.innerWidth <= 768) toggleSidebar();
 }
 
-function onDeptFilterChange() {
-  // Visual feedback - could be expanded later
-}
-
-// ─── Sidebar toggle (mobile) ───
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
+  $('sidebar').classList.toggle('open');
+  $('sidebarOverlay').classList.toggle('open');
 }
 
-// ─── Modal ───
-function openModal() {
-  document.getElementById('infoModal').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('infoModal').classList.remove('open');
-}
-document.getElementById('infoModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
+function openModal() { $('infoModal').classList.add('open'); }
+function closeModal() { $('infoModal').classList.remove('open'); }
 
-// ─── Chat management ───
 function clearChat() {
-  // Remove all messages but keep landing state
-  const messages = chatInner.querySelectorAll('.message');
-  messages.forEach(m => m.remove());
-  // Show landing state (it's still in DOM)
+  chatInner.querySelectorAll('.message').forEach(m => m.remove());
   if (landingState) landingState.style.display = 'flex';
   queryInput.focus();
 }
 
-// ─── Input handling ───
-function handleKeyDown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendQuery();
-  }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
 function askQuestion(card) {
   const dept = card.querySelector('.starter-dept')?.textContent || '';
-  const deptCode = dept.match(/^(\w+)/)?.[1] || '';
-  if (deptCode && deptCode !== 'All') {
-    deptFilter.value = deptCode;
-  }
-  const text = card.textContent.replace(dept, '').trim();
-  queryInput.value = text;
-  autoResize(queryInput);
+  const code = dept.match(/^(\w+)/)?.[1] || '';
+  if (code) deptFilter.value = code;
+  queryInput.value = card.textContent.replace(dept, '').trim();
+  queryInput.dispatchEvent(new Event('input'));
   sendQuery();
 }
 
-// ─── Send query ───
+// ─── Send query (SSE streaming) ───
 async function sendQuery() {
   const query = queryInput.value.trim();
   if (!query || isStreaming) return;
 
-  // Hide landing state
   if (landingState) landingState.style.display = 'none';
-
-  // Add user message
   appendMessage('user', query);
   queryInput.value = '';
   queryInput.style.height = 'auto';
   isStreaming = true;
   sendBtn.disabled = true;
 
-  // Build filter
   const dept = deptFilter.value;
   const body = { query };
   if (dept) body.filter = { department: dept };
 
-  // Create assistant message container
   const msgEl = document.createElement('div');
   msgEl.className = 'message message-assistant';
-  msgEl.style.animation = 'fadeUp .35s ease';
   chatInner.appendChild(msgEl);
 
-  // Status indicator
   const statusEl = document.createElement('div');
   statusEl.className = 'stream-status';
   statusEl.innerHTML = '<div class="dot-pulse"><span></span><span></span><span></span></div><span>Connecting...</span>';
   msgEl.appendChild(statusEl);
   scrollToBottom();
+
+  let answerEl = null;
+  let rawText = '';
+
+  function getOrCreateAnswer() {
+    if (!answerEl) {
+      answerEl = document.createElement('div');
+      answerEl.className = 'answer-bubble';
+      // Copy button
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(rawText).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 1500);
+        }).catch(() => {});
+      });
+      answerEl.appendChild(btn);
+      // Content area
+      const content = document.createElement('div');
+      content.className = 'answer-content';
+      answerEl.appendChild(content);
+      msgEl.appendChild(answerEl);
+    }
+    return answerEl;
+  }
 
   try {
     const res = await fetch('/api/query/stream', {
@@ -1007,19 +1030,16 @@ async function sendQuery() {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Request failed' }));
-      throw new Error(err.error || `HTTP ${res.status}`);
+      throw new Error(err.error || 'HTTP ' + res.status);
     }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
-    let answerEl = null;
-    let answerText = '';
     let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
@@ -1027,34 +1047,50 @@ async function sendQuery() {
       for (const line of lines) {
         if (!line.startsWith('data: ')) continue;
         try {
-          const event = JSON.parse(line.slice(6));
-          handleStreamEvent(event, msgEl, statusEl, () => {
-            if (!answerEl) {
-              answerEl = document.createElement('div');
-              answerEl.className = 'answer-bubble';
-              const btn = document.createElement('button');
-              btn.className = 'copy-btn';
-              btn.textContent = 'Copy';
-              btn.onclick = function() { copyAnswer(btn); };
-              answerEl.appendChild(btn);
-              msgEl.appendChild(answerEl);
-            }
-            return answerEl;
-          }, (text) => { answerText += text; });
-        } catch {}
+          const ev = JSON.parse(line.slice(6));
+
+          if (ev.type === 'status') {
+            const span = statusEl.querySelector('span:last-child');
+            if (span) span.textContent = ev.message;
+            scrollToBottom();
+          }
+          else if (ev.type === 'sources' && ev.sources?.length) {
+            const strip = document.createElement('div');
+            strip.className = 'sources-strip';
+            strip.innerHTML = ev.sources.map(s => {
+              const d = s.department || 'BD';
+              return '<div class="source-card" data-dept="' + d + '">' +
+                '<div class="source-card-dept">' + d + ' — ' + (DEPTS[d]?.name || d) + '</div>' +
+                '<div class="source-card-name">' + (s.document_name || 'Regulation') + '</div>' +
+                '<div class="source-card-section">' + (s.section || []).join(' &rsaquo; ') + '</div>' +
+                '</div>';
+            }).join('');
+            msgEl.insertBefore(strip, statusEl);
+            scrollToBottom();
+          }
+          else if (ev.type === 'token') {
+            const el = getOrCreateAnswer();
+            rawText += ev.content;
+            el.querySelector('.answer-content').innerHTML = formatMarkdown(rawText);
+            scrollToBottom();
+          }
+          else if (ev.type === 'error') {
+            statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + ev.message + '</span>';
+          }
+        } catch(e) {}
       }
     }
 
-    // Stream complete — show disclaimer (no redundant API call)
+    // Stream done
     statusEl.remove();
     const disc = document.createElement('div');
     disc.className = 'disclaimer';
-    disc.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>This is for reference only — not legal advice. Always verify with the relevant HK government department and consult qualified professionals.</span>';
+    disc.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>For reference only — not legal advice. Verify with the relevant HK government department.</span>';
     msgEl.appendChild(disc);
     scrollToBottom();
 
   } catch (err) {
-    statusEl.innerHTML = `<span style="color:var(--danger)">Error: ${err.message}</span>`;
+    statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + (err.message || 'Connection failed') + '</span>';
   } finally {
     isStreaming = false;
     sendBtn.disabled = false;
@@ -1062,121 +1098,36 @@ async function sendQuery() {
   }
 }
 
-function handleStreamEvent(event, msgEl, statusEl, getAnswerEl, appendText) {
-  switch (event.type) {
-    case 'status':
-      statusEl.querySelector('span:last-child').textContent = event.message;
-      scrollToBottom();
-      break;
-
-    case 'sources':
-      if (event.sources && event.sources.length > 0) {
-        const strip = document.createElement('div');
-        strip.className = 'sources-strip';
-        strip.innerHTML = event.sources.map(s => {
-          const dept = s.department || 'BD';
-          return `
-          <div class="source-card" data-dept="${dept}" style="animation:slideIn .3s ease">
-            <div class="source-card-dept">${dept} — ${DEPTS[dept]?.name || dept}</div>
-            <div class="source-card-name">${s.document_name || 'Regulation'}</div>
-            <div class="source-card-section">${(s.section || []).join(' > ')}</div>
-          </div>
-        `}).join('');
-        msgEl.insertBefore(strip, statusEl);
-      }
-      scrollToBottom();
-      break;
-
-    case 'token': {
-      const ansEl = getAnswerEl();
-      appendText(event.content);
-      ansEl._rawText = (ansEl._rawText || '') + event.content;
-      // Update content area only (preserve copy button)
-      let contentDiv = ansEl.querySelector('.answer-content');
-      if (!contentDiv) {
-        contentDiv = document.createElement('div');
-        contentDiv.className = 'answer-content';
-        ansEl.appendChild(contentDiv);
-      }
-      contentDiv.innerHTML = formatMarkdown(ansEl._rawText);
-      scrollToBottom();
-      break;
-    }
-
-    case 'done':
-      break;
-
-    case 'error':
-      statusEl.innerHTML = `<span style="color:var(--danger)">Error: ${event.message}</span>`;
-      break;
-  }
-}
-
 // ─── Helpers ───
 function appendMessage(role, text) {
   const msg = document.createElement('div');
-  msg.className = `message message-${role}`;
-  msg.innerHTML = `<div class="message-bubble">${escapeHtml(text)}</div>`;
+  msg.className = 'message message-' + role;
+  const bubble = document.createElement('div');
+  bubble.className = 'message-bubble';
+  bubble.textContent = text;
+  msg.appendChild(bubble);
   chatInner.appendChild(msg);
   scrollToBottom();
 }
 
 function scrollToBottom() {
-  requestAnimationFrame(() => {
-    chatArea.scrollTop = chatArea.scrollHeight;
-  });
-}
-
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+  requestAnimationFrame(() => chatArea.scrollTop = chatArea.scrollHeight);
 }
 
 function formatMarkdown(text) {
-  // Escape HTML first
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  // Bold
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Citations in brackets — style them distinctly
-  html = html.replace(/\[([^\]]{5,})\]/g, '<span class="citation">[$1]</span>');
-  // Numbered lists
-  html = html.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
-  // Bullet lists
-  html = html.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
-  // Wrap consecutive <li> in <ul>/<ol>
-  html = html.replace(/((?:<li[^>]*>.*?<\/li>\n?)+)/g, '<ul>$1</ul>');
-  // Paragraphs
-  html = html.replace(/\n\n+/g, '</p><p>');
-  html = html.replace(/\n/g, '<br>');
-  html = '<p>' + html + '</p>';
-  html = html.replace(/<p><\/p>/g, '');
-  return html;
+  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+  h = h.replace(/\[([^\]]{5,})\]/g, '<span class="citation">[$1]</span>');
+  h = h.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
+  h = h.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
+  h = h.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+  h = h.replace(/\n\n+/g, '</p><p>');
+  h = h.replace(/\n/g, '<br>');
+  return '<p>' + h + '</p>';
 }
 
-function copyAnswer(btn) {
-  const bubble = btn.closest('.answer-bubble');
-  const text = bubble._rawText || bubble.querySelector('.answer-content')?.textContent || bubble.textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-  }).catch(() => {
-    // Fallback for older browsers
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-  });
-}
+})();
 </script>
 </body>
 </html>
