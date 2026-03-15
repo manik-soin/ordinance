@@ -9,6 +9,12 @@ import { rerank } from '../retrieval/reranker.js';
 import { getSourceStats } from '../db/store.js';
 import { checkForChanges } from '../scheduler/index.js';
 import { BD_CODES_OF_PRACTICE } from '../sources/buildings-dept.js';
+import {
+  checkBulkFreshness,
+  getDocumentSourceUrls,
+  detectNewBDCirculars,
+  detectNewFSDCirculars,
+} from './live-data.js';
 
 export const router = Router();
 
@@ -209,6 +215,111 @@ router.get('/admin/changes', async (_req: Request, res: Response) => {
     res.json({ changes: rows });
   } catch (err) {
     console.error('[API] Changes error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─── LIVE DATA APIs ───────────────────────────────────────────────────────────
+
+/**
+ * GET /api/live/freshness — Check if ingested documents are still current.
+ * Issues HEAD requests to source URLs and compares Last-Modified headers.
+ */
+router.get('/live/freshness', async (_req: Request, res: Response) => {
+  try {
+    const pool = getPool();
+    const docs = await getDocumentSourceUrls(pool);
+
+    if (docs.length === 0) {
+      res.json({ documents: [], summary: { total: 0, stale: 0, fresh: 0 } });
+      return;
+    }
+
+    // Check up to 20 at a time to avoid overloading
+    const toCheck = docs.slice(0, 20);
+    const results = await checkBulkFreshness(toCheck);
+
+    const stale = results.filter((r) => r.is_stale);
+    res.json({
+      documents: results,
+      summary: {
+        total: results.length,
+        stale: stale.length,
+        fresh: results.length - stale.length,
+        checked_at: new Date().toISOString(),
+      },
+    });
+  } catch (err) {
+    console.error('[API] Freshness check error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/live/new-circulars — Detect newly published circular letters
+ * from BD and FSD by probing known URL patterns.
+ */
+router.get('/live/new-circulars', async (_req: Request, res: Response) => {
+  try {
+    const [bdCirculars, fsdCirculars] = await Promise.all([
+      detectNewBDCirculars(),
+      detectNewFSDCirculars(),
+    ]);
+
+    res.json({
+      bd: bdCirculars,
+      fsd: fsdCirculars,
+      total: bdCirculars.length + fsdCirculars.length,
+      checked_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('[API] Circular detection error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/live/status — Combined live data status dashboard.
+ * Returns freshness summary + new circular count + data currency.
+ */
+router.get('/live/status', async (_req: Request, res: Response) => {
+  try {
+    const pool = getPool();
+
+    // Run all live checks in parallel
+    const [docs, bdCirculars, fsdCirculars, healthData] = await Promise.all([
+      getDocumentSourceUrls(pool).then((d) =>
+        checkBulkFreshness(d.slice(0, 10))
+      ),
+      detectNewBDCirculars(),
+      detectNewFSDCirculars(),
+      pool.query(
+        'SELECT COUNT(*) AS chunks FROM regulation_chunks WHERE is_current = true'
+      ),
+    ]);
+
+    const staleCount = docs.filter((d) => d.is_stale).length;
+    const totalChunks = Number(
+      (healthData.rows[0] as Record<string, unknown>)?.chunks ?? 0
+    );
+
+    res.json({
+      status: staleCount === 0 ? 'current' : 'updates_available',
+      data: {
+        total_chunks: totalChunks,
+        documents_checked: docs.length,
+        stale_documents: staleCount,
+        fresh_documents: docs.length - staleCount,
+      },
+      new_circulars: {
+        bd: bdCirculars.length,
+        fsd: fsdCirculars.length,
+        total: bdCirculars.length + fsdCirculars.length,
+      },
+      checked_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('[API] Live status error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
