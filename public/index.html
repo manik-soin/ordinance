@@ -2192,8 +2192,7 @@ async function sendQuery() {
           const event = JSON.parse(line.slice(6));
 
           if (event.type === 'status') {
-            const label = statusEl.querySelector('span:last-child');
-            if (label) label.textContent = event.message;
+            statusEl.innerHTML = '<div class="dot-pulse"><span></span><span></span><span></span></div><span>' + escapeHtml(event.message) + '</span>';
             scrollToBottom();
           } else if (event.type === 'sources' && event.sources?.length) {
             for (const source of event.sources) {
