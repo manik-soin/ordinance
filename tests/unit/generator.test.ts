@@ -69,7 +69,7 @@ describe('Generator', () => {
 
   describe('COMPLIANCE_SYSTEM_PROMPT', () => {
     it('requires citation in [Document, Section] format', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('[Document Name, Section X.X]');
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('[Document Name (Dept), Version, Section X.X]');
     });
 
     it('includes instruction to never fabricate clause numbers', () => {
@@ -91,12 +91,12 @@ describe('Generator', () => {
       }
     });
 
-    it('rule 1: only answer based on retrieved text', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('ONLY answer based on the retrieved regulation text');
+    it('rule 1: answer based on retrieved text', () => {
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('Answer based on the retrieved regulation text');
     });
 
-    it('rule 3: includes fallback message when context is insufficient', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('Please consult the relevant department directly');
+    it('rule 3: includes fallback for unrelated context', () => {
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain("don't have sufficient information");
     });
 
     it('rule 5: requires explicit cross-reference notation', () => {

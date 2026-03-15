@@ -534,11 +534,11 @@ describe('Hybrid Retrieval', () => {
       });
 
       const calls = pool.query.mock.calls;
-      // Default vectorK = 10, keywordK = 10
+      // Default vectorK = 15, keywordK = 15
       const vectorCall = calls.find((c: unknown[]) => (c[0] as string).includes('<=>'));
       const keywordCall = calls.find((c: unknown[]) => (c[0] as string).includes('plainto_tsquery'));
-      expect(vectorCall![1][vectorCall![1].length - 1]).toBe(10);
-      expect(keywordCall![1][keywordCall![1].length - 1]).toBe(10);
+      expect(vectorCall![1][vectorCall![1].length - 1]).toBe(15);
+      expect(keywordCall![1][keywordCall![1].length - 1]).toBe(15);
     });
   });
 });

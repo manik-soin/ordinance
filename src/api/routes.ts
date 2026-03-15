@@ -82,10 +82,10 @@ router.post('/query/stream', async (req: Request, res: Response) => {
 
     const context = await hybridSearch(pool, validation.data.query, {
       filter: validation.data.filter,
-      topK: 5,
+      topK: 10,
     });
 
-    const reranked = await rerank(validation.data.query, context, { topK: 3 });
+    const reranked = await rerank(validation.data.query, context, { topK: 5 });
 
     res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy })) })}\n\n`);
 

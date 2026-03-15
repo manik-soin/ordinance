@@ -38,9 +38,9 @@ export async function hybridSearch(
     queryEmbedding?: number[];
   }
 ): Promise<SearchResult[]> {
-  const vectorK = options?.vectorK ?? 10;
-  const keywordK = options?.keywordK ?? 10;
-  const topK = options?.topK ?? 5;
+  const vectorK = options?.vectorK ?? 15;
+  const keywordK = options?.keywordK ?? 15;
+  const topK = options?.topK ?? 7;
   const filter = options?.filter ?? {};
 
   const [vectorResults, keywordResults] = await Promise.all([

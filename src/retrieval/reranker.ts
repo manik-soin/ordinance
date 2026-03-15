@@ -2,7 +2,7 @@ import type { SearchResult } from './hybrid-search.js';
 
 const COHERE_RERANK_URL = 'https://api.cohere.com/v2/rerank';
 const DEFAULT_MODEL = 'rerank-v3.5';
-const DEFAULT_THRESHOLD = 0.3;
+const DEFAULT_THRESHOLD = 0.1;
 
 export interface RerankOptions {
   model?: string;
