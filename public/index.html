@@ -1607,8 +1607,8 @@ button,input,select,textarea{font:inherit}
 
     <div class="sidebar-section">
       <div class="sidebar-panel">
-        <div class="sidebar-section-title">Current Corpus</div>
-        <div id="sourcesList" class="source-list-empty">Loading official source documents...</div>
+        <div class="sidebar-section-title">Referenced Documents</div>
+        <div id="sourcesList" class="source-list-empty">Loading document references...</div>
       </div>
     </div>
   </div>
@@ -1621,12 +1621,8 @@ button,input,select,textarea{font:inherit}
         <span class="status-value" id="statusText">Checking</span>
       </div>
       <div class="status-row">
-        <span class="status-label">Indexed clauses</span>
+        <span class="status-label">Sections referenced</span>
         <span class="status-value" id="docCount">-</span>
-      </div>
-      <div class="status-row">
-        <span class="status-label">Last scrape</span>
-        <span class="status-value" id="lastScrape">-</span>
       </div>
     </div>
   </div>
@@ -1650,13 +1646,22 @@ button,input,select,textarea{font:inherit}
     </div>
     <div class="modal-body">
       <h4>What it does</h4>
-      <p>Ordinance answers questions about Hong Kong building regulations with clause-level citations from official documents. The interface is intentionally minimal, but the pipeline behind it is not.</p>
+      <p>Ordinance is a research assistant that helps AEC professionals navigate Hong Kong building regulations. It references publicly available government documents and provides answers with clause-level citations, linking directly to the official source material.</p>
 
-      <h4>Source coverage</h4>
+      <h4>How it works</h4>
+      <p>When you ask a question, the system searches across publicly available regulatory material from multiple Hong Kong government departments, identifies the most relevant sections, and generates a concise answer that cites the specific clauses and documents used.</p>
+      <ul>
+        <li><strong>Search:</strong> Your question is matched against relevant sections of publicly available regulatory documents.</li>
+        <li><strong>Cite:</strong> Answers include specific clause references so you can verify against the original source.</li>
+        <li><strong>Link:</strong> Each referenced document links to the official government publication.</li>
+        <li><strong>Verify:</strong> Quality checks reduce unsupported claims and flag where verification is needed.</li>
+      </ul>
+
+      <h4>Source material</h4>
       <div class="info-grid">
         <div class="info-card">
           <div class="info-card-title">Codes of Practice</div>
-          <div class="info-card-desc">Fire safety, structural steel, concrete, foundations, wind effects, demolition, site supervision and more.</div>
+          <div class="info-card-desc">Fire safety, structural steel, concrete, foundations, wind effects, energy efficiency and more.</div>
         </div>
         <div class="info-card">
           <div class="info-card-title">Practice Notes</div>
@@ -1664,28 +1669,16 @@ button,input,select,textarea{font:inherit}
         </div>
         <div class="info-card">
           <div class="info-card-title">Legislation</div>
-          <div class="info-card-desc">Buildings Ordinance, Building (Planning) Regulations, fire safety legislation and related statutory material.</div>
+          <div class="info-card-desc">Buildings Ordinance, Building (Planning) Regulations, fire safety and environmental legislation.</div>
         </div>
         <div class="info-card">
-          <div class="info-card-title">Design Manuals</div>
-          <div class="info-card-desc">Barrier-free access, energy efficiency, environmental assessment, fire engineering and housing guidance.</div>
+          <div class="info-card-title">Specifications</div>
+          <div class="info-card-desc">Housing Authority building specifications, contract conditions and design standards.</div>
         </div>
       </div>
 
-      <h4>Pipeline</h4>
-      <p>The system ingests PDFs from official sources, preserves document hierarchy during chunking, stores embeddings in PostgreSQL, retrieves with hybrid search, reranks for relevance, and streams an answer from grounded context.</p>
-      <ul>
-        <li><strong>Ingestion:</strong> PDFs are fetched, parsed and split while retaining section hierarchy.</li>
-        <li><strong>Retrieval:</strong> Vector similarity and keyword search are fused for stronger recall.</li>
-        <li><strong>Generation:</strong> The answer is streamed with exact clause references where possible.</li>
-        <li><strong>Verification:</strong> Citation and faithfulness checks reduce unsupported claims.</li>
-      </ul>
-
-      <h4>Safety and quality</h4>
-      <p>Queries pass through prompt-injection detection, and the answer pipeline tracks citation accuracy, phantom citations, uncited claims and overall grounding quality.</p>
-
-      <h4>Freshness</h4>
-      <p>The corpus periodically checks official sources for content changes using hashing so new or amended material can be re-ingested when required.</p>
+      <h4>Important notice</h4>
+      <p>Ordinance is a research tool for informational purposes only. It is not a substitute for professional advice. Answers are generated summaries that reference publicly available documents published by Hong Kong government departments. Users should always verify cited clauses against the original official publications, which remain the authoritative source. All referenced documents are linked to their official government URLs.</p>
 
       <h4>Contact</h4>
       <p>Built by <a href="https://maniksoin.com" target="_blank" rel="noopener" style="color:var(--accent-strong);text-decoration:underline">maniksoin.com</a>. Questions, feedback or partnership inquiries welcome.</p>
@@ -1731,7 +1724,7 @@ button,input,select,textarea{font:inherit}
           <div class="hero-copy">
             <div>
               <h2 class="hero-title">Ordinance</h2>
-              <p>Ask questions about Hong Kong building regulations. Answers are grounded in official government PDFs with clause-level citations.</p>
+              <p>Ask questions about Hong Kong building regulations. Answers reference publicly available government documents with clause-level citations.</p>
             </div>
           </div>
         </section>
@@ -1782,7 +1775,7 @@ button,input,select,textarea{font:inherit}
         </button>
       </div>
     </div>
-    <div class="input-hint">Press Enter to send. Use Shift+Enter for a new line. Answers link back to source PDFs when available.</div>
+    <div class="input-hint">Press Enter to send. Use Shift+Enter for a new line. Answers link to official government publications where available.</div>
   </div>
 </div>
 
@@ -1891,18 +1884,14 @@ async function checkHealth() {
     const dot = $('statusDot');
     const text = $('statusText');
     const docs = $('docCount');
-    const scrape = $('lastScrape');
     const badge = $('topbarBadge');
     const chunks = data.documentChunks || 0;
 
     dot.className = data.status === 'healthy' ? 'status-dot healthy' : 'status-dot unhealthy';
     text.textContent = data.status === 'healthy' ? 'Healthy' : 'Unhealthy';
     docs.textContent = chunks > 0 ? chunks.toLocaleString() : '-';
-    badge.textContent = chunks > 0 ? chunks.toLocaleString() + ' clauses indexed' : 'Corpus not indexed';
+    badge.textContent = chunks > 0 ? chunks.toLocaleString() + ' sections referenced' : 'Loading';
 
-    scrape.textContent = data.lastScrape
-      ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' })
-      : '-';
   } catch {
     $('statusDot').className = 'status-dot unhealthy';
     $('statusText').textContent = 'Offline';
@@ -1917,7 +1906,7 @@ async function loadSources() {
     const sourceList = $('sourcesList');
 
     if (!data.sources || data.sources.length === 0) {
-      sourceList.innerHTML = '<div class="source-list-empty">No documents have been ingested yet.</div>';
+      sourceList.innerHTML = '<div class="source-list-empty">No document references available.</div>';
       return;
     }
 
