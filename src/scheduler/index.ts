@@ -1,6 +1,8 @@
 import cron from 'node-cron';
 import { BD_CODES_OF_PRACTICE } from '../sources/buildings-dept.js';
 import type { RegulationSource } from '../sources/buildings-dept.js';
+import { EMSD_CODES_OF_PRACTICE } from '../sources/emsd.js';
+import { HA_SOURCES } from '../sources/housing-authority.js';
 import { fetchPdf, computeHash } from '../scraper/index.js';
 import { getPool } from '../db/pool.js';
 import { getDocumentHash, recordDocumentVersion } from '../db/store.js';
@@ -109,8 +111,16 @@ export const DEFAULT_SCHEDULES: ScheduleConfig[] = [
     schedule: '0 2 1 * *', // Monthly, 1st at 2am
     sources: BD_CODES_OF_PRACTICE,
   },
-  // PNAP and circular letter schedules would be added dynamically
-  // after URL discovery
+  {
+    name: 'EMSD Codes of Practice',
+    schedule: '0 3 1 * *', // Monthly, 1st at 3am
+    sources: EMSD_CODES_OF_PRACTICE,
+  },
+  {
+    name: 'HA Specifications',
+    schedule: '0 4 1 * *', // Monthly, 1st at 4am
+    sources: HA_SOURCES,
+  },
 ];
 
 /**
