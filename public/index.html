@@ -526,26 +526,6 @@ button,input,select,textarea{font:inherit}
   letter-spacing:-.04em;
   margin-bottom:14px;
   font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  gap:.18em;
-}
-.hero-logo{
-  width:.9em;
-  height:.9em;
-  color:var(--ink);
-}
-.hero-logo-r1{
-  animation:logoSpin 12s ease-in-out infinite;
-  transform-origin:24px 24px;
-}
-.hero-logo-r2{
-  animation:logoSpin 12s ease-in-out infinite reverse;
-  transform-origin:24px 24px;
-}
-.hero-logo-r3{
-  animation:logoBreath 8s ease-in-out infinite;
-  transform-origin:24px 24px;
 }
 .hero-title span{
   font-style:italic;
@@ -1527,17 +1507,6 @@ button,input,select,textarea{font:inherit}
   0%,100%{opacity:.28;transform:translateY(0)}
   50%{opacity:1;transform:translateY(-1px)}
 }
-@keyframes logoSpin{
-  0%{transform:rotate(0deg)}
-  25%{transform:rotate(8deg)}
-  50%{transform:rotate(0deg)}
-  75%{transform:rotate(-8deg)}
-  100%{transform:rotate(0deg)}
-}
-@keyframes logoBreath{
-  0%,100%{opacity:.7;transform:rotate(120deg) scale(1)}
-  50%{opacity:1;transform:rotate(120deg) scale(1.06)}
-}
 </style>
 </head>
 <body>
@@ -1741,7 +1710,7 @@ button,input,select,textarea{font:inherit}
         <section class="hero-panel">
           <div class="hero-copy">
             <div>
-              <h2 class="hero-title"><svg class="hero-logo" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect class="hero-logo-r1" x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2"/><rect class="hero-logo-r2" x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2" transform="rotate(60 24 24)"/><rect class="hero-logo-r3" x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2" transform="rotate(120 24 24)"/></svg>Ordinance</h2>
+              <h2 class="hero-title">Ordinance</h2>
               <p>Ask questions about Hong Kong building regulations. Answers are grounded in official government PDFs with clause-level citations.</p>
             </div>
           </div>
