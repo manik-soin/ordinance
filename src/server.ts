@@ -103,13 +103,20 @@ async function start(): Promise<void> {
     console.log(`[Server] Listening on port ${PORT}`);
   });
 
-  // Run migrations + create cache table in background
+  // Run migrations in background (non-blocking)
   try {
     await runMigrations();
-    await ensureCacheTable(getPool());
-    console.log('[Server] Database migrations + cache table complete');
+    console.log('[Server] Database migrations complete');
   } catch (err) {
     console.error('[Server] Migration error (non-fatal):', err);
+  }
+
+  // Create cache table after migrations (non-fatal)
+  try {
+    await ensureCacheTable(getPool());
+    console.log('[Server] Cache table ready');
+  } catch (err) {
+    console.error('[Server] Cache table error (non-fatal):', err);
   }
 
   // Cleanup rate limit map periodically
