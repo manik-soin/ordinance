@@ -40,10 +40,10 @@ describe('runMigrations', () => {
 
     await runMigrations();
 
-    // 1 CREATE TABLE (migrations table) + 7 * (SELECT + SQL + INSERT) = 22 total queries
+    // 1 CREATE TABLE (migrations table) + 9 * (SELECT + SQL + INSERT)
     // Each unapplied migration: SELECT + migration SQL + INSERT = 3 calls
     // Plus 1 for the initial CREATE TABLE IF NOT EXISTS migrations
-    expect(mockPool.query).toHaveBeenCalledTimes(1 + 8 * 3);
+    expect(mockPool.query).toHaveBeenCalledTimes(1 + 9 * 3);
   });
 
   it('skips already-applied migrations', async () => {
@@ -56,14 +56,15 @@ describe('runMigrations', () => {
       '006_create_scrape_log',
       '007_create_migrations_table',
       '008_fix_vector_index',
+      '009_enable_pgcrypto_and_chunk_vector_index',
     ];
     const mockPool = createMockPool(allMigrations);
     mockGetPool.mockReturnValue(mockPool as any);
 
     await runMigrations();
 
-    // 1 CREATE TABLE + 8 SELECTs (no migration SQL or INSERTs)
-    expect(mockPool.query).toHaveBeenCalledTimes(1 + 8);
+    // 1 CREATE TABLE + 9 SELECTs (no migration SQL or INSERTs)
+    expect(mockPool.query).toHaveBeenCalledTimes(1 + 9);
   });
 
   it('handles mixed scenario — some applied, some new', async () => {
@@ -77,8 +78,8 @@ describe('runMigrations', () => {
 
     await runMigrations();
 
-    // 1 CREATE TABLE + 3 applied (SELECT only) + 5 new (SELECT + SQL + INSERT)
-    expect(mockPool.query).toHaveBeenCalledTimes(1 + 3 + 5 * 3);
+    // 1 CREATE TABLE + 3 applied (SELECT only) + 6 new (SELECT + SQL + INSERT)
+    expect(mockPool.query).toHaveBeenCalledTimes(1 + 3 + 6 * 3);
   });
 
   it('creates migrations table first before anything else', async () => {
@@ -100,9 +101,9 @@ describe('runMigrations', () => {
     const insertCalls = mockPool.query.mock.calls.filter(
       (call: any[]) => typeof call[0] === 'string' && call[0].includes('INSERT INTO migrations')
     );
-    expect(insertCalls).toHaveLength(8);
+    expect(insertCalls).toHaveLength(9);
     expect(insertCalls[0][1]).toEqual(['001_create_extensions']);
-    expect(insertCalls[7][1]).toEqual(['008_fix_vector_index']);
+    expect(insertCalls[8][1]).toEqual(['009_enable_pgcrypto_and_chunk_vector_index']);
   });
 
   it('verifies correct SQL is executed for each migration', async () => {
@@ -140,19 +141,21 @@ describe('runMigrations', () => {
     expect(allSqlTexts.some((s) => s.includes('CREATE TABLE IF NOT EXISTS document_versions'))).toBe(true);
     expect(allSqlTexts.some((s) => s.includes('CREATE TABLE IF NOT EXISTS query_audit_log'))).toBe(true);
     expect(allSqlTexts.some((s) => s.includes('CREATE TABLE IF NOT EXISTS scrape_log'))).toBe(true);
+    expect(allSqlTexts.some((s) => s.includes('CREATE EXTENSION IF NOT EXISTS pgcrypto'))).toBe(true);
+    expect(allSqlTexts.some((s) => s.includes('idx_chunks_embedding_hnsw'))).toBe(true);
   });
 
-  it('MIGRATIONS array has correct number of entries (8)', async () => {
+  it('MIGRATIONS array has correct number of entries (9)', async () => {
     const mockPool = createMockPool([]);
     mockGetPool.mockReturnValue(mockPool as any);
 
     await runMigrations();
 
-    // 8 SELECT queries (one per migration) should be issued
+    // 9 SELECT queries (one per migration) should be issued
     const selectCalls = mockPool.query.mock.calls.filter(
       (call: any[]) => typeof call[0] === 'string' && call[0].includes('SELECT name FROM migrations WHERE name')
     );
-    expect(selectCalls).toHaveLength(8);
+    expect(selectCalls).toHaveLength(9);
   });
 
   it('each migration has a name and sql property', async () => {

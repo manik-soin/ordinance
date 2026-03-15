@@ -99,16 +99,16 @@ async function searchGovData(query: string): Promise<WebSearchResult[]> {
   const terms = query.toLowerCase();
 
   if (terms.includes('fire door') || terms.includes('doorset')) {
-    results.push({ title: 'BD Central Data Bank: Approved Fire Doorsets (860 products)', snippet: 'Live data from data.gov.hk — fire resisting doorsets with ratings, manufacturers, test reports', url: '/api/gov/fire-doorsets', source: 'data.gov.hk' });
+    results.push({ title: 'BD Central Data Bank: Approved Fire Doorsets', snippet: 'Live data from data.gov.hk for fire resisting doorsets with ratings, manufacturers, and test reports', url: '/api/gov/fire-doorsets', source: 'data.gov.hk' });
   }
   if (terms.includes('fire glass') || terms.includes('glazing') || terms.includes('fire rated glass')) {
-    results.push({ title: 'BD Central Data Bank: Approved Fire Glazing (126 products)', snippet: 'Live data from data.gov.hk — fire resisting glazing with integrity/insulation ratings', url: '/api/gov/fire-glazing', source: 'data.gov.hk' });
+    results.push({ title: 'BD Central Data Bank: Approved Fire Glazing', snippet: 'Live data from data.gov.hk for fire resisting glazing with integrity and insulation ratings', url: '/api/gov/fire-glazing', source: 'data.gov.hk' });
   }
   if (terms.includes('fire stop') || terms.includes('firestop') || terms.includes('fire seal')) {
-    results.push({ title: 'BD Central Data Bank: Approved Fire Stop Materials (12 products)', snippet: 'Live data from data.gov.hk — fire stopping materials with test standards', url: '/api/gov/fire-stop-materials', source: 'data.gov.hk' });
+    results.push({ title: 'BD Central Data Bank: Approved Fire Stop Materials', snippet: 'Live data from data.gov.hk for fire stopping materials and test standards', url: '/api/gov/fire-stop-materials', source: 'data.gov.hk' });
   }
   if (terms.includes('mic') || terms.includes('modular') || terms.includes('prefab')) {
-    results.push({ title: 'BD Accepted MiC Systems (135 systems)', snippet: 'Live data from data.gov.hk — accepted modular integrated construction systems', url: '/api/gov/mic-systems', source: 'data.gov.hk' });
+    results.push({ title: 'BD Accepted MiC Systems', snippet: 'Live data from data.gov.hk for accepted modular integrated construction systems', url: '/api/gov/mic-systems', source: 'data.gov.hk' });
   }
   if (terms.includes('compliance') || terms.includes('enforcement') || terms.includes('direction')) {
     results.push({ title: 'Fire Safety Compliance Statistics (Cap 502/572)', snippet: 'Live data from data.gov.hk — fire safety directions issued and complied with', url: '/api/gov/fire-safety', source: 'data.gov.hk' });

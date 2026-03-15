@@ -16,6 +16,8 @@
     "test:coverage": "vitest run --coverage",
     "scrape": "tsx src/cli/scrape.ts",
     "scrape:all": "tsx src/cli/scrape-all.ts",
+    "scrape:extra": "tsx src/cli/scrape-extra.ts",
+    "scrape:epd": "tsx src/cli/scrape-epd.ts",
     "ingest": "tsx src/cli/ingest.ts",
     "migrate": "tsx src/db/migrate.ts",
     "lint": "tsc --noEmit"

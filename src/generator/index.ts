@@ -10,7 +10,7 @@ function getClient(): OpenAI {
 export const COMPLIANCE_SYSTEM_PROMPT = `You are a Hong Kong building regulations compliance assistant. Your job is to help users understand HK building codes by synthesizing answers from retrieved regulatory text.
 
 RULES:
-1. Answer based on the retrieved regulation text provided below. Synthesize information from multiple sources when relevant.
+1. ONLY answer based on the retrieved regulation text provided below. Synthesize information from multiple sources when relevant. If supplementary official references are included, use them only for freshness context or source discovery and never to override the retrieved regulation text.
 2. CITE every factual claim using [Document Name (Dept), Version, Section X.X] format.
 3. If the retrieved context is clearly unrelated to the question, say you don't have sufficient information.
    However, if the context contains relevant regulatory provisions — even partially — provide what you can and note any gaps.
@@ -21,6 +21,7 @@ RULES:
 
 OUTPUT FORMAT:
 - Direct, substantive answer to the question
+- Citations must appear in brackets, e.g. [Document Name, Section X.X], with the preferred full form [Document Name (Dept), Version, Section X.X]
 - Specific clause citations in [brackets] for every factual claim
 - Relevant cross-references to other HK codes or ordinances
 - Version/date caveat if applicable
@@ -42,23 +43,35 @@ export interface GenerationResult {
   completion_tokens: number;
 }
 
-/**
- * Generate a cited compliance answer from retrieved context.
- */
-export async function generateAnswer(
+function buildUserMessage(
   query: string,
   context: SearchResult[],
-  options?: { client?: OpenAI; model?: string }
-): Promise<GenerationResult> {
-  const client = options?.client ?? getClient();
-  const model = options?.model ?? 'gpt-4o';
-
+  supplementaryContext?: string
+): string {
   const contextText = context
     .map(
       (c, i) =>
         `[Context ${i + 1}]\nSource: ${c.document_name} (${c.source_department}), ${c.version}\nSection: ${c.section_hierarchy.join(' > ')}\nPage: ${c.page_number}\n\n${c.content}`
     )
     .join('\n\n---\n\n');
+
+  const extraContext = supplementaryContext?.trim()
+    ? `\n\nSupplementary official references:\n${supplementaryContext.trim()}`
+    : '';
+
+  return `Retrieved regulation context:\n\n${contextText}${extraContext}\n\n---\n\nQuestion: ${query}`;
+}
+
+/**
+ * Generate a cited compliance answer from retrieved context.
+ */
+export async function generateAnswer(
+  query: string,
+  context: SearchResult[],
+  options?: { client?: OpenAI; model?: string; supplementaryContext?: string }
+): Promise<GenerationResult> {
+  const client = options?.client ?? getClient();
+  const model = options?.model ?? 'gpt-4o';
 
   const response = await client.chat.completions.create({
     model,
@@ -67,7 +80,7 @@ export async function generateAnswer(
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
       {
         role: 'user',
-        content: `Retrieved regulation context:\n\n${contextText}\n\n---\n\nQuestion: ${query}`,
+        content: buildUserMessage(query, context, options?.supplementaryContext),
       },
     ],
   });
@@ -130,17 +143,10 @@ export function extractCitations(
 export async function* streamAnswer(
   query: string,
   context: SearchResult[],
-  options?: { client?: OpenAI; model?: string }
+  options?: { client?: OpenAI; model?: string; supplementaryContext?: string }
 ): AsyncGenerator<string> {
   const client = options?.client ?? getClient();
   const model = options?.model ?? 'gpt-4o';
-
-  const contextText = context
-    .map(
-      (c, i) =>
-        `[Context ${i + 1}]\nSource: ${c.document_name} (${c.source_department}), ${c.version}\nSection: ${c.section_hierarchy.join(' > ')}\nPage: ${c.page_number}\n\n${c.content}`
-    )
-    .join('\n\n---\n\n');
 
   const stream = await client.chat.completions.create({
     model,
@@ -150,7 +156,7 @@ export async function* streamAnswer(
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
       {
         role: 'user',
-        content: `Retrieved regulation context:\n\n${contextText}\n\n---\n\nQuestion: ${query}`,
+        content: buildUserMessage(query, context, options?.supplementaryContext),
       },
     ],
   });

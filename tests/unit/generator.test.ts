@@ -92,7 +92,7 @@ describe('Generator', () => {
     });
 
     it('rule 1: answer based on retrieved text', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('Answer based on the retrieved regulation text');
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('ONLY answer based on the retrieved regulation text');
     });
 
     it('rule 3: includes fallback for unrelated context', () => {
@@ -257,6 +257,21 @@ describe('Generator', () => {
       expect(userMessage.content).toContain('BD');
       expect(userMessage.content).toContain('Section 5');
       expect(userMessage.content).toContain('fire resistance');
+    });
+
+    it('includes supplementary official references when provided', async () => {
+      const { client, mockCreate } = makeMockClient('answer');
+      const context = [makeContext('Fire Code', 'BD', 'Section 5')];
+
+      await generateAnswer('fire resistance', context, {
+        client,
+        supplementaryContext: '[Live Web Sources]\n- Official reference',
+      });
+
+      const callArgs = mockCreate.mock.calls[0][0];
+      const userMessage = callArgs.messages[1];
+      expect(userMessage.content).toContain('Supplementary official references');
+      expect(userMessage.content).toContain('Official reference');
     });
 
     it('uses temperature 0.1', async () => {

@@ -100,7 +100,9 @@ export async function queryPipeline(
   }
 
   // 4. Generate answer with citations
-  const generation = await generateAnswer(query, reranked);
+  const generation = await generateAnswer(query, reranked, {
+    supplementaryContext: webSearch.supplementaryContext,
+  });
 
   // 5. Verify citations (synchronous, fast)
   const verification = verifyCitations(

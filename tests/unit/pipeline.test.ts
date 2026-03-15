@@ -15,6 +15,10 @@ vi.mock('../../src/retrieval/reranker.js', () => ({
   rerank: vi.fn(),
 }));
 
+vi.mock('../../src/retrieval/web-search.js', () => ({
+  liveWebSearch: vi.fn(),
+}));
+
 vi.mock('../../src/generator/index.js', () => ({
   generateAnswer: vi.fn(),
 }));
@@ -66,6 +70,7 @@ import { ingestSource, ingestSources } from '../../src/pipeline/ingest.js';
 import { expandQuery } from '../../src/retrieval/query-expansion.js';
 import { hybridSearch, rrfFuse } from '../../src/retrieval/hybrid-search.js';
 import { rerank } from '../../src/retrieval/reranker.js';
+import { liveWebSearch } from '../../src/retrieval/web-search.js';
 import { generateAnswer } from '../../src/generator/index.js';
 import { verifyCitations, appendDisclaimer } from '../../src/safety/citation-verifier.js';
 import { scoreFaithfulness } from '../../src/safety/faithfulness.js';
@@ -160,6 +165,10 @@ describe('queryPipeline', () => {
     vi.mocked(hybridSearch).mockResolvedValue(mockResults);
     vi.mocked(rrfFuse).mockReturnValue(mockResults);
     vi.mocked(rerank).mockResolvedValue(mockResults);
+    vi.mocked(liveWebSearch).mockResolvedValue({
+      webResults: [{ title: 'Official BD reference', url: 'https://example.com', source: 'bd.gov.hk', snippet: 'Live source' }],
+      supplementaryContext: '[Live Web Sources]\n- Official BD reference (bd.gov.hk): Live source',
+    });
     vi.mocked(generateAnswer).mockResolvedValue(mockGeneration);
     vi.mocked(verifyCitations).mockReturnValue(mockVerification);
     vi.mocked(scoreFaithfulness).mockResolvedValue(mockFaithfulness);
@@ -190,6 +199,9 @@ describe('queryPipeline', () => {
     expect(generateAnswer).toHaveBeenCalledWith(
       'What is the fire resistance requirement?',
       mockResults,
+      {
+        supplementaryContext: '[Live Web Sources]\n- Official BD reference (bd.gov.hk): Live source',
+      },
     );
 
     // 6. Verify citations
@@ -275,7 +287,9 @@ describe('queryPipeline', () => {
 
     expect(rerank).not.toHaveBeenCalled();
     // Should slice to topK (default 5) instead
-    expect(generateAnswer).toHaveBeenCalledWith('test', manyResults.slice(0, 5));
+    expect(generateAnswer).toHaveBeenCalledWith('test', manyResults.slice(0, 5), {
+      supplementaryContext: '[Live Web Sources]\n- Official BD reference (bd.gov.hk): Live source',
+    });
     expect(result.auditId).toBe('audit-id-123');
   });
 
