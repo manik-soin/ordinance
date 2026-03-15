@@ -15,6 +15,15 @@ import {
   detectNewBDCirculars,
   detectNewFSDCirculars,
 } from './live-data.js';
+import {
+  fetchGovDataSummary,
+  fetchFireDoorsets,
+  fetchFireGlazing,
+  fetchFireStopMaterials,
+  fetchMiCSystems,
+  fetchFireSafetyCompliance,
+  searchLocation,
+} from './gov-data.js';
 
 export const router = Router();
 
@@ -320,6 +329,106 @@ router.get('/live/status', async (_req: Request, res: Response) => {
     });
   } catch (err) {
     console.error('[API] Live status error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─── GOVERNMENT OPEN DATA APIs ────────────────────────────────────────────────
+
+/**
+ * GET /api/gov/summary — Fetch summary of all BD open datasets from data.gov.hk.
+ * Returns counts and samples of fire doorsets, glazing, materials, MiC, fire safety.
+ */
+router.get('/gov/summary', async (_req: Request, res: Response) => {
+  try {
+    const summary = await fetchGovDataSummary();
+    res.json({ source: 'data.gov.hk', department: 'BD', ...summary });
+  } catch (err) {
+    console.error('[API] Gov data summary error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/fire-doorsets — BD Central Data Bank: approved fire resisting doorsets.
+ * Live data from data.gov.hk.
+ */
+router.get('/gov/fire-doorsets', async (_req: Request, res: Response) => {
+  try {
+    const data = await fetchFireDoorsets();
+    res.json({ source: 'data.gov.hk/bd/opendata/cdbbc/cdbfrd.csv', count: data.length, data });
+  } catch (err) {
+    console.error('[API] Fire doorsets error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/fire-glazing — BD Central Data Bank: approved fire resisting glazing.
+ */
+router.get('/gov/fire-glazing', async (_req: Request, res: Response) => {
+  try {
+    const data = await fetchFireGlazing();
+    res.json({ source: 'data.gov.hk/bd/opendata/cdbbc/cdbfrg.csv', count: data.length, data });
+  } catch (err) {
+    console.error('[API] Fire glazing error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/fire-stop-materials — BD Central Data Bank: approved fire stop materials.
+ */
+router.get('/gov/fire-stop-materials', async (_req: Request, res: Response) => {
+  try {
+    const data = await fetchFireStopMaterials();
+    res.json({ source: 'data.gov.hk/bd/opendata/cdbbm/cdbfsm.csv', count: data.length, data });
+  } catch (err) {
+    console.error('[API] Fire stop materials error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/mic-systems — BD accepted Modular Integrated Construction systems.
+ */
+router.get('/gov/mic-systems', async (_req: Request, res: Response) => {
+  try {
+    const data = await fetchMiCSystems();
+    res.json({ source: 'data.gov.hk/bd/opendata/mic/mic.csv', count: data.length, data });
+  } catch (err) {
+    console.error('[API] MiC systems error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/fire-safety — Fire safety compliance statistics (Cap 502/572).
+ */
+router.get('/gov/fire-safety', async (_req: Request, res: Response) => {
+  try {
+    const data = await fetchFireSafetyCompliance();
+    res.json({ source: 'data.gov.hk/bd/opendata/fso/fso.csv', count: data.length, data });
+  } catch (err) {
+    console.error('[API] Fire safety compliance error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/gov/location?q=query — Search buildings/locations via GeoData API.
+ */
+router.get('/gov/location', async (req: Request, res: Response) => {
+  const query = (req.query.q as string) ?? '';
+  if (!query) {
+    res.status(400).json({ error: 'Missing q parameter' });
+    return;
+  }
+  try {
+    const results = await searchLocation(query);
+    res.json({ source: 'geodata.gov.hk', query, count: results.length, results });
+  } catch (err) {
+    console.error('[API] Location search error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
