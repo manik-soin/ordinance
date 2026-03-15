@@ -1350,12 +1350,27 @@ button,input,select,textarea{font:inherit}
 }
 @media(max-width:980px){
   body{
-    display:block;
-    min-height:var(--viewport-height);
+    display:flex;
+    flex-direction:column;
+    height:var(--viewport-height);
+    min-height:0;
+    overflow:hidden;
   }
   body::before{display:none}
   body::after{display:none}
-  .main{min-height:var(--viewport-height)}
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+  }
+  .chat-area{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
   .sidebar{border-radius:0 28px 28px 0}
   .sidebar-header{padding:20px 18px 16px}
   .sidebar-scroll{padding:16px 16px 10px}
@@ -2300,13 +2315,7 @@ function scrollToBottom() {
   if (_scrollRAF) return;
   _scrollRAF = requestAnimationFrame(() => {
     _scrollRAF = 0;
-    // Use scrollTo with smooth behavior for better mobile support
-    chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'auto' });
-    // Fallback: also try scrolling the last message into view
-    const lastMsg = chatInner.lastElementChild;
-    if (lastMsg && lastMsg.scrollIntoView) {
-      lastMsg.scrollIntoView({ block: 'end', behavior: 'auto' });
-    }
+    chatArea.scrollTop = chatArea.scrollHeight - chatArea.clientHeight;
   });
 }
 
