@@ -409,6 +409,16 @@ button,input,select,textarea{font:inherit}
   flex-direction:column;
   gap:4px;
 }
+.topbar-brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.topbar-logo{
+  width:22px;
+  height:22px;
+  color:var(--ink);
+}
 .topbar-title{
   font-family:var(--font-mono);
   font-size:11px;
@@ -892,12 +902,18 @@ button,input,select,textarea{font:inherit}
 }
 
 .stream-status{
-  display:inline-flex;
+  display:flex;
   align-items:center;
   gap:10px;
-  padding:6px 2px;
+  padding:8px 2px;
   font-size:12px;
   color:var(--ink-muted);
+  overflow:hidden;
+}
+.stream-status > span:last-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .dot-pulse{
   display:flex;
@@ -1533,8 +1549,15 @@ button,input,select,textarea{font:inherit}
     </button>
 
     <div class="topbar-copy">
-      <span class="topbar-title">Ordinance</span>
-      <span class="topbar-context">HK building regulation answers with clause citations.</span>
+      <div class="topbar-brand">
+        <svg class="topbar-logo" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4"/>
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(60 24 24)"/>
+          <rect x="16" y="6.5" width="16" height="24" rx="8" stroke="currentColor" stroke-width="2.4" transform="rotate(120 24 24)"/>
+        </svg>
+        <span class="topbar-context">Ordinance</span>
+      </div>
+      <span class="topbar-title">HK building regulation answers with clause citations.</span>
     </div>
 
     <div class="topbar-right">
@@ -2087,13 +2110,15 @@ function formatMarkdown(text, urlMap) {
   let html = escapeHtml(text);
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  html = html.replace(/\[([^\]]{5,})\]/g, (match, inner) => {
+  html = html.replace(/\[([^\]]{2,})\]/g, (match, inner) => {
     if (!urlMap) return '<span class="citation">[' + inner + ']</span>';
     let url = null;
+    const innerLower = inner.toLowerCase();
     for (const [documentName, pdfUrl] of Object.entries(urlMap)) {
-      const shortName = documentName.split(' ').slice(0, 4).join(' ');
-      const prefix = inner.split(',')[0].trim();
-      if (inner.includes(documentName) || inner.includes(shortName) || documentName.includes(prefix)) {
+      const docLower = documentName.toLowerCase();
+      const shortName = docLower.split(' ').slice(0, 4).join(' ');
+      const prefix = innerLower.split(',')[0].trim();
+      if (innerLower.includes(docLower) || innerLower.includes(shortName) || docLower.includes(prefix) || prefix.includes(shortName)) {
         url = pdfUrl;
         break;
       }
