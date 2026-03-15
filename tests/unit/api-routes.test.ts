@@ -503,26 +503,26 @@ describe('API Routes', () => {
       expect(res.body.lastScrape).toBeNull();
     });
 
-    it('returns 503 when database query fails', async () => {
+    it('returns 200 even when database is unreachable (graceful degradation)', async () => {
       mockQuery.mockRejectedValueOnce(new Error('Connection refused'));
 
       const res = await request(app)
         .get('/api/health')
-        .expect(503);
+        .expect(200);
 
-      expect(res.body.status).toBe('unhealthy');
-      expect(res.body.error).toBe('Connection refused');
+      expect(res.body.status).toBe('healthy');
+      expect(res.body.database).toBe(false);
     });
 
-    it('returns 503 with generic message for non-Error throws', async () => {
+    it('returns 200 with database=false for non-Error throws', async () => {
       mockQuery.mockRejectedValueOnce('some string error');
 
       const res = await request(app)
         .get('/api/health')
-        .expect(503);
+        .expect(200);
 
-      expect(res.body.status).toBe('unhealthy');
-      expect(res.body.error).toBe('Unknown error');
+      expect(res.body.status).toBe('healthy');
+      expect(res.body.database).toBe(false);
     });
 
     it('timestamp is a valid ISO string', async () => {
