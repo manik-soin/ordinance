@@ -323,8 +323,10 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   flex-shrink:0;scroll-snap-align:start;
   border:1px solid var(--border);border-radius:var(--radius);
   padding:10px 14px;background:var(--bg-chat);min-width:210px;max-width:270px;
-  transition:all .2s;cursor:default;position:relative;overflow:hidden;
+  transition:all .2s;cursor:pointer;position:relative;overflow:hidden;
+  text-decoration:none;display:block;
 }
+.source-card-link{font-size:10px;color:var(--primary-light);margin-top:4px;display:flex;align-items:center;gap:3px}
 .source-card::before{
   content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
 }
@@ -376,11 +378,12 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
 .answer-bubble ul,.answer-bubble ol{margin:8px 0 8px 20px}
 .answer-bubble li{margin-bottom:4px}
 .answer-bubble .citation{
-  font-size:12px;color:var(--primary);background:var(--primary-subtle);
-  padding:1px 6px;border-radius:4px;font-family:var(--font-mono);
-  white-space:nowrap;
+  font-size:11px;color:var(--primary);background:var(--primary-subtle);
+  padding:2px 6px;border-radius:4px;font-family:var(--font-mono);
+  display:inline;word-break:break-word;line-height:1.8;
 }
-.answer-content{}
+.answer-content{overflow-wrap:break-word;word-break:break-word}
+.answer-bubble{overflow-wrap:break-word;word-break:break-word;overflow:hidden}
 .copy-btn{
   position:absolute;top:10px;right:10px;
   background:var(--border-light);border:1px solid var(--border);
@@ -914,6 +917,7 @@ async function checkHealth() {
 
 async function loadSources() {
   try {
+    // Load department summary
     const res = await fetch('/api/sources');
     const data = await res.json();
     const el = $('sourcesList');
@@ -925,11 +929,40 @@ async function loadSources() {
       const c = $('deptCount' + s.department);
       if (c) c.textContent = s.chunk_count;
     }
-    el.innerHTML = data.sources.map(s =>
-      '<div class="source-item"><span class="source-item-dept">' + s.department +
-      '</span><span class="source-item-stats">' + s.document_count + ' docs &middot; ' +
-      s.chunk_count + ' chunks</span></div>'
-    ).join('');
+    // Load individual documents with PDF links
+    const docsRes = await fetch('/api/documents');
+    const docsData = await docsRes.json();
+    if (docsData.documents && docsData.documents.length > 0) {
+      const byDept = {};
+      for (const d of docsData.documents) {
+        const dept = d.source_department || 'BD';
+        if (!byDept[dept]) byDept[dept] = [];
+        byDept[dept].push(d);
+      }
+      let html = '';
+      for (const [dept, docs] of Object.entries(byDept)) {
+        html += '<div style="margin-bottom:8px">';
+        html += '<div style="color:#94a3b8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">' + dept + ' — ' + docs.length + ' documents</div>';
+        for (const d of docs.slice(0, 8)) {
+          const name = (d.document_name || '').length > 40 ? d.document_name.slice(0,40) + '...' : d.document_name;
+          if (d.pdf_url) {
+            html += '<a href="' + d.pdf_url + '" target="_blank" rel="noopener" style="display:block;color:#64748b;font-size:11px;padding:2px 0;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</a>';
+          } else {
+            html += '<div style="color:#475569;font-size:11px;padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + d.document_name + '">' + name + '</div>';
+          }
+        }
+        if (docs.length > 8) {
+          html += '<div style="color:#475569;font-size:10px;padding:2px 0">+ ' + (docs.length - 8) + ' more documents</div>';
+        }
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    } else {
+      el.innerHTML = data.sources.map(s =>
+        '<div class="source-item"><span class="source-item-dept">' + s.department +
+        '</span><span class="source-item-stats">' + s.document_count + ' docs</span></div>'
+      ).join('');
+    }
   } catch {
     $('sourcesList').innerHTML = '<div style="color:#475569">Could not load</div>';
   }
@@ -1057,13 +1090,23 @@ async function sendQuery() {
           else if (ev.type === 'sources' && ev.sources?.length) {
             const strip = document.createElement('div');
             strip.className = 'sources-strip';
-            strip.innerHTML = ev.sources.map(s => {
+            // Deduplicate by document name
+            const seen = new Set();
+            const unique = ev.sources.filter(s => {
+              if (seen.has(s.document_name)) return false;
+              seen.add(s.document_name);
+              return true;
+            });
+            strip.innerHTML = unique.map(s => {
               const d = s.department || 'BD';
-              return '<div class="source-card" data-dept="' + d + '">' +
+              const url = s.pdf_url || '#';
+              const hasUrl = s.pdf_url ? true : false;
+              return '<a class="source-card" data-dept="' + d + '" href="' + url + '" target="_blank" rel="noopener"' + (hasUrl ? '' : ' style="cursor:default"') + '>' +
                 '<div class="source-card-dept">' + d + ' — ' + (DEPTS[d]?.name || d) + '</div>' +
                 '<div class="source-card-name">' + (s.document_name || 'Regulation') + '</div>' +
                 '<div class="source-card-section">' + (s.section || []).join(' &rsaquo; ') + '</div>' +
-                '</div>';
+                (hasUrl ? '<div class="source-card-link"><svg width="10" height="10" fill="none" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Open PDF</div>' : '') +
+                '</a>';
             }).join('');
             msgEl.insertBefore(strip, statusEl);
             scrollToBottom();

@@ -102,7 +102,23 @@ router.post('/query/stream', async (req: Request, res: Response) => {
 
     const reranked = await rerank(validation.data.query, context, { topK: 6 });
 
-    res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy })) })}\n\n`);
+    // Look up PDF URLs for source documents
+    const docNames = [...new Set(reranked.map((s) => s.document_name))];
+    const urlMap = new Map<string, string>();
+    if (docNames.length > 0) {
+      try {
+        const placeholders = docNames.map((_, i) => `$${i + 1}`).join(',');
+        const { rows: urlRows } = await pool.query(
+          `SELECT document_name, pdf_url FROM document_versions WHERE document_name IN (${placeholders}) AND status = 'current'`,
+          docNames
+        );
+        for (const row of urlRows) {
+          urlMap.set(row.document_name as string, row.pdf_url as string);
+        }
+      } catch {}
+    }
+
+    res.write(`data: ${JSON.stringify({ type: 'sources', sources: reranked.map((s) => ({ document_name: s.document_name, department: s.source_department, section: s.section_hierarchy, pdf_url: urlMap.get(s.document_name) || null })) })}\n\n`);
 
     // Stream answer
     res.write(`data: ${JSON.stringify({ type: 'status', message: 'Generating answer...' })}\n\n`);
@@ -169,6 +185,25 @@ router.get('/sources', async (_req: Request, res: Response) => {
     res.json({ sources: stats });
   } catch (err) {
     console.error('[API] Sources error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/documents — List all ingested documents with source PDF URLs.
+ */
+router.get('/documents', async (_req: Request, res: Response) => {
+  try {
+    const pool = getPool();
+    const { rows } = await pool.query(
+      `SELECT document_name, source_department, version, pdf_url, chunk_count, fetched_at
+       FROM document_versions
+       WHERE status = 'current'
+       ORDER BY source_department, document_name`
+    );
+    res.json({ documents: rows, count: rows.length });
+  } catch (err) {
+    console.error('[API] Documents error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
