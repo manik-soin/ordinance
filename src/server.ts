@@ -24,17 +24,23 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "https://www.google-analytics.com", "https://*.google-analytics.com", "https://*.analytics.google.com", "https://*.googletagmanager.com"],
+      imgSrc: ["'self'", "data:", "https://www.googletagmanager.com"],
     },
   },
 }));
-app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+
+// CORS: restrict API to own origin in production
+const ALLOWED_ORIGINS = process.env.NODE_ENV === 'production'
+  ? ['https://ordinance.maniksoin.com', 'https://hk-compliance-api-production.up.railway.app']
+  : undefined;
+app.use(cors(ALLOWED_ORIGINS ? { origin: ALLOWED_ORIGINS } : undefined));
+
+app.use(express.json({ limit: '16kb' }));
 
 // Request ID middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -57,28 +63,40 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Simple in-memory rate limiter (per IP, 30 requests per minute for query endpoints)
+// Rate limiter: 8 requests per minute + 50 per day per IP
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const dailyBudgetMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 30;
+const RATE_LIMIT_MAX = 8;
+const DAILY_LIMIT_MAX = 50;
+const DAILY_WINDOW_MS = 24 * 60 * 60_000;
 
 function rateLimiter(req: Request, res: Response, next: NextFunction): void {
   const ip = req.ip ?? req.socket.remoteAddress ?? 'unknown';
   const now = Date.now();
-  const entry = rateLimitMap.get(ip);
 
+  // Per-minute check
+  const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    next();
+  } else if (entry.count >= RATE_LIMIT_MAX) {
+    res.status(429).json({ error: 'Too many requests. Please wait a moment before asking again.' });
     return;
+  } else {
+    entry.count++;
   }
 
-  if (entry.count >= RATE_LIMIT_MAX) {
-    res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  // Daily budget check
+  const daily = dailyBudgetMap.get(ip);
+  if (!daily || now > daily.resetAt) {
+    dailyBudgetMap.set(ip, { count: 1, resetAt: now + DAILY_WINDOW_MS });
+  } else if (daily.count >= DAILY_LIMIT_MAX) {
+    res.status(429).json({ error: 'Daily query limit reached. Please try again tomorrow.' });
     return;
+  } else {
+    daily.count++;
   }
 
-  entry.count++;
   next();
 }
 
@@ -128,13 +146,14 @@ async function start(): Promise<void> {
     console.error('[Server] Scheduler error (non-fatal):', err);
   }
 
-  // Cleanup rate limit map periodically
+  // Cleanup rate limit maps periodically
   setInterval(() => {
     const now = Date.now();
     for (const [ip, entry] of rateLimitMap) {
-      if (now > entry.resetAt) {
-        rateLimitMap.delete(ip);
-      }
+      if (now > entry.resetAt) rateLimitMap.delete(ip);
+    }
+    for (const [ip, entry] of dailyBudgetMap) {
+      if (now > entry.resetAt) dailyBudgetMap.delete(ip);
     }
   }, RATE_LIMIT_WINDOW_MS);
 }

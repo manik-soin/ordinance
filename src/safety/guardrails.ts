@@ -8,7 +8,7 @@ export const queryInputSchema = z.object({
   query: z
     .string()
     .min(5, 'Query must be at least 5 characters')
-    .max(2000, 'Query must be at most 2000 characters'),
+    .max(500, 'Query must be at most 500 characters'),
   history: z
     .array(
       z.object({

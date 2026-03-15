@@ -297,14 +297,14 @@ describe('API Routes', () => {
       expect(res.body.error).toMatch(/at least 5/i);
     });
 
-    it('returns 400 for query too long (> 2000 chars)', async () => {
+    it('returns 400 for query too long (> 500 chars)', async () => {
       const res = await request(app)
         .post('/api/query')
-        .send({ query: 'a'.repeat(2001) })
+        .send({ query: 'a'.repeat(501) })
         .expect(400);
 
       expect(res.body).toHaveProperty('error');
-      expect(res.body.error).toMatch(/at most 2000/i);
+      expect(res.body.error).toMatch(/at most 500/i);
     });
 
     it('returns 400 for non-string query', async () => {
@@ -900,12 +900,12 @@ describe('API Routes', () => {
         .expect(200);
     });
 
-    it('POST /api/query handles query with exactly 2000 chars', async () => {
+    it('POST /api/query handles query with exactly 500 chars', async () => {
       mockQueryPipeline.mockResolvedValueOnce(makePipelineResult());
 
       await request(app)
         .post('/api/query')
-        .send({ query: 'a'.repeat(2000) })
+        .send({ query: 'a'.repeat(500) })
         .expect(200);
     });
 
