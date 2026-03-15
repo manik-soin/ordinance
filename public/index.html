@@ -96,6 +96,40 @@ button,input,select,textarea{font:inherit}
   box-shadow:var(--shadow-sm);
   position:relative;
   z-index:2;
+  transition:width .22s ease,min-width .22s ease;
+}
+.sidebar.collapsed{
+  width:0;
+  min-width:0;
+  overflow:hidden;
+  border-right:none;
+}
+.sidebar-collapse-btn{
+  position:absolute;
+  top:28px;
+  right:-14px;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--surface-strong);
+  color:var(--ink-muted);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:3;
+  box-shadow:var(--shadow-sm);
+  transition:transform .18s ease;
+}
+.sidebar.collapsed .sidebar-collapse-btn{
+  right:-38px;
+}
+.sidebar-collapse-btn:hover{
+  color:var(--ink);
+}
+.sidebar.collapsed .sidebar-collapse-btn svg{
+  transform:rotate(180deg);
 }
 .sidebar-header{
   padding:24px;
@@ -913,11 +947,18 @@ button,input,select,textarea{font:inherit}
   font-size:12px;
   color:var(--ink-muted);
   overflow:hidden;
+  max-width:100%;
+  min-width:0;
 }
 .stream-status > span:last-child{
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
+  min-width:0;
+}
+.message-assistant{
+  min-width:0;
+  overflow:hidden;
 }
 .dot-pulse{
   display:flex;
@@ -1360,6 +1401,7 @@ button,input,select,textarea{font:inherit}
   .sidebar-status{padding:0 16px 16px}
   .sidebar-footer{padding:0 18px calc(18px + env(safe-area-inset-bottom))}
   .topbar-menu{display:flex}
+  .sidebar-collapse-btn{display:none}
   .topbar{padding:14px 16px 8px}
   .topbar-title{display:none}
   .chat-area{padding:0 16px calc(148px + env(safe-area-inset-bottom))}
@@ -1514,6 +1556,9 @@ button,input,select,textarea{font:inherit}
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar">
+  <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" aria-label="Toggle sidebar">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
   <div class="sidebar-header">
     <div class="sidebar-brand">
       <div class="brand-mark-shell" aria-hidden="true">
@@ -1825,6 +1870,9 @@ queryInput.addEventListener('focus', () => {
 
 sidebarOverlay.addEventListener('click', closeSidebar);
 document.querySelector('.topbar-menu')?.addEventListener('click', toggleSidebar);
+$('sidebarCollapseBtn')?.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+});
 document.querySelector('.new-chat-btn')?.addEventListener('click', clearChat);
 
 document.querySelector('.topbar-info-btn')?.addEventListener('click', openModal);
@@ -1879,7 +1927,7 @@ async function checkHealth() {
 
     scrape.textContent = data.lastScrape
       ? new Date(data.lastScrape).toLocaleDateString('en-HK', { year: 'numeric', month: 'short', day: 'numeric' })
-      : 'Never';
+      : '-';
   } catch {
     $('statusDot').className = 'status-dot unhealthy';
     $('statusText').textContent = 'Offline';
