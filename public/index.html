@@ -105,9 +105,9 @@ button,input,select,textarea{font:inherit}
   border-right:none;
 }
 .sidebar-collapse-btn{
-  position:absolute;
+  position:fixed;
   top:28px;
-  right:-14px;
+  left:314px;
   width:28px;
   height:28px;
   border-radius:999px;
@@ -120,15 +120,15 @@ button,input,select,textarea{font:inherit}
   cursor:pointer;
   z-index:3;
   box-shadow:var(--shadow-sm);
-  transition:transform .18s ease;
+  transition:left .22s ease;
 }
-.sidebar.collapsed .sidebar-collapse-btn{
-  right:-38px;
+.sidebar.collapsed + .sidebar-collapse-btn{
+  left:8px;
 }
 .sidebar-collapse-btn:hover{
   color:var(--ink);
 }
-.sidebar.collapsed .sidebar-collapse-btn svg{
+.sidebar.collapsed + .sidebar-collapse-btn svg{
   transform:rotate(180deg);
 }
 .sidebar-header{
@@ -1554,9 +1554,6 @@ button,input,select,textarea{font:inherit}
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar">
-  <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" aria-label="Toggle sidebar">
-    <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
   <div class="sidebar-header">
     <div class="sidebar-brand">
       <div class="brand-mark-shell" aria-hidden="true">
@@ -1660,6 +1657,10 @@ button,input,select,textarea{font:inherit}
     <a class="signature-link" href="https://maniksoin.com">made with love by maniksoin.com</a>
   </div>
 </aside>
+
+<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" aria-label="Toggle sidebar">
+  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 
 <div class="modal-overlay" id="infoModal">
   <div class="modal">
