@@ -126,9 +126,12 @@ const MIGRATIONS = [
     name: '009_enable_pgcrypto_and_chunk_vector_index',
     sql: `
       CREATE EXTENSION IF NOT EXISTS pgcrypto;
-      CREATE INDEX IF NOT EXISTS idx_chunks_embedding_hnsw
-      ON regulation_chunks USING hnsw (embedding vector_cosine_ops)
-      WHERE embedding IS NOT NULL;
+    `,
+  },
+  {
+    name: '010_ivfflat_vector_index',
+    sql: `
+      SELECT 1;
     `,
   },
 ];

@@ -1,34 +1,49 @@
 import dotenv from 'dotenv';
 import { BD_CODES_OF_PRACTICE } from '../sources/buildings-dept.js';
+import { EMSD_CODES_OF_PRACTICE } from '../sources/emsd.js';
+import { HA_SOURCES } from '../sources/housing-authority.js';
+import type { RegulationSource } from '../sources/buildings-dept.js';
 import { ingestSources } from '../pipeline/ingest.js';
 import { closePool } from '../db/pool.js';
 import { runMigrations } from '../db/migrate.js';
 
 dotenv.config();
 
+const DEPT_SOURCES: Record<string, RegulationSource[]> = {
+  BD: BD_CODES_OF_PRACTICE,
+  EMSD: EMSD_CODES_OF_PRACTICE,
+  HA: HA_SOURCES,
+};
+
 async function main(): Promise<void> {
-  console.log('[Scrape] Starting BD codes ingestion...');
-  console.log(`[Scrape] ${BD_CODES_OF_PRACTICE.length} sources to process`);
+  const deptArg = process.argv[2]?.toUpperCase();
+  const depts = deptArg && DEPT_SOURCES[deptArg]
+    ? { [deptArg]: DEPT_SOURCES[deptArg] }
+    : DEPT_SOURCES;
 
   await runMigrations();
 
-  const results = await ingestSources(BD_CODES_OF_PRACTICE, 2);
+  for (const [dept, sources] of Object.entries(depts)) {
+    console.log(`\n[Scrape] Starting ${dept} ingestion (${sources.length} sources)...`);
 
-  const ingested = results.filter((r) => r.status === 'ingested');
-  const unchanged = results.filter((r) => r.status === 'unchanged');
-  const failed = results.filter((r) => r.status === 'failed');
+    const results = await ingestSources(sources, 2);
 
-  console.log('\n[Scrape] Results:');
-  console.log(`  Ingested: ${ingested.length}`);
-  console.log(`  Unchanged: ${unchanged.length}`);
-  console.log(`  Failed: ${failed.length}`);
+    const ingested = results.filter((r) => r.status === 'ingested');
+    const unchanged = results.filter((r) => r.status === 'unchanged');
+    const failed = results.filter((r) => r.status === 'failed');
 
-  for (const r of failed) {
-    console.error(`  FAILED: ${r.source.name} — ${r.error}`);
-  }
+    console.log(`[Scrape] ${dept} results:`);
+    console.log(`  Ingested: ${ingested.length}`);
+    console.log(`  Unchanged: ${unchanged.length}`);
+    console.log(`  Failed: ${failed.length}`);
 
-  for (const r of ingested) {
-    console.log(`  ✓ ${r.source.name}: ${r.chunksCreated} chunks (${r.durationMs}ms)`);
+    for (const r of failed) {
+      console.error(`  FAILED: ${r.source.name} — ${r.error}`);
+    }
+
+    for (const r of ingested) {
+      console.log(`  ✓ ${r.source.name}: ${r.chunksCreated} chunks (${r.durationMs}ms)`);
+    }
   }
 
   await closePool();
