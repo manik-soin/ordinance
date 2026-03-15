@@ -382,6 +382,15 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);display
   padding:2px 6px;border-radius:4px;font-family:var(--font-mono);
   display:inline;word-break:break-word;line-height:1.8;
 }
+.answer-bubble .citation-link{
+  text-decoration:none;cursor:pointer;
+  border-bottom:1px dashed var(--primary-light);
+  transition:all .15s;
+}
+.answer-bubble .citation-link:hover{
+  background:var(--primary);color:#fff;
+  border-bottom-color:transparent;
+}
 .answer-content{overflow-wrap:break-word;word-break:break-word}
 .answer-bubble{overflow-wrap:break-word;word-break:break-word;overflow:hidden}
 .copy-btn{
@@ -1029,6 +1038,7 @@ async function sendQuery() {
 
   let answerEl = null;
   let rawText = '';
+  const pdfUrlMap = {}; // document_name → pdf_url
 
   function getOrCreateAnswer() {
     if (!answerEl) {
@@ -1088,6 +1098,10 @@ async function sendQuery() {
             scrollToBottom();
           }
           else if (ev.type === 'sources' && ev.sources?.length) {
+            // Store PDF URLs for citation linking
+            for (const s of ev.sources) {
+              if (s.pdf_url && s.document_name) pdfUrlMap[s.document_name] = s.pdf_url;
+            }
             const strip = document.createElement('div');
             strip.className = 'sources-strip';
             // Deduplicate by document name
@@ -1114,7 +1128,7 @@ async function sendQuery() {
           else if (ev.type === 'token') {
             const el = getOrCreateAnswer();
             rawText += ev.content;
-            el.querySelector('.answer-content').innerHTML = formatMarkdown(rawText);
+            el.querySelector('.answer-content').innerHTML = formatMarkdown(rawText, pdfUrlMap);
             scrollToBottom();
           }
           else if (ev.type === 'web_sources' && ev.sources?.length) {
@@ -1170,11 +1184,28 @@ function scrollToBottom() {
   requestAnimationFrame(() => chatArea.scrollTop = chatArea.scrollHeight);
 }
 
-function formatMarkdown(text) {
+function formatMarkdown(text, urlMap) {
   let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   h = h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
-  h = h.replace(/\[([^\]]{5,})\]/g, '<span class="citation">[$1]</span>');
+  // Citations: make them clickable links to source PDFs
+  h = h.replace(/\[([^\]]{5,})\]/g, function(match, inner) {
+    if (!urlMap) return '<span class="citation">[' + inner + ']</span>';
+    // Try to find a matching document name in the citation text
+    let url = null;
+    for (const [docName, pdfUrl] of Object.entries(urlMap)) {
+      // Match if the citation contains a substantial part of the document name
+      const shortName = docName.split(' ').slice(0, 4).join(' ');
+      if (inner.includes(docName) || inner.includes(shortName) || docName.includes(inner.split(',')[0].trim())) {
+        url = pdfUrl;
+        break;
+      }
+    }
+    if (url) {
+      return '<a class="citation citation-link" href="' + url + '" target="_blank" rel="noopener" title="Open source PDF">[' + inner + ']</a>';
+    }
+    return '<span class="citation">[' + inner + ']</span>';
+  });
   h = h.replace(/^(\d+)\.\s+(.+)$/gm, '<li value="$1">$2</li>');
   h = h.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
   h = h.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
