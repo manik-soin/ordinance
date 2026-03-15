@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@types/node": "^25.5.0",
+    "autoevals": "^0.0.132",
     "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
