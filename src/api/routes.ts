@@ -16,6 +16,7 @@ import {
   detectNewFSDCirculars,
 } from './live-data.js';
 import { liveWebSearch } from '../retrieval/web-search.js';
+import { getAggregateStats } from '../observability/cost-tracker.js';
 import {
   fetchGovDataSummary,
   fetchFireDoorsets,
@@ -70,6 +71,7 @@ router.post('/query', async (req: Request, res: Response) => {
       model: result.model,
       cached: result.cached ?? false,
       webSources: result.webSources ?? [],
+      cost: result.cost ?? null,
     });
   } catch (err) {
     console.error('[API] Query error:', err);
@@ -254,6 +256,13 @@ router.post('/admin/scrape', async (_req: Request, res: Response) => {
     console.error('[API] Scrape error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+/**
+ * GET /api/admin/costs — Aggregate cost and usage statistics since server start.
+ */
+router.get('/admin/costs', (_req: Request, res: Response) => {
+  res.json(getAggregateStats());
 });
 
 /**

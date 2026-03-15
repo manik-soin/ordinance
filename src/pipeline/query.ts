@@ -9,6 +9,7 @@ import { logQueryAudit } from '../db/store.js';
 import { rrfFuse } from '../retrieval/hybrid-search.js';
 import { liveWebSearch } from '../retrieval/web-search.js';
 import { checkCache, writeCache } from '../cache/semantic-cache.js';
+import { estimateQueryCost } from '../observability/cost-tracker.js';
 import type { SearchFilter, SearchResult } from '../retrieval/hybrid-search.js';
 import type { Citation } from '../generator/index.js';
 import type { VerificationResult } from '../safety/citation-verifier.js';
@@ -25,6 +26,7 @@ export interface QueryPipelineResult {
   model: string;
   cached?: boolean;
   webSources?: Array<{ title: string; url: string; source: string }>;
+  cost?: import('../observability/cost-tracker.js').QueryCost;
 }
 
 export interface QueryPipelineOptions {
@@ -62,6 +64,7 @@ export async function queryPipeline(
       latencyMs: Date.now() - start,
       model: 'cached',
       cached: true,
+      cost: estimateQueryCost({ cached: true }),
     };
   }
 
@@ -131,6 +134,13 @@ export async function queryPipeline(
   // 8. Write to semantic cache (non-blocking)
   writeCache(pool, query, finalAnswer, generation.citations, reranked, options?.filter?.department).catch(() => {});
 
+  // 9. Track cost
+  const cost = estimateQueryCost({
+    generationModel: generation.model,
+    promptTokens: generation.prompt_tokens,
+    completionTokens: generation.completion_tokens,
+  });
+
   return {
     answer: finalAnswer,
     citations: generation.citations,
@@ -142,5 +152,6 @@ export async function queryPipeline(
     model: generation.model,
     cached: false,
     webSources: webSearch.webResults.map(w => ({ title: w.title, url: w.url, source: w.source })),
+    cost,
   };
 }
