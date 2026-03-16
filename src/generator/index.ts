@@ -18,14 +18,13 @@ RULES:
 5. When regulations cross-reference other documents, note the cross-reference explicitly.
 6. Always note the version/edition date of the regulation you are citing.
 7. If a regulation may have been superseded or amended, flag this explicitly.
+8. Be CONCISE. Answer in 2-4 short paragraphs maximum. Do not repeat information. Do not list every possible scenario — focus on the most directly relevant answer. Aim for under 500 words.
 
 OUTPUT FORMAT:
 - Direct, substantive answer to the question
-- Citations must appear in brackets, e.g. [Document Name, Section X.X], with the preferred full form [Document Name (Dept), Version, Section X.X]
-- Specific clause citations in [brackets] for every factual claim
-- Relevant cross-references to other HK codes or ordinances
-- Version/date caveat if applicable
-- If you can only partially answer, state what you found and what additional information may be needed`;
+- Citations in brackets: [Document Name (Dept), Version, Section X.X]
+- Cross-references to other HK codes only if directly relevant
+- Version/date caveat if applicable`;
 
 export interface Citation {
   document_name: string;
@@ -76,7 +75,7 @@ export async function generateAnswer(
   const response = await client.chat.completions.create({
     model,
     temperature: 0.1,
-    max_completion_tokens: 2000,
+    max_completion_tokens: 800,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
       {
@@ -152,7 +151,7 @@ export async function* streamAnswer(
   const stream = await client.chat.completions.create({
     model,
     temperature: 0.1,
-    max_completion_tokens: 2000,
+    max_completion_tokens: 800,
     stream: true,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },

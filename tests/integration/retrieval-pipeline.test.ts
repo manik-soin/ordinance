@@ -198,7 +198,7 @@ All exit routes must be at least 1050mm wide.`;
   describe('System prompt compliance', () => {
     it('system prompt enforces all citation rules', () => {
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain('ONLY answer based on the retrieved regulation text');
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('[Document Name, Section X.X]');
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('[Document Name (Dept), Version, Section X.X]');
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain("don't have sufficient information");
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain('NEVER fabricate');
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain('cross-reference');
