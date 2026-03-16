@@ -142,7 +142,7 @@ describe('queryPipeline', () => {
   const mockGeneration = {
     answer: 'The minimum fire resistance is 120 minutes.',
     citations: mockCitations,
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     prompt_tokens: 500,
     completion_tokens: 100,
   };
@@ -235,7 +235,7 @@ describe('queryPipeline', () => {
     // 9. Log audit
     expect(logQueryAudit).toHaveBeenCalledWith(mockPool, expect.objectContaining({
       query: 'What is the fire resistance requirement?',
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
     }));
 
     // Verify returned structure
@@ -243,7 +243,7 @@ describe('queryPipeline', () => {
     expect(result.citations).toEqual(mockCitations);
     expect(result.verification).toEqual(mockVerification);
     expect(result.faithfulness).toEqual(mockFaithfulness);
-    expect(result.model).toBe('gpt-4o');
+    expect(result.model).toBe('gpt-5.4');
     expect(result.answer).toContain('Disclaimer');
     expect(typeof result.latencyMs).toBe('number');
   });

@@ -60,7 +60,11 @@ export async function queryPipeline(
   ).catch(() => query);
 
   // 0. Exact-match cache avoids any model call on repeated queries.
-  const exactCached = await checkExactCache(pool, resolvedQuery, options?.filter).catch(() => null);
+  const exactCached = await checkExactCache(
+    pool,
+    resolvedQuery,
+    options?.filter
+  ).catch(() => null);
   if (exactCached) {
     const liveSearch = await liveWebSearch(resolvedQuery).catch(() => ({
       webResults: [],
@@ -97,8 +101,8 @@ export async function queryPipeline(
   //    already-computed query embedding.
   const semanticCached = queryEmbedding
     ? await checkSemanticCache(pool, resolvedQuery, options?.filter, {
-      queryEmbedding,
-    }).catch(() => null)
+        queryEmbedding,
+      }).catch(() => null)
     : null;
 
   if (semanticCached) {
@@ -196,9 +200,17 @@ export async function queryPipeline(
   ]);
 
   // 9. Write to cache (non-blocking).
-  writeCache(pool, resolvedQuery, finalAnswer, generation.citations, reranked, options?.filter, {
-    queryEmbedding,
-  }).catch(() => {});
+  writeCache(
+    pool,
+    resolvedQuery,
+    finalAnswer,
+    generation.citations,
+    reranked,
+    options?.filter,
+    {
+      queryEmbedding,
+    }
+  ).catch(() => {});
 
   // 10. Track cost
   const cost = estimateQueryCost({
@@ -217,7 +229,11 @@ export async function queryPipeline(
     latencyMs,
     model: generation.model,
     cached: false,
-    webSources: webSearch.webResults.map(w => ({ title: w.title, url: w.url, source: w.source })),
+    webSources: webSearch.webResults.map((w) => ({
+      title: w.title,
+      url: w.url,
+      source: w.source,
+    })),
     cost,
   };
 }

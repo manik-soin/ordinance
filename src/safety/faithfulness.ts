@@ -15,7 +15,7 @@ export interface FaithfulnessResult {
 
 /**
  * Score the faithfulness of a generated answer against its source context.
- * Uses an LLM judge (gpt-4o-mini for cost efficiency).
+ * Uses an LLM judge (gpt-5-mini for cost efficiency).
  */
 export async function scoreFaithfulness(
   query: string,
@@ -30,7 +30,7 @@ export async function scoreFaithfulness(
     .join('\n\n---\n\n');
 
   const response = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     temperature: 0,
     response_format: { type: 'json_object' },
     messages: [

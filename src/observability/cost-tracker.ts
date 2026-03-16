@@ -8,8 +8,8 @@
 
 // Pricing per 1M tokens (as of March 2026)
 const MODEL_PRICING: Record<string, { input: number; output: number }> = {
-  'gpt-4o': { input: 2.50, output: 10.00 },
-  'gpt-4o-mini': { input: 0.15, output: 0.60 },
+  'gpt-5.4': { input: 2.50, output: 15.00 },
+  'gpt-5-mini': { input: 0.40, output: 1.60 },
   'text-embedding-3-large': { input: 0.13, output: 0 },
 };
 
@@ -51,7 +51,7 @@ let stats = {
  * Calculate cost for a set of token usages.
  */
 function calcCost(model: string, inputTokens: number, outputTokens: number): number {
-  const pricing = MODEL_PRICING[model] ?? MODEL_PRICING['gpt-4o-mini'];
+  const pricing = MODEL_PRICING[model] ?? MODEL_PRICING['gpt-5-mini'];
   return (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
 }
 
@@ -65,7 +65,7 @@ export function estimateQueryCost(options: {
   cached?: boolean;
   embeddingTokens?: number;
 }): QueryCost {
-  const model = options.generationModel ?? 'gpt-4o';
+  const model = options.generationModel ?? 'gpt-5.4';
   const cached = options.cached ?? false;
   const embeddingTokens = options.embeddingTokens ?? 50;
 
@@ -97,10 +97,10 @@ export function estimateQueryCost(options: {
   const faithIn = 3000;
   const faithOut = 200;
 
-  const expansionCost = calcCost('gpt-4o-mini', expansionIn, expansionOut);
+  const expansionCost = calcCost('gpt-5-mini', expansionIn, expansionOut);
   const embeddingCost = calcCost('text-embedding-3-large', queryEmbeddingTokens, 0);
   const generationCost = calcCost(model, genIn, genOut);
-  const faithfulnessCost = calcCost('gpt-4o-mini', faithIn, faithOut);
+  const faithfulnessCost = calcCost('gpt-5-mini', faithIn, faithOut);
   const totalCost = expansionCost + embeddingCost + generationCost + faithfulnessCost;
 
   const totalTokens = expansionIn + expansionOut + queryEmbeddingTokens + genIn + genOut + faithIn + faithOut;
@@ -110,12 +110,12 @@ export function estimateQueryCost(options: {
   stats.totalTokens += totalTokens;
 
   return {
-      model,
-      promptTokens: genIn,
-      completionTokens: genOut,
-      embeddingTokens: queryEmbeddingTokens,
-      totalTokens,
-      costUsd: totalCost,
+    model,
+    promptTokens: genIn,
+    completionTokens: genOut,
+    embeddingTokens: queryEmbeddingTokens,
+    totalTokens,
+    costUsd: totalCost,
     breakdown: {
       expansion: expansionCost,
       embedding: embeddingCost,

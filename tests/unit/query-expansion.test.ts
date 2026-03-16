@@ -52,13 +52,13 @@ describe('expandQuery', () => {
     ]);
   });
 
-  it('uses gpt-4o-mini model', async () => {
+  it('uses gpt-5-mini model', async () => {
     const { client, mockCreate } = createMockClient('expansion 1');
     await expandQuery('test query', { client });
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini',
       })
     );
   });

@@ -120,7 +120,7 @@ function makePipelineResult(overrides?: Record<string, unknown>) {
     faithfulness: { score: 0.95, reasoning: 'All claims supported', flaggedClaims: [] },
     auditId: 'audit-123',
     latencyMs: 450,
-    model: 'gpt-4o',
+    model: 'gpt-5.4',
     ...overrides,
   };
 }
@@ -183,7 +183,7 @@ describe('API Routes', () => {
       expect(res.body).toHaveProperty('model');
       expect(res.body.answer).toBe(pipelineResult.answer);
       expect(res.body.audit_id).toBe('audit-123');
-      expect(res.body.model).toBe('gpt-4o');
+      expect(res.body.model).toBe('gpt-5.4');
     });
 
     it('returns correctly shaped source objects', async () => {
@@ -676,7 +676,7 @@ describe('API Routes', () => {
         id: 'audit-abc-123',
         query: 'Fire resistance requirements',
         response: 'The minimum fire resistance...',
-        model_used: 'gpt-4o',
+        model_used: 'gpt-5.4',
         latency_ms: 450,
         faithfulness_score: 0.95,
         created_at: '2026-03-14T10:00:00Z',

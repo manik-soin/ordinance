@@ -71,11 +71,12 @@ export async function generateAnswer(
   options?: { client?: OpenAI; model?: string; supplementaryContext?: string }
 ): Promise<GenerationResult> {
   const client = options?.client ?? getClient();
-  const model = options?.model ?? 'gpt-4o';
+  const model = options?.model ?? 'gpt-5.4';
 
   const response = await client.chat.completions.create({
     model,
     temperature: 0.1,
+    max_tokens: 2000,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
       {
@@ -146,11 +147,12 @@ export async function* streamAnswer(
   options?: { client?: OpenAI; model?: string; supplementaryContext?: string }
 ): AsyncGenerator<string> {
   const client = options?.client ?? getClient();
-  const model = options?.model ?? 'gpt-4o';
+  const model = options?.model ?? 'gpt-5.4';
 
   const stream = await client.chat.completions.create({
     model,
     temperature: 0.1,
+    max_tokens: 2000,
     stream: true,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },

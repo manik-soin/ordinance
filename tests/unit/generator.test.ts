@@ -297,26 +297,26 @@ describe('Generator', () => {
       expect(result.completion_tokens).toBe(75);
     });
 
-    it('defaults model to gpt-4o', async () => {
+    it('defaults model to gpt-5.4', async () => {
       const { client, mockCreate } = makeMockClient('answer');
       const context = [makeContext('Doc', 'BD', 'S1')];
 
       const result = await generateAnswer('q', context, { client });
 
       const callArgs = mockCreate.mock.calls[0][0];
-      expect(callArgs.model).toBe('gpt-4o');
-      expect(result.model).toBe('gpt-4o');
+      expect(callArgs.model).toBe('gpt-5.4');
+      expect(result.model).toBe('gpt-5.4');
     });
 
     it('uses custom model when specified', async () => {
       const { client, mockCreate } = makeMockClient('answer');
       const context = [makeContext('Doc', 'BD', 'S1')];
 
-      const result = await generateAnswer('q', context, { client, model: 'gpt-4o-mini' });
+      const result = await generateAnswer('q', context, { client, model: 'gpt-5.2' });
 
       const callArgs = mockCreate.mock.calls[0][0];
-      expect(callArgs.model).toBe('gpt-4o-mini');
-      expect(result.model).toBe('gpt-4o-mini');
+      expect(callArgs.model).toBe('gpt-5.2');
+      expect(result.model).toBe('gpt-5.2');
     });
   });
 

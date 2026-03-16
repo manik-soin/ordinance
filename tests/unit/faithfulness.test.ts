@@ -125,7 +125,7 @@ describe('Faithfulness Scorer', () => {
     expect(result.reasoning).toBe('Failed to evaluate');
   });
 
-  it('calls OpenAI with gpt-4o-mini model and temperature 0', async () => {
+  it('calls OpenAI with gpt-5-mini model and temperature 0', async () => {
     const mockCreate = vi.fn().mockResolvedValue({
       choices: [
         {
@@ -144,7 +144,7 @@ describe('Faithfulness Scorer', () => {
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini',
         temperature: 0,
         response_format: { type: 'json_object' },
       })

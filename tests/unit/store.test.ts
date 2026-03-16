@@ -290,7 +290,7 @@ describe('logQueryAudit', () => {
       citations: [{ document_name: 'Fire Safety Code', section: '4.1' }],
       faithfulnessScore: 8.5,
       citationAccuracy: 1.0,
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
       latencyMs: 1234,
     };
 
@@ -310,7 +310,7 @@ describe('logQueryAudit', () => {
     expect(params[4]).toBe(JSON.stringify(auditData.citations));
     expect(params[5]).toBe(8.5);
     expect(params[6]).toBe(1.0);
-    expect(params[7]).toBe('gpt-4o');
+    expect(params[7]).toBe('gpt-5.4');
     expect(params[8]).toBe(1234);
   });
 
@@ -324,7 +324,7 @@ describe('logQueryAudit', () => {
       citations: [],
       faithfulnessScore: 0,
       citationAccuracy: 0,
-      model: 'gpt-4o',
+      model: 'gpt-5.4',
       latencyMs: 100,
     });
 

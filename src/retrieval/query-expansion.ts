@@ -8,7 +8,7 @@ function getClient(): OpenAI {
 
 /**
  * Expand an ambiguous query into 2-3 variant phrasings for multi-query retrieval.
- * Uses a lightweight model (gpt-4o-mini) for cost efficiency.
+ * Uses a lightweight model (gpt-5-mini) for cost efficiency.
  */
 export async function expandQuery(
   query: string,
@@ -17,7 +17,7 @@ export async function expandQuery(
   const client = options?.client ?? getClient();
 
   const response = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     temperature: 0.3,
     messages: [
       {
