@@ -31,7 +31,6 @@ export async function scoreFaithfulness(
 
   const response = await client.chat.completions.create({
     model: 'gpt-5-mini',
-    temperature: 0,
     response_format: { type: 'json_object' },
     messages: [
       {

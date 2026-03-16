@@ -145,7 +145,6 @@ describe('Faithfulness Scorer', () => {
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'gpt-5-mini',
-        temperature: 0,
         response_format: { type: 'json_object' },
       })
     );

@@ -31,7 +31,6 @@ export async function contextualizeFollowUpQuery(
 
   const response = await client.chat.completions.create({
     model: 'gpt-5-mini',
-    temperature: 0,
     messages: [
       {
         role: 'system',

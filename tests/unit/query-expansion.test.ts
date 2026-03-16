@@ -63,15 +63,12 @@ describe('expandQuery', () => {
     );
   });
 
-  it('uses temperature 0.3', async () => {
+  it('uses default temperature (gpt-5-mini does not support custom temperature)', async () => {
     const { client, mockCreate } = createMockClient('expansion 1');
     await expandQuery('test query', { client });
 
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        temperature: 0.3,
-      })
-    );
+    const callArgs = mockCreate.mock.calls[0][0];
+    expect(callArgs.temperature).toBeUndefined();
   });
 
   it('passes query as user message', async () => {

@@ -18,7 +18,6 @@ export async function expandQuery(
 
   const response = await client.chat.completions.create({
     model: 'gpt-5-mini',
-    temperature: 0.3,
     messages: [
       {
         role: 'system',
