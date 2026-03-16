@@ -76,7 +76,7 @@ export async function generateAnswer(
   const response = await client.chat.completions.create({
     model,
     temperature: 0.1,
-    max_tokens: 2000,
+    max_completion_tokens: 2000,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
       {
@@ -152,7 +152,7 @@ export async function* streamAnswer(
   const stream = await client.chat.completions.create({
     model,
     temperature: 0.1,
-    max_tokens: 2000,
+    max_completion_tokens: 2000,
     stream: true,
     messages: [
       { role: 'system', content: COMPLIANCE_SYSTEM_PROMPT },
