@@ -2,7 +2,7 @@
 
 Hong Kong building-regulation retrieval-augmented generation system built on Node.js, TypeScript, PostgreSQL, and pgvector. It ingests official government PDFs, chunks and embeds them, serves cited answers over HTTP/SSE, and exposes live government/open-data endpoints alongside the core RAG workflow.
 
-Production: `https://hk-compliance-api-production.up.railway.app`
+Project page: [maniksoin.com/projects/ordinance](https://maniksoin.com/projects/ordinance) · Engineering write-ups: [the RAG build](https://maniksoin.com/blog/building-rag-for-hk-regulations) and [the agent rebuild](https://maniksoin.com/blog/from-rag-to-agent-harnessing-ordinance)
 
 For a deeper architecture and operations guide, see [HK-COMPLIANCE-GUIDE.md](./HK-COMPLIANCE-GUIDE.md).
 
