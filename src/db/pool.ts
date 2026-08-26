@@ -9,6 +9,7 @@ export function getPool(connectionString?: string): pg.Pool {
     _pool = new Pool({
       connectionString: connectionString ?? process.env.DATABASE_URL,
       max: 10,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
     });
   }
   return _pool;
