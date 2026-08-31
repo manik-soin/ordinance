@@ -1,0 +1,45 @@
+{
+  "mode": "agent",
+  "provider": "openai",
+  "model": "gpt-5.4",
+  "report": {
+    "totalQuestions": 1,
+    "answered": 1,
+    "correct": 1,
+    "accuracy": 1,
+    "sourceHitRate": 0,
+    "byDifficulty": {
+      "factual": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1
+      }
+    },
+    "byCategory": {
+      "planning": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1
+      }
+    },
+    "multiStatementAccuracy": 0,
+    "singleStatementAccuracy": 1,
+    "avgLatencyMs": 57055,
+    "failures": []
+  },
+  "results": [
+    {
+      "questionId": "mcq-001",
+      "question": "One of the purposes of \"usable floor space\" in building plan submissions is for determining:",
+      "expectedAnswer": "A",
+      "systemAnswer": "A",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "Option A is supported. PNAP APP-35 states that the **size of a refuse chamber (RC)** “should be based on the **TUFS** of each domestic building or domestic part of a composite building” and then gives RC size ranges by TUFS bands [PNAP APP-35: Refuse Storage and Collection (BD), current, Appendix C item (iii)]. Since TUFS means total usable floor space, usable floor space is expressly used for determining the area/size of the refuse chamber [PNAP APP-35: Refuse Storage and Collection (BD), current, Appendix C item (iii)].\n\nOption D is not the best answer. The Fire Safety Code uses **usable floor area** for assessing **occupant capacity** in certain cases, e.g. “the usable floor area for assessing the occupant capacity in the swimming pool…” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 2 – Provisions of Means of Escape, note 5]. That relates to means of escape calculations, but the question asks for one purpose of “usable floor space” in building plan submissions; the clearest direct planning/submission use shown in the retrieved regulations is RC sizing by TUFS. Options B and C are not supported by the retrieved text: no retrieved sanitary-fitment provision ties the requirement to “usable floor space,” and no retrieved regulation defines it as simply the area within a flat exclusive of common areas.\n\nThe answer is A\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 57055,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    }
+  ]
+}

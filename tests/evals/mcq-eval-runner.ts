@@ -23,6 +23,7 @@ import OpenAI from 'openai';
 import { GoogleGenAI } from '@google/genai';
 import { getPool } from '../../src/db/pool.js';
 import { queryPipeline } from '../../src/pipeline/query.js';
+import { agentQuery } from '../../src/agent/index.js';
 import {
   extractMCQAnswer,
   checkSourceHit,
@@ -120,10 +121,11 @@ async function runEvaluation(options: {
   firstN?: number;
   questionId?: string;
   noRag?: boolean;
+  agent?: boolean;
   model?: string;
   provider?: 'openai' | 'gemini';
 }) {
-  const mode = options.noRag ? 'NO-RAG BASELINE' : 'RAG PIPELINE';
+  const mode = options.noRag ? 'NO-RAG BASELINE' : options.agent ? 'AGENT LOOP' : 'RAG PIPELINE';
   const provider = options.provider ?? 'openai';
   const model = options.model ?? (provider === 'gemini' ? 'gemini-2.5-pro' : 'gpt-5.4');
   console.log(`=== MCQ Benchmark Evaluation [${mode}] [${provider}/${model}] ===\n`);
@@ -176,6 +178,12 @@ async function runEvaluation(options: {
           : await runNoRagOpenAI(openaiClient!, q, model);
         responseText = result.answer;
         latencyMs = result.latencyMs;
+      } else if (options.agent) {
+        // Agent loop — force the ReAct path so the router can't fall back to static
+        const prompt = formatMCQForPipeline(q);
+        const result = await agentQuery(pool!, prompt, { mode: 'agent' });
+        responseText = result.answer;
+        latencyMs = Date.now() - start;
       } else {
         // RAG pipeline — use original MCQ format (debiased prompt hurts RAG accuracy)
         const prompt = formatMCQForPipeline(q);
@@ -271,7 +279,7 @@ async function runEvaluation(options: {
   }
 
   // Save results to file
-  const modeTag = options.noRag ? 'norag' : 'rag';
+  const modeTag = options.noRag ? 'norag' : options.agent ? 'agent' : 'rag';
   const modelTag = model.replace(/[^a-z0-9]/gi, '-');
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const outputPath = path.join(__dirname, `mcq-results-${modeTag}-${provider}-${modelTag}-${timestamp}.json`);
@@ -285,6 +293,7 @@ async function runEvaluation(options: {
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const noRag = args.includes('--no-rag');
+const agent = args.includes('--agent');
 const firstNIdx = args.indexOf('--first');
 const firstN = firstNIdx >= 0 ? parseInt(args[firstNIdx + 1]) : undefined;
 const questionIdx = args.indexOf('--question');
@@ -294,4 +303,4 @@ const model = modelIdx >= 0 ? args[modelIdx + 1] : undefined;
 const providerIdx = args.indexOf('--provider');
 const provider = providerIdx >= 0 ? args[providerIdx + 1] as 'openai' | 'gemini' : undefined;
 
-runEvaluation({ dryRun, firstN, questionId, noRag, model, provider }).catch(console.error);
+runEvaluation({ dryRun, firstN, questionId, noRag, agent, model, provider }).catch(console.error);
