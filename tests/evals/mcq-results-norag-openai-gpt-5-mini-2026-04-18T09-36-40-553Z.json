@@ -1,0 +1,586 @@
+{
+  "mode": "norag",
+  "provider": "openai",
+  "model": "gpt-5-mini",
+  "report": {
+    "totalQuestions": 27,
+    "answered": 0,
+    "correct": 0,
+    "accuracy": 0,
+    "sourceHitRate": 0,
+    "byDifficulty": {
+      "factual": {
+        "total": 14,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "application": {
+        "total": 2,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "multi_statement": {
+        "total": 11,
+        "correct": 0,
+        "accuracy": 0
+      }
+    },
+    "byCategory": {
+      "planning": {
+        "total": 6,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "primary_legislation": {
+        "total": 5,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "licensing": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "fire_safety": {
+        "total": 10,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "accessibility": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "administration": {
+        "total": 3,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "demolition": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0
+      }
+    },
+    "multiStatementAccuracy": 0,
+    "singleStatementAccuracy": 0,
+    "avgLatencyMs": 361.4074074074074,
+    "failures": [
+      {
+        "id": "mcq-001",
+        "expected": "A",
+        "got": null,
+        "question": "One of the purposes of \"usable floor space\" in building plan submissions is for determining:"
+      },
+      {
+        "id": "mcq-002",
+        "expected": "C",
+        "got": null,
+        "question": "Which of the following is exempted from the provisions of the Buildings Ordinance?"
+      },
+      {
+        "id": "mcq-003",
+        "expected": "D",
+        "got": null,
+        "question": "Development proposal for a site zoned \"Comprehensive Development Area\" in an Outline Zoning Plan always requires:"
+      },
+      {
+        "id": "mcq-004",
+        "expected": "D",
+        "got": null,
+        "question": "Who is the Licensing Authority for a restaurant situated at a licensed hotel?"
+      },
+      {
+        "id": "mcq-005",
+        "expected": "C",
+        "got": null,
+        "question": "Which of the following always requires approval and consent?"
+      },
+      {
+        "id": "mcq-006",
+        "expected": "B",
+        "got": null,
+        "question": "Under Building (Planning) Regulations, which of the following statements about \"open space\" is correct?"
+      },
+      {
+        "id": "mcq-007",
+        "expected": "C",
+        "got": null,
+        "question": "Which combination of the following criteria requires a room to be provided with at least 2 exit doors?\n(1) The size of the room exceeds 30 m2\n(2) The capacity of the room exceeds 30 persons.\n(3) The direct distance is below 18m but exceeds 15m.\n(4) The travel distance is below 18m but exceeds 15m."
+      },
+      {
+        "id": "mcq-008",
+        "expected": "C",
+        "got": null,
+        "question": "When applying for an \"Occupation Permit\", which of the following documents are required?\n(1) Certificate of Compliance\n(2) Plan index\n(3) Drainage connection advice\n(4) Completion advice from EMSD"
+      },
+      {
+        "id": "mcq-009",
+        "expected": "C",
+        "got": null,
+        "question": "Irrespective of its distance from adjoining buildings, the roof\n(1) of a domestic building must have an FRP of not less than 1 hour.\n(2) of a single-staircase building of more than 13m above ground level should have an FRP of not less than 1 hour.\n(3) of a building intended for use as a refuge floor must have an FRP of not less than 2 hours."
+      },
+      {
+        "id": "mcq-010",
+        "expected": "A",
+        "got": null,
+        "question": "Required smoke outlets for any basement must be:\n(1) not more than 30m apart.\n(2) not less than 1m in its least dimension.\n(3) covered with stall-boards with FRP >= not less than that of the basement.\n(4) located on external walls at the ground floor of the building."
+      },
+      {
+        "id": "mcq-011",
+        "expected": "C",
+        "got": null,
+        "question": "The Disability Discrimination Ordinance does not apply to:\n(1) buildings <= 13 m in height for domestic use with multiple occupancies.\n(2) buildings <= 13 m for a single family.\n(3) temporary buildings in B(P)R.\n(4) buildings with temporary occupation permits."
+      },
+      {
+        "id": "mcq-012",
+        "expected": "A",
+        "got": null,
+        "question": "An automatic sprinkler system is not required for:"
+      },
+      {
+        "id": "mcq-013",
+        "expected": "A",
+        "got": null,
+        "question": "The Code of Practice for the provision of Means of Escape in Case of Fire stipulates that where 2 or more exit staircases are required, people using one staircase should be able to gain access to at least one of the other staircases at each floor without having to pass through other person's premises, unless the staircases are inter-connected at roof level and"
+      },
+      {
+        "id": "mcq-014",
+        "expected": "C",
+        "got": null,
+        "question": "Which of the following about hoardings are true?\n(1) Obtaining of consent for the hoarding plans is required before erection of the hoardings.\n(2) Hoardings Permits may be renewed until completion of the construction works.\n(3) Hoardings for demolition works may be re-used as hoardings for new building works on the same site.\n(4) For hoardings to be erected on public streets, an Excavation Permit must be obtained from the Highways Department prior to submission of the Hoarding Plans to the Buildings Department."
+      },
+      {
+        "id": "mcq-015",
+        "expected": "A",
+        "got": null,
+        "question": "Which buildings before 1 March 1987 are \"Specified Commercial Buildings\" under Fire Safety (Commercial Premises) Ordinance?\n(1) A cinema\n(2) An office building\n(3) A shopping centre\n(4) A purpose-built department store"
+      },
+      {
+        "id": "mcq-016",
+        "expected": "D",
+        "got": null,
+        "question": "An order by the Building Authority to cease the carrying out of building works deviating from the approved structural plans is to be served to"
+      },
+      {
+        "id": "mcq-017",
+        "expected": "A",
+        "got": null,
+        "question": "The concept of \"compartmentation\" in B(C)R is for the purpose of:\n(1) control of the spread of fire.\n(2) containment of smoke dispersion.\n(3) orderly evacuation of inhabitants in case of fire.\n(4) even distribution of fire-fighting devices."
+      },
+      {
+        "id": "mcq-018",
+        "expected": "D",
+        "got": null,
+        "question": "Where a private street within a site is created for site classification:\n(1) must have street hydrants.\n(2) must be an EVA.\n(3) windows may face it as external air.\n(4) area not counted for site area calculation."
+      },
+      {
+        "id": "mcq-019",
+        "expected": "D",
+        "got": null,
+        "question": "Which of the following building uses does not require risers and treads to be respectively less than 175 mm and greater than 225 mm for Means of Escape staircases?"
+      },
+      {
+        "id": "mcq-020",
+        "expected": "A",
+        "got": null,
+        "question": "Under the Building (Demolition Works) Regulations, which of the following is not necessary for the Authorized Person appointed in respect of the demolition works to carry out before commencement of the demolition works?"
+      },
+      {
+        "id": "mcq-021",
+        "expected": "C",
+        "got": null,
+        "question": "Which of the following will NOT require application for lease modifications?"
+      },
+      {
+        "id": "mcq-022",
+        "expected": "B",
+        "got": null,
+        "question": "Under normal circumstances, which of the following may be considered upon application for exemption from site coverage calculation?\n(1) A curtain wall system forming the building envelope of an existing building\n(2) Bay windows of bona fide hotels\n(3) A building that houses swimming pool filtration plants only\n(4) Balconies that meet the green feature requirements"
+      },
+      {
+        "id": "mcq-023",
+        "expected": "A",
+        "got": null,
+        "question": "The purpose of PNAP is NOT to:"
+      },
+      {
+        "id": "mcq-024",
+        "expected": "D",
+        "got": null,
+        "question": "Which elements must satisfy stability, integrity, and insulation under FRC Code?"
+      },
+      {
+        "id": "mcq-025",
+        "expected": "D",
+        "got": null,
+        "question": "Which of the following statements is correct?"
+      },
+      {
+        "id": "mcq-029",
+        "expected": "D",
+        "got": null,
+        "question": "Under the Buildings Ordinance, it is the duty of a RGBC to:\n(1) co-ordinate subcontractors.\n(2) provide site agent.\n(3) notify BA of contravention.\n(4) certify works in accordance with BO prior to OP application."
+      },
+      {
+        "id": "mcq-030",
+        "expected": "C",
+        "got": null,
+        "question": "Which is NOT required for a bridge uniting two buildings without fire shutters/lobbies under FRC Code?"
+      }
+    ]
+  },
+  "results": [
+    {
+      "questionId": "mcq-001",
+      "question": "One of the purposes of \"usable floor space\" in building plan submissions is for determining:",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 956,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-002",
+      "question": "Which of the following is exempted from the provisions of the Buildings Ordinance?",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 425,
+      "difficulty": "factual",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-003",
+      "question": "Development proposal for a site zoned \"Comprehensive Development Area\" in an Outline Zoning Plan always requires:",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 494,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-004",
+      "question": "Who is the Licensing Authority for a restaurant situated at a licensed hotel?",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 822,
+      "difficulty": "factual",
+      "category": "licensing",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-005",
+      "question": "Which of the following always requires approval and consent?",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 290,
+      "difficulty": "application",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-006",
+      "question": "Under Building (Planning) Regulations, which of the following statements about \"open space\" is correct?",
+      "expectedAnswer": "B",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 286,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-007",
+      "question": "Which combination of the following criteria requires a room to be provided with at least 2 exit doors?\n(1) The size of the room exceeds 30 m2\n(2) The capacity of the room exceeds 30 persons.\n(3) The direct distance is below 18m but exceeds 15m.\n(4) The travel distance is below 18m but exceeds 15m.",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 284,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-008",
+      "question": "When applying for an \"Occupation Permit\", which of the following documents are required?\n(1) Certificate of Compliance\n(2) Plan index\n(3) Drainage connection advice\n(4) Completion advice from EMSD",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 365,
+      "difficulty": "multi_statement",
+      "category": "primary_legislation",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-009",
+      "question": "Irrespective of its distance from adjoining buildings, the roof\n(1) of a domestic building must have an FRP of not less than 1 hour.\n(2) of a single-staircase building of more than 13m above ground level should have an FRP of not less than 1 hour.\n(3) of a building intended for use as a refuge floor must have an FRP of not less than 2 hours.",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 292,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-010",
+      "question": "Required smoke outlets for any basement must be:\n(1) not more than 30m apart.\n(2) not less than 1m in its least dimension.\n(3) covered with stall-boards with FRP >= not less than that of the basement.\n(4) located on external walls at the ground floor of the building.",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 288,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-011",
+      "question": "The Disability Discrimination Ordinance does not apply to:\n(1) buildings <= 13 m in height for domestic use with multiple occupancies.\n(2) buildings <= 13 m for a single family.\n(3) temporary buildings in B(P)R.\n(4) buildings with temporary occupation permits.",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 441,
+      "difficulty": "multi_statement",
+      "category": "accessibility",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-012",
+      "question": "An automatic sprinkler system is not required for:",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 281,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-013",
+      "question": "The Code of Practice for the provision of Means of Escape in Case of Fire stipulates that where 2 or more exit staircases are required, people using one staircase should be able to gain access to at least one of the other staircases at each floor without having to pass through other person's premises, unless the staircases are inter-connected at roof level and",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 269,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-014",
+      "question": "Which of the following about hoardings are true?\n(1) Obtaining of consent for the hoarding plans is required before erection of the hoardings.\n(2) Hoardings Permits may be renewed until completion of the construction works.\n(3) Hoardings for demolition works may be re-used as hoardings for new building works on the same site.\n(4) For hoardings to be erected on public streets, an Excavation Permit must be obtained from the Highways Department prior to submission of the Hoarding Plans to the Buildings Department.",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 249,
+      "difficulty": "multi_statement",
+      "category": "administration",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-015",
+      "question": "Which buildings before 1 March 1987 are \"Specified Commercial Buildings\" under Fire Safety (Commercial Premises) Ordinance?\n(1) A cinema\n(2) An office building\n(3) A shopping centre\n(4) A purpose-built department store",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 327,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-016",
+      "question": "An order by the Building Authority to cease the carrying out of building works deviating from the approved structural plans is to be served to",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 427,
+      "difficulty": "factual",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-017",
+      "question": "The concept of \"compartmentation\" in B(C)R is for the purpose of:\n(1) control of the spread of fire.\n(2) containment of smoke dispersion.\n(3) orderly evacuation of inhabitants in case of fire.\n(4) even distribution of fire-fighting devices.",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 311,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-018",
+      "question": "Where a private street within a site is created for site classification:\n(1) must have street hydrants.\n(2) must be an EVA.\n(3) windows may face it as external air.\n(4) area not counted for site area calculation.",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 295,
+      "difficulty": "multi_statement",
+      "category": "planning",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-019",
+      "question": "Which of the following building uses does not require risers and treads to be respectively less than 175 mm and greater than 225 mm for Means of Escape staircases?",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 279,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-020",
+      "question": "Under the Building (Demolition Works) Regulations, which of the following is not necessary for the Authorized Person appointed in respect of the demolition works to carry out before commencement of the demolition works?",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 289,
+      "difficulty": "factual",
+      "category": "demolition",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-021",
+      "question": "Which of the following will NOT require application for lease modifications?",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 280,
+      "difficulty": "application",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-022",
+      "question": "Under normal circumstances, which of the following may be considered upon application for exemption from site coverage calculation?\n(1) A curtain wall system forming the building envelope of an existing building\n(2) Bay windows of bona fide hotels\n(3) A building that houses swimming pool filtration plants only\n(4) Balconies that meet the green feature requirements",
+      "expectedAnswer": "B",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 260,
+      "difficulty": "multi_statement",
+      "category": "planning",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-023",
+      "question": "The purpose of PNAP is NOT to:",
+      "expectedAnswer": "A",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 420,
+      "difficulty": "factual",
+      "category": "administration",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-024",
+      "question": "Which elements must satisfy stability, integrity, and insulation under FRC Code?",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 304,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-025",
+      "question": "Which of the following statements is correct?",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 269,
+      "difficulty": "factual",
+      "category": "administration",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-029",
+      "question": "Under the Buildings Ordinance, it is the duty of a RGBC to:\n(1) co-ordinate subcontractors.\n(2) provide site agent.\n(3) notify BA of contravention.\n(4) certify works in accordance with BO prior to OP application.",
+      "expectedAnswer": "D",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 262,
+      "difficulty": "multi_statement",
+      "category": "primary_legislation",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-030",
+      "question": "Which is NOT required for a bridge uniting two buildings without fire shutters/lobbies under FRC Code?",
+      "expectedAnswer": "C",
+      "systemAnswer": null,
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "ERROR: Error: 400 Unsupported value: 'temperature' does not support 0.1 with this model. Only the default (1) value is supported.",
+      "latencyMs": 293,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    }
+  ]
+}

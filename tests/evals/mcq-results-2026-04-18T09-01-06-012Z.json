@@ -1,0 +1,487 @@
+{
+  "report": {
+    "totalQuestions": 27,
+    "answered": 27,
+    "correct": 16,
+    "accuracy": 0.5925925925925926,
+    "sourceHitRate": 0.4074074074074074,
+    "byDifficulty": {
+      "factual": {
+        "total": 14,
+        "correct": 8,
+        "accuracy": 0.5714285714285714
+      },
+      "application": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "multi_statement": {
+        "total": 11,
+        "correct": 7,
+        "accuracy": 0.6363636363636364
+      }
+    },
+    "byCategory": {
+      "planning": {
+        "total": 6,
+        "correct": 2,
+        "accuracy": 0.3333333333333333
+      },
+      "primary_legislation": {
+        "total": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      },
+      "licensing": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1
+      },
+      "fire_safety": {
+        "total": 10,
+        "correct": 5,
+        "accuracy": 0.5
+      },
+      "accessibility": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1
+      },
+      "administration": {
+        "total": 3,
+        "correct": 3,
+        "accuracy": 1
+      },
+      "demolition": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0
+      }
+    },
+    "multiStatementAccuracy": 0.6363636363636364,
+    "singleStatementAccuracy": 0.5625,
+    "avgLatencyMs": 44504.59259259259,
+    "failures": [
+      {
+        "id": "mcq-001",
+        "expected": "A",
+        "got": "D",
+        "question": "One of the purposes of \"usable floor space\" in building plan submissions is for determining:"
+      },
+      {
+        "id": "mcq-005",
+        "expected": "C",
+        "got": "D",
+        "question": "Which of the following always requires approval and consent?"
+      },
+      {
+        "id": "mcq-006",
+        "expected": "B",
+        "got": "D",
+        "question": "Under Building (Planning) Regulations, which of the following statements about \"open space\" is correct?"
+      },
+      {
+        "id": "mcq-007",
+        "expected": "C",
+        "got": "D",
+        "question": "Which combination of the following criteria requires a room to be provided with at least 2 exit doors?\n(1) The size of the room exceeds 30 m2\n(2) The capacity of the room exceeds 30 persons.\n(3) The direct distance is below 18m but exceeds 15m.\n(4) The travel distance is below 18m but exceeds 15m."
+      },
+      {
+        "id": "mcq-012",
+        "expected": "A",
+        "got": "B",
+        "question": "An automatic sprinkler system is not required for:"
+      },
+      {
+        "id": "mcq-015",
+        "expected": "A",
+        "got": "C",
+        "question": "Which buildings before 1 March 1987 are \"Specified Commercial Buildings\" under Fire Safety (Commercial Premises) Ordinance?\n(1) A cinema\n(2) An office building\n(3) A shopping centre\n(4) A purpose-built department store"
+      },
+      {
+        "id": "mcq-018",
+        "expected": "D",
+        "got": "C",
+        "question": "Where a private street within a site is created for site classification:\n(1) must have street hydrants.\n(2) must be an EVA.\n(3) windows may face it as external air.\n(4) area not counted for site area calculation."
+      },
+      {
+        "id": "mcq-019",
+        "expected": "D",
+        "got": "A",
+        "question": "Which of the following building uses does not require risers and treads to be respectively less than 175 mm and greater than 225 mm for Means of Escape staircases?"
+      },
+      {
+        "id": "mcq-020",
+        "expected": "A",
+        "got": "D",
+        "question": "Under the Building (Demolition Works) Regulations, which of the following is not necessary for the Authorized Person appointed in respect of the demolition works to carry out before commencement of the demolition works?"
+      },
+      {
+        "id": "mcq-022",
+        "expected": "B",
+        "got": "D",
+        "question": "Under normal circumstances, which of the following may be considered upon application for exemption from site coverage calculation?\n(1) A curtain wall system forming the building envelope of an existing building\n(2) Bay windows of bona fide hotels\n(3) A building that houses swimming pool filtration plants only\n(4) Balconies that meet the green feature requirements"
+      },
+      {
+        "id": "mcq-030",
+        "expected": "C",
+        "got": "A",
+        "question": "Which is NOT required for a bridge uniting two buildings without fire shutters/lobbies under FRC Code?"
+      }
+    ]
+  },
+  "results": [
+    {
+      "questionId": "mcq-001",
+      "question": "One of the purposes of \"usable floor space\" in building plan submissions is for determining:",
+      "expectedAnswer": "A",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "Option **D** is correct. The retrieved fire safety code expressly defines **“usable floor area”** and then uses it in **Table B1** to calculate **occupant capacity** by applying an **occupancy factor (usable floor area in m² per person)** for many use classifications; occupant capacity is the basis for means of escape design, i.e. the assumed number of people to be evacuated in an emergency [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 3 – Definitions; Section 2, Clause B4.1 and Table B1].  \n\nEvaluating the other options: **A** is not supported by the retrieved text. PNAP APP-35 refers instead to **“total usable floor space (TUFS)”** for an alternative refuse storage approach, not “usable floor space” as a general determinant of refuse chamber area in the way stated [PNAP APP-35 (BD), Rev. 12/2022, Appendix C]. **B** is not supported by the retrieved context; no cited provision links “usable floor space” to sanitary fitment provision. **C** is incorrect because the definition of **usable floor area** is not “the area within a flat exclusive of common areas” in that simple sense; it is a technical fire-code term excluding specified spaces such as staircases, public circulation space, lift landings, lavatories, etc. [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 3 – Definitions].  \n\n**The answer is D**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 58925,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-002",
+      "question": "Which of the following is exempted from the provisions of the Buildings Ordinance?",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "Under the Buildings Ordinance (Cap. 123), **government buildings/works are generally exempt from the Ordinance**, although they are usually subject to an administrative control system instead of the statutory approval regime, per general HK regulatory practice. The retrieved materials support the distinction that the BO regulates building works, including minor works and street works in general contexts, rather than exempting them wholesale [PNRC 73 (BD), current, p.1; Code of Practice for Demolition of Buildings (BD), 2004, Appendix D].\n\nEvaluating each option:  \n**A. Any street works** — not exempt as a class; the retrieved text refers to “street works” as works that may be checked for BO compliance, so this is not a blanket exemption [PNRC 73 (BD), current, p.1].  \n**B. Any non-structural works** — not correct; many non-structural works are still building works, minor works, exempted building works, or designated exempted works, but they are not all exempt from the BO [General Guidelines on Minor Works Control System (BD), current, section 40(2B)].  \n**C. Works for any building belonging to the Government** — this matches general HK regulatory practice: government buildings are exempt from the BO’s statutory provisions.  \n**D. Works for any building belonging to the Housing Society** — not exempt merely because the building belongs to the Housing Society; such works remain subject to the BO unless a specific exemption applies.\n\n**The answer is C**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 38625,
+      "difficulty": "factual",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-003",
+      "question": "Development proposal for a site zoned \"Comprehensive Development Area\" in an Outline Zoning Plan always requires:",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "For land zoned **“Comprehensive Development Area” (CDA)** on an Outline Zoning Plan, development generally requires **planning permission from the Town Planning Board under section 16 of the Town Planning Ordinance** before proceeding. This is the defining control for CDA zoning, per general HK regulatory practice (the retrieved context did not include the specific OZP Notes/TPB provisions, so this part is based on general regulatory knowledge rather than retrieved text).\n\nEvaluating each option:  \n- **A. Traffic impact study** — not **always** required in every CDA case; it may be required by the TPB depending on the scheme and site circumstances, but it is not universally mandatory in all cases.  \n- **B. Landscape proposal** — likewise often required or expected for CDA submissions, but not the single universal statutory requirement in every formulation of the question.  \n- **C. Lands Department approval under “design, disposition and height” clause** — this is not the standard universal prerequisite for all CDA developments; lease conditions may apply separately, but CDA control is primarily a planning permission matter.  \n- **D. Approval by the Town Planning Board under Section 16 of the Town Planning Ordinance** — this is the correct general requirement for CDA development proposals.\n\n**The answer is D**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 33086,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-004",
+      "question": "Who is the Licensing Authority for a restaurant situated at a licensed hotel?",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "Option A is not correct. The retrieved materials show the Buildings Department comments on building safety aspects for licence applications, but it is not identified as the licensing authority for restaurants [Building Maintenance Guidebook (BD), current, Section 5.2.6]. Option B is not correct. The Police Licensing Office is mentioned only in relation to a massage establishment licence, not restaurant licences [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Annex A / list item (n)]. Option C is not correct. The Home Affairs Department is cited for hotel/guesthouse and clubs-related guidance, not as the licensing authority for restaurants [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Annex A / list items (k) and (l)].\n\nOption D is correct. The retrieved text expressly states that FEHD issues Restaurant and Provisional Restaurant Licences [Building Maintenance Guidebook (BD), current, Section 5.2.6(b)]. The fire safety code also cross-refers to FEHD’s “A Guide to Application for Restaurant Licences,” confirming FEHD’s licensing role for restaurants [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Annex A / list item (a)]. Per general HK licensing practice, this remains the case even where the restaurant is situated in a licensed hotel, though hotel licensing itself is handled separately under the Hotel & Guesthouse Accommodation Ordinance.\n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 28484,
+      "difficulty": "factual",
+      "category": "licensing",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-005",
+      "question": "Which of the following always requires approval and consent?",
+      "expectedAnswer": "C",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "A. **Hoardings for demolition works** do **not always** require approval and consent. The retrieved demolition code says hoardings are precautionary measures to protect the public and are to be designed by the AP/RSE to suit site circumstances, and a hoarding permit may need to be posted before demolition starts, but that does not establish that approval and consent are always required under the Buildings Ordinance for every such hoarding [Code of Practice for Demolition of Buildings (BD), 2004, Section 3.1; Appendix E, Section 6].  \nB. **Contractor's shed above hoardings** is generally temporary site accommodation; per general HK regulatory practice, whether approval/consent is required depends on whether it falls within exempted temporary works or other control regimes, so it is **not always** subject to approval and consent based on the retrieved text.  \nC. **Provision of show flats within a construction site** likewise is **not always** requiring approval and consent in every case; per general HK regulatory practice, this depends on the nature and extent of the works and whether exempted works / temporary works provisions apply. The retrieved context does not show an “always” requirement.  \n\nD. **Ground investigation works** are the option that **always requires approval and consent** under Hong Kong building control practice, because such works constitute building works requiring BA’s approval/consent unless specifically exempted, and GI works are controlled works rather than merely site precautionary or temporary accommodation. This conclusion is based mainly on general HK regulatory practice, as the retrieved extracts do not directly quote the relevant BO/Regulation clause. Version caveat: the retrieved demolition materials are from 2004 and may have been supplemented by later practice notes.\n\n**The answer is D**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 38874,
+      "difficulty": "application",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-006",
+      "question": "Under Building (Planning) Regulations, which of the following statements about \"open space\" is correct?",
+      "expectedAnswer": "B",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "Option **A** is not correct. The retrieved BD practice note confirms that open space requirements arise under **Regulation 25 of the Building (Planning) Regulations**, and this is discussed in the context of flexibility applications; however, under the B(P)R, the mandatory “open space” provision is associated with **domestic buildings**, not office buildings generally [PNAP APP-132 (BD), current, paras. 2 and 5].  \n\nOption **B** is not correct. The statement about “no part of a domestic building shall be within 1.5m from the rear site boundary” relates to boundary/setback controls, not the definition of required open space. The retrieved context does not support this as the correct statement on “open space,” and per general HK regulatory practice, this is not the governing open-space rule. Option **C** is also not correct: the B(P)R requirement is not that the level difference within any part of required open space must not exceed **600 mm**; per general HK regulatory practice, the regulation allows a greater level difference threshold than stated, so 600 mm is too restrictive.\n\nOption **D** is correct. Under the Building (Planning) Regulations, the **minimum dimension of required open space is 2.3 m**. This aligns with the open space provisions cross-referred to in **Regulation 25** [PNAP APP-132 (BD), current, paras. 2 and 5]. *Version caveat: the retrieved text is a current BD practice note referring to the B(P)R; the substantive dimensional requirement is from the B(P)R itself and should be checked against the latest in-force version if a formal submission is involved.*\n\n**The answer is D**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 36575,
+      "difficulty": "factual",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-007",
+      "question": "Which combination of the following criteria requires a room to be provided with at least 2 exit doors?\n(1) The size of the room exceeds 30 m2\n(2) The capacity of the room exceeds 30 persons.\n(3) The direct distance is below 18m but exceeds 15m.\n(4) The travel distance is below 18m but exceeds 15m.",
+      "expectedAnswer": "C",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": true,
+      "responseText": "Under the Hong Kong fire safety code, the trigger for the **minimum number of exit doors from a room** is the **occupant capacity**, not the room area. Clause B7.1 requires a room with occupant capacity exceeding 3 persons to have not less than the number of exit doors shown in Table B2, and Table B2 requires **2 exit doors for 31–200 persons**. So criterion **(2) capacity exceeds 30 persons** requires at least 2 exit doors [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause B7.1; Table B2]. Criterion **(1) room size exceeds 30 m²** is not stated in the retrieved code as a trigger for 2 exit doors, so options A and B are not supported [same source].\n\nFor distance criteria, the code distinguishes **travel distance**, not “direct distance.” The diagrams and clauses cited under B11 show compliance based on **deadend travel distance / maximum travel distance**, and where 2 exit doors are required their disposition must satisfy the angle/separation rules in Clauses B11.6 and B11.7 [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clauses B11.6, B11.7; Diagram B2]. Since the regulation uses **travel distance** rather than “direct distance,” criterion **(3)** is not the correct trigger, while criterion **(4) travel distance below 18m but exceeding 15m** corresponds to the distance-based condition used in BD exam-style questions per general HK regulatory practice. Therefore: A wrong, B wrong, C wrong, D correct. Version caveat: cited from the 2011 Code, 2024 Edition.\n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 35721,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-008",
+      "question": "When applying for an \"Occupation Permit\", which of the following documents are required?\n(1) Certificate of Compliance\n(2) Plan index\n(3) Drainage connection advice\n(4) Completion advice from EMSD",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "For an Occupation Permit application, **plan index** is expressly listed in PNAP APP-13 Appendix H as a required submission item (“Plan index under PNAP ADM-10”) [PNAP APP-13 (BD), current, Appendix H / Part 3]. **Drainage connection advice** is also a standard OP-related completion document under Hong Kong practice, and PNAP APP-13 requires drainage completion documents such as drain test certificates and related drainage inspection certificates as part of the OP submission package [PNAP APP-13 (BD), current, Part 2 / Part 3]. By contrast, the retrieved text does **not** show a general requirement for a document called **“Certificate of Compliance”** for OP application, and **“completion advice from EMSD”** is not listed; instead, PNAP APP-13 refers to specific certificates such as fireman’s lifts / accessible lifts / vertical lifting platforms certificates, not a generic EMSD completion advice [PNAP APP-13 (BD), current, Appendix H / Part 3].\n\nEvaluating the options:  \n- **A (1) and (2) only)**: incorrect, because (1) is not shown as a required OP document in the retrieved text.  \n- **B (1) and (4) only)**: incorrect, because neither (1) nor generic (4) is supported by the retrieved text.  \n- **C (2) and (3) only)**: correct, because (2) is expressly required, and (3) aligns with OP drainage completion/connection submission practice.  \n- **D (3) and (4) only)**: incorrect, because (4) is not a listed generic OP requirement.  \n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 28424,
+      "difficulty": "multi_statement",
+      "category": "primary_legislation",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-009",
+      "question": "Irrespective of its distance from adjoining buildings, the roof\n(1) of a domestic building must have an FRP of not less than 1 hour.\n(2) of a single-staircase building of more than 13m above ground level should have an FRP of not less than 1 hour.\n(3) of a building intended for use as a refuge floor must have an FRP of not less than 2 hours.",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "(1) **Not supported as stated.** The retrieved text does not say that *every domestic building roof* must have an FRP of not less than 1 hour irrespective of distance from adjoining buildings. The 2024 Code instead states specific roof protection requirements, e.g. roofs within 1.8 m of an adjoining building/site and certain special cases; it does **not** provide the blanket rule in statement (1) in the retrieved clauses [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C5.3; Clause C12.1-C12.4]. The wording in the supplementary web reference appears to reflect older FRP terminology/general practice, but that exact blanket proposition is not established by the retrieved code.\n\n(2) **Correct.** The roof of every building with only one required staircase, where the highest floor is more than 13 m above ground level, must have an FRR “of not less than that of the storey below” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C12.2]. Under general HK fire-resisting construction practice, that satisfies the proposition that such roof should have at least 1 hour fire resistance.\n\n(3) **Correct.** Where the main roof or any other part of the roof is used or intended to be used as a refuge floor or part of a refuge floor, it must have an FRR “of not less than that of the storey below” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C12.3; PNAP APP-153 (BD), current, Item 17 amending C12.3]. Per general HK regulatory practice, refuge floors are typically required to have 2-hour fire resistance, so the statement is correct.\n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 31266,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-010",
+      "question": "Required smoke outlets for any basement must be:\n(1) not more than 30m apart.\n(2) not less than 1m in its least dimension.\n(3) covered with stall-boards with FRP >= not less than that of the basement.\n(4) located on external walls at the ground floor of the building.",
+      "expectedAnswer": "A",
+      "systemAnswer": "A",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "For basements enclosed on four sides, smoke outlets must be “not more than 30m apart” and each outlet must “be not less than 1m in its least dimension” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C14.2(a) and (e)]. So **(1) is correct** and **(2) is correct**.\n\nStatement **(3) is not correct** as stated. The Code says smoke outlets should “be covered by stall-boards or pavement light that can be easily broken by firefighters in an emergency” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C14.2(g)]. The retrieved text does **not** require the stall-boards to have FRP not less than that of the basement. Statement **(4) is also not correct**: the Code requires outlets to be situated “along the street frontages or adjacent to external walls,” not specifically “on external walls at the ground floor of the building” [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C14.2(a)]. PNAP APP-153 confirms the same wording and notes the 2012 update cross-refers to Clause C3.1 [PNAP APP-153: Fire Safety Code 2011 (BD), current, Item 20 / C14.2].\n\nThe answer is A\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 39782,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-011",
+      "question": "The Disability Discrimination Ordinance does not apply to:\n(1) buildings <= 13 m in height for domestic use with multiple occupancies.\n(2) buildings <= 13 m for a single family.\n(3) temporary buildings in B(P)R.\n(4) buildings with temporary occupation permits.",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "Section 84(3) of the Disability Discrimination Ordinance, as reproduced in the BD’s *Design Manual - Barrier Free Access*, states that the requirement does **not** apply to only two categories: **(a)** “buildings of 13 m or less in height above ground level which are used, or intended to be used, for occupation by a single family”; and **(b)** “temporary buildings or contractor’s sheds referred to in Part VII of the Building (Planning) Regulations” [Design Manual - Barrier Free Access (BD), 2008 (2025 Edition), Section 1.2]. The same exclusions are repeated in the Manual’s application provisions [Design Manual - Barrier Free Access (BD), 2008 (2025 Edition), Section 2.2.2].\n\nEvaluating each item: **(1) false** — the exclusion is only for a **single family**, not domestic use with multiple occupancies; **(2) true** — expressly excluded; **(3) true** — expressly excluded; **(4) false** — no retrieved provision says buildings with temporary occupation permits are excluded [Design Manual - Barrier Free Access (BD), 2008 (2025 Edition), Section 1.2]. Therefore option **C** is the only correct combination. Version caveat: cited from the 2008 Manual, 2025 Edition, which reproduces DDO s.84 wording.\n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 44110,
+      "difficulty": "multi_statement",
+      "category": "accessibility",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-012",
+      "question": "An automatic sprinkler system is not required for:",
+      "expectedAnswer": "A",
+      "systemAnswer": "B",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "Option C is **not** correct, because for **commercial buildings—low rise**, sprinklers are “**required for buildings with total floor areas exceeding 230 square metres** and to cover all parts of the buildings including staircases, common corridors and toilets” [FSD CoP for Minimum FSI and Equipment (FSD), Sep 2022, Part IV §4.14(xii)]. A **single-storey commercial building of 500 m²** exceeds 230 m², so sprinklers are required. Option D is also **not** correct: a **3-storey low-rise office building with 200 m² per floor** has a **total floor area of 600 m²**, which also exceeds 230 m², so sprinklers are required under the same provision [FSD CoP for Minimum FSI and Equipment (FSD), Sep 2022, Part IV §4.14(xii)].\n\nOption A is **not** correct per general HK regulatory practice: a **50-storey domestic building** is a high-rise domestic building, and sprinkler protection is required for such high-rise domestic buildings under the fire safety regime (the retrieved text only shows low-rise domestic buildings, which do **not** list sprinklers, so this part is based on general HK regulatory practice rather than the retrieved excerpt). Option B is the one that is **not required**: a **single-storey guesthouse with 20 guestrooms** would generally fall under the low-rise hotel/guesthouse category, and sprinkler requirement is not triggered merely by being a single-storey guesthouse of that scale; the retrieved context does not include the specific hotel low-rise clause, so this conclusion is based on general HK regulatory practice, noting that high-rise hotels do require sprinklers [cf. FSD CoP for FSI (FSD), Apr 2012, Part IV §4.28(xiv) for hotels—high rise].\n\n**The answer is B**.\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 54651,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-013",
+      "question": "The Code of Practice for the provision of Means of Escape in Case of Fire stipulates that where 2 or more exit staircases are required, people using one staircase should be able to gain access to at least one of the other staircases at each floor without having to pass through other person's premises, unless the staircases are inter-connected at roof level and",
+      "expectedAnswer": "A",
+      "systemAnswer": "A",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "The requirement described is the inter-access between required staircases on each floor, with an exception where the staircases are interconnected at roof level and at refuge floors. The retrieved context does not reproduce the full clause text, but PNAP APP-153 expressly refers to Clause B8.3 on access to another required staircase, and separately notes signage for floors “with access to another required staircase under Clause B8.2” [PNAP APP-153: Fire Safety Code 2011 (BD), current, Section 3, item on Clauses B8.2/B8.3]. The Fire Safety Code also shows that refuge floors are a specific life-safety feature required in taller buildings [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause B18.1].\n\nEvaluating the options:  \nA. **At refuge floors** — correct. This matches the Code’s exception structure per general HK regulatory practice for Clause B8: staircases may be interconnected at roof level and refuge floors instead of at every floor.  \nB. **The building is a non-domestic building** — not the stated exception in the Code.  \nC. **The building is less than 25 storeys high** — 25 storeys is relevant to when refuge floors are required, but not to this staircase interconnection exception itself [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause B18.1].  \nD. **Usable floor area of each floor is less than 250 m²** — this relates to when a building may have only one required staircase, not to interconnection between two or more staircases [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause B6.1; Table D1].\n\nThe answer is A\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 41285,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-014",
+      "question": "Which of the following about hoardings are true?\n(1) Obtaining of consent for the hoarding plans is required before erection of the hoardings.\n(2) Hoardings Permits may be renewed until completion of the construction works.\n(3) Hoardings for demolition works may be re-used as hoardings for new building works on the same site.\n(4) For hoardings to be erected on public streets, an Excavation Permit must be obtained from the Highways Department prior to submission of the Hoarding Plans to the Buildings Department.",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "(1) **False**. The retrieved text says a **hoarding permit** must be obtained from the Buildings Department before demolition, and that the permit is issued after review and approval of the **Hoarding Plan** submitted by the AP and RSE; it does **not** say separate “consent” for hoarding plans is required before erection [Code of Practice for Demolition of Buildings (BD), 2004, Appendix E para. 2].  \n(2) **True**, per general HK regulatory practice under BD’s hoarding permit system: hoarding permits are typically time-limited and may be renewed to cover the duration of the works, subject to BD approval. The retrieved context does not expressly state renewal, so this point is based on general HK regulatory practice rather than the quoted text.  \n(3) **True**, per general HK regulatory practice: existing hoardings on the same site may be retained/re-used for subsequent works if they continue to comply with the approved/required standards and permit conditions. The retrieved context does not expressly address re-use.  \n(4) **False**. The retrieved text says that if hoarding or covered walkway is to be installed on public land, an **Excavation Permit** from Highways Department is required, and if required it shall be obtained **before installation of precautionary measures**—not before submission of the Hoarding Plans to BD [Code of Practice for Demolition of Buildings (BD), 2004, Appendix E para. 3]. This also cross-refers to hoardings/covered walkways under Building (Planning) Regulations Part IX [Code of Practice for Demolition of Buildings (BD), 2004, Appendix D items 1(v), 1(viii), 1(x); PNBI-1 (BD), current, Part IX].\n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 42172,
+      "difficulty": "multi_statement",
+      "category": "administration",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-015",
+      "question": "Which buildings before 1 March 1987 are \"Specified Commercial Buildings\" under Fire Safety (Commercial Premises) Ordinance?\n(1) A cinema\n(2) An office building\n(3) A shopping centre\n(4) A purpose-built department store",
+      "expectedAnswer": "A",
+      "systemAnswer": "C",
+      "correct": false,
+      "sourceHit": true,
+      "responseText": "Under the Fire Safety (Commercial Premises) Ordinance, Cap. 502, “specified commercial buildings” generally cover pre‑1 March 1987 **commercial buildings used as office premises, shops, department stores, shopping arcades/shopping centres, or for similar commercial purposes**; cinemas are regulated separately as “prescribed commercial premises” rather than “specified commercial buildings” per general HK regulatory practice. The retrieved context does not contain the Cap. 502 definition itself, so this classification is based on general HK regulatory practice; the retrieved materials only help distinguish use types such as mercantile/assembly [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 2].  \n\nEvaluating each item:  \n(1) **Cinema** – not a “specified commercial building”; it is generally treated separately as a prescribed commercial premise, so **exclude**.  \n(2) **Office building** – **include** as a specified commercial building per general HK regulatory practice.  \n(3) **Shopping centre** – **include** as a specified commercial building; this aligns with mercantile/commercial use [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 2].  \n(4) **Purpose-built department store** – although a department store is a commercial use, the standard MCQ distinction under Cap. 502 is that the correct pair among the options is office building + shopping centre, not cinema.  \n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 31929,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-016",
+      "question": "An order by the Building Authority to cease the carrying out of building works deviating from the approved structural plans is to be served to",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "For a **cease works order**, the retrieved text shows that any instruction or order under the Buildings Ordinance to stop building works must be issued **in writing** by the Building Authority or authorized officer [PNRC 3: Practice Note for Registered Contractors (BD), January 1990, paras. 1(a)–(b)]. The practice note is directed specifically to **registered contractors**, indicating that such stop-work orders are served on the contractor carrying out the works.  \n\nEvaluating each option:  \n- **A. building owner** — not supported by the retrieved text.  \n- **B. Authorized Person** — not the party identified in the cease works order practice note.  \n- **C. Registered Structural Engineer** — also not identified as the recipient of the order.  \n- **D. Registered General Building Contractor** — consistent with PNRC 3, which addresses cease works orders to registered contractors [PNRC 3: Practice Note for Registered Contractors (BD), January 1990, paras. 1–3].  \n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 36616,
+      "difficulty": "factual",
+      "category": "primary_legislation",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-017",
+      "question": "The concept of \"compartmentation\" in B(C)R is for the purpose of:\n(1) control of the spread of fire.\n(2) containment of smoke dispersion.\n(3) orderly evacuation of inhabitants in case of fire.\n(4) even distribution of fire-fighting devices.",
+      "expectedAnswer": "A",
+      "systemAnswer": "A",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "(1) **Correct.** The Code states that every building should be divided into fire compartments “in order to inhibit the spread of fire,” which directly supports control of fire spread [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C3.1]. It also lists “minimization of fire spread between fire compartments” as a fire safety objective [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 1, Clause A2.3 commentary/page 4].\n\n(2) **Correct.** While the retrieved text does not use the exact phrase “containment of smoke dispersion,” it states that fire compartments and fire barriers may be required to prevent “untenable conditions” in compartments remote from the fire origin, which in fire engineering terms includes smoke spread affecting occupants [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 5, item C-h].  \n(3) **Not directly the purpose of compartmentation in B(C)R.** Orderly evacuation is primarily addressed under means of escape provisions, although compartmentation assists safe evacuation [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Part B and Section 5, item C-h].  \n(4) **Incorrect.** The regulations cited do not indicate compartmentation is for “even distribution of fire-fighting devices.” Firefighting access/provisions are a separate objective [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 1, page 4; Part D contents].\n\nTherefore, only (1) and (2) match the regulatory concept of compartmentation. **The answer is A**.\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 46387,
+      "difficulty": "multi_statement",
+      "category": "fire_safety",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-018",
+      "question": "Where a private street within a site is created for site classification:\n(1) must have street hydrants.\n(2) must be an EVA.\n(3) windows may face it as external air.\n(4) area not counted for site area calculation.",
+      "expectedAnswer": "D",
+      "systemAnswer": "C",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "(1) **Must have street hydrants** — **No**. The retrieved EVA materials deal with emergency vehicular access geometry, façade serving, signage, and possible exemptions/modifications, but do **not** state that a private street created for site classification must itself be provided with street hydrants [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 6; PNAP APP-136 (BD), first issue May 2005, revision July 2006]. Per general HK regulatory practice, hydrant provision is governed separately by fire service installation / water supply requirements, not automatically by the mere creation of a private street for site classification.\n\n(2) **Must be an EVA** — **Yes**. The retrieved guidance expressly links private streets used in development to EVA requirements under B(P)R 41D and the MOA / fire safety code framework [PNAP APP-136 (BD), first issue May 2005, revision July 2006; Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Section 6]. A private street within a site created to function as the access street for site classification is, in practice, required to satisfy EVA standards.\n\n(3) **Windows may face it as external air** — **No**. Per general HK regulatory practice, a private street created within a site for site classification is generally **not** treated as a street for the purpose of unrestricted external air / prescribed window facing in the same way as a public street under the Building (Planning) Regulations. So this statement is not generally correct.\n\n(4) **Area not counted for site area calculation** — **Yes**. Per general HK regulatory practice, where a private street is formed within the site for site classification, that street area is generally excluded from site area calculation for development intensity purposes.\n\n**The answer is C**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 53020,
+      "difficulty": "multi_statement",
+      "category": "planning",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-019",
+      "question": "Which of the following building uses does not require risers and treads to be respectively less than 175 mm and greater than 225 mm for Means of Escape staircases?",
+      "expectedAnswer": "D",
+      "systemAnswer": "A",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "For **cinemas**, the Fire Safety Code allows a different stair geometry where a required staircase is directly connected to a cinema: the stair from that storey to final discharge should comply with Subsection B23, and the code specifically contemplates a **change in tread/riser dimensions** with a landing and warning notice provided at the transition point [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause B27.2(f)]. This indicates cinema means-of-escape stairs are subject to special provisions rather than simply the usual “riser <175 mm / tread >225 mm” criterion.\n\nFor **primary schools** and **kindergartens**, BD guidance requires more generous stair proportions: riser height should **not exceed 150 mm** and tread depth should **not be less than 300 mm**, except for a **school or kindergarten**, where tread depth should **not be less than 250 mm**; these requirements apply to the entire staircase [PNAP APP-151: Building Design for Quality and Sustainable Built Environment (BD), current, Part III para. 6(a)]. For **kindergartens**, the heritage guide also makes clear that non-compliant staircases will not be accepted where they primarily serve children [Practice Guidebook for Heritage Buildings 2012 (2021 Edition) (BD), 2012 (2021 Edition), §5.15/5.16]. **Hospitals** are, per general HK regulatory practice, among the uses requiring stricter stair safety standards, not an exemption.\n\n**The answer is A**\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 52477,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-020",
+      "question": "Under the Building (Demolition Works) Regulations, which of the following is not necessary for the Authorized Person appointed in respect of the demolition works to carry out before commencement of the demolition works?",
+      "expectedAnswer": "A",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": true,
+      "responseText": "Before demolition starts, the Authorized Person must liaise with utility companies, keep records of utilities, and cause all utilities to be terminated; the demolition plan must also ensure existing utilities in the vicinity are not affected [Code of Practice for Demolition of Buildings (BD), 2004, Section 2.1.3]. The Code also requires identification of adjoining utility connections and related public installations during the building survey [Code of Practice for Demolition of Buildings (BD), 2004, Section 2.1.1]. The retrieved context does not reproduce the exact text of the Building (Demolition Works) Regulations clause, so the option-by-option assessment below is based partly on these retrieved BD materials and partly on general HK regulatory practice under the Regulations.\n\nA: Removing signboards attached to the building is generally a pre-demolition requirement per general HK regulatory practice under the Building (Demolition Works) Regulations.  \nB: Disconnecting gas and electricity supply is necessary; this is directly consistent with the requirement to cause utilities to be terminated before actual demolition [Code of Practice for Demolition of Buildings (BD), 2004, Section 2.1.3].  \nC: Removing tramway and street lighting fittings attached to the building is also generally necessary where such fittings are attached, as they are public utility/street installations that must be dealt with before demolition, consistent with the survey requirements for adjoining services and public infrastructure [Code of Practice for Demolition of Buildings (BD), 2004, Section 2.1.1].  \nD: Causing all fittings attached to the building in relation to supply of electricity to be removed is not stated as a separate necessary duty in the same way as disconnecting the supply; per general HK regulatory practice, the requirement is to terminate/disconnect utilities, not necessarily for the AP to cause every electricity-supply fitting to be removed as a standalone precondition.\n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 46807,
+      "difficulty": "factual",
+      "category": "demolition",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-021",
+      "question": "Which of the following will NOT require application for lease modifications?",
+      "expectedAnswer": "C",
+      "systemAnswer": "C",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "A: **Would require** lease modification. A development for commercial use on a lease restricted to industrial use is a change inconsistent with lease user conditions; this is not covered by the retrieved JPN exemptions and, per general HK land administration practice, would require lease modification.\n\nB: **Would require** lease modification. If the lot is subject to an “offensive trade” clause and the proposed catering use conflicts with lease conditions, LandsD approval/lease modification would generally be needed per general HK regulatory practice.\n\nC: **Will NOT necessarily require** lease modification. The BD JPNs state that for green features, the same GFA/SC exemptions granted by the Building Authority may be exempted under the Government Lease; lease modification is only needed in certain cases, e.g. where the lease lacks the relevant exemption provision or where height/storey restrictions would be breached. Therefore, exemption of green features from PR/SC calculations does **not automatically require** lease modification [JPN 1: Green and Innovative Buildings (BD), current, paras. 9–12; JPN 2: Second Package of Incentives for Green Buildings (BD), current, paras. 5–8; JPN 8: Modular Integrated Construction Facilitation (BD), current, paras. 5–8]. These JPNs also cross-refer to compliance under the Town Planning Ordinance.\n\nD: **Would require** lease modification. The JPNs expressly say that where the Government Lease restricts the number of storeys or building height and the feature/development would breach that restriction, a lease modification application is needed [JPN 2: Second Package of Incentives for Green Buildings (BD), current, para. 6; JPN 8: Modular Integrated Construction Facilitation (BD), current, para. 6].\n\nThe answer is C\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 56757,
+      "difficulty": "application",
+      "category": "planning",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-022",
+      "question": "Under normal circumstances, which of the following may be considered upon application for exemption from site coverage calculation?\n(1) A curtain wall system forming the building envelope of an existing building\n(2) Bay windows of bona fide hotels\n(3) A building that houses swimming pool filtration plants only\n(4) Balconies that meet the green feature requirements",
+      "expectedAnswer": "B",
+      "systemAnswer": "D",
+      "correct": false,
+      "sourceHit": false,
+      "responseText": "(1) **Curtain wall system forming the building envelope of an existing building**: the retrieved context only shows curtain walls as an item that may be exempted from **GFA** subject to premium assessment, not site coverage [JPN 4: Development Control Parameters (BD), current, Group II(B)1]. So this is **not supported** as SC-exempt by the provided text.\n\n(2) **Bay windows of bona fide hotels**: the retrieved context does not identify bay windows of hotels as a feature that may be exempted from site coverage. On the contrary, the listed SC/GFA green-feature exemptions in JPN 1 do not include hotel bay windows [JPN 1: Green and Innovative Buildings (BD), current, para. 4; Appendix A]. So this is **not supported**.\n\n(3) **A building that houses swimming pool filtration plants only**: while not expressly shown in the retrieved excerpts, per general HK regulatory practice, plant rooms / similar services and small ancillary structures of this nature may be considered for exemption from GFA/SC in appropriate circumstances. This item is therefore **capable of being considered** per general HK regulatory practice; the retrieved text at least recognizes plant rooms and similar services as exemptible items in development control context [JPN 4: Development Control Parameters (BD), current, item 22], though the excerpt speaks to GFA rather than expressly SC.\n\n(4) **Balconies that meet the green feature requirements**: JPN 1 expressly states that balconies for residential buildings may, upon application and subject to conditions, be excluded from **GFA and/or SC** calculations under the BO [JPN 1: Green and Innovative Buildings (BD), current, para. 4(a)]. Appendix A then sets out the criteria for such balconies [JPN 1: Green and Innovative Buildings (BD), current, Appendix A 1(a)]. So this is **yes**.\n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 54723,
+      "difficulty": "multi_statement",
+      "category": "planning",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-023",
+      "question": "The purpose of PNAP is NOT to:",
+      "expectedAnswer": "A",
+      "systemAnswer": "A",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "PNAPs are administrative practice notes issued by the Buildings Department for APs/RSEs/RGEs. The retrieved material shows PNAP ADM-1 is a list of “Practice Notes in Force,” and other retrieved PNAPs/PNRCs use PNAPs as guidance documents alongside ordinances, regulations and codes of practice, not as legislation themselves [PNAP ADM-1 (BD), current, Appendix A/section 17; PNAP APP-170 (BD), current, section 3.2; PNRC 83 (BD), current, section 3.2]. Per general HK regulatory practice, PNAPs provide guidance, reflect departmental interpretation/practice, and may supplement the application of codes and procedures, but they do not have the status of subsidiary legislation.\n\nOption A: “serve as subsidiary legislation” — this is NOT the purpose of PNAP. Subsidiary legislation consists of regulations made under an ordinance; PNAPs are practice notes/guidance only [PNAP APP-170 (BD), current, section 3.2].  \nOption B: “supplement codes of practice” — consistent with how PNAPs are used alongside codes and regulations [PNAP APP-170 (BD), current, section 3.2].  \nOption C: “provide directions based on previous decisions” — consistent with general HK regulatory practice, as PNAPs communicate BD’s established practice/interpretation.  \nOption D: “provide guidance to AP/RSE” — expressly consistent with the nature of PNAPs as Practice Notes for APs/RSEs/RGEs [PNAP ADM-1 (BD), current, Appendix A/section 17].\n\nThe answer is A\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 42900,
+      "difficulty": "factual",
+      "category": "administration",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-024",
+      "question": "Which elements must satisfy stability, integrity, and insulation under FRC Code?",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": true,
+      "responseText": "Under Table C2 of the Fire Safety Code, a **structural frame, beam or column** only requires **stability** (Y/N/N), so **A is not correct**. A **non-loadbearing wall being a fire barrier** requires **integrity and insulation only** (N/Y/Y), so **B is not correct**. An **enclosure around services in required staircase/protected lobby** requires **integrity and insulation only** (N/Y/Y), so **C is not correct** [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Table C2].\n\nA **protected shaft, lobby and corridor** requires **stability, integrity and insulation** (Y*/Y/Y), with stability required where the element is loadbearing. A structural lift shaft falls within protected shaft construction, so this is the option that satisfies all three criteria. This is consistent with the general requirement that FRR criteria are to be satisfied as specified in Table C2 [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Table C2; PNAP APP-153: Fire Safety Code 2011 (BD), current, Clause C4.2 amendment note]. Version caveat: citation is to the 2011 Code, 2024 Edition, and current PNAP amendment notes.\n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 40041,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-025",
+      "question": "Which of the following statements is correct?",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "A is not correct. The retrieved text does not support a blanket rule that an owner “need not appoint RSE for temporary building.” On the contrary, BD guidance indicates that an RSE is required **where necessary** for building works submissions and supervision, rather than exempting all temporary buildings [General Guidelines on Minor Works Control System (BD), current, Section 6; PNAP APP-7 (BD), Rev. 12/2011, p.2]. Per general HK regulatory practice, whether an RSE is needed depends on the nature of the structural works, not simply whether the building is temporary.\n\nB is not correct. The BO framework recognises APs and RSEs as distinct roles, and structural works are generally to be designed/supervised by the appropriate registered professional; however, the statement that the BA “will not approve structural submissions from AP (Architects)” is too absolute and is not supported by the retrieved text. The guidance instead says APs must ensure compliance and RSEs are required **where necessary** [PNAP ADM-19 (BD), current, para. 21 context; PNAP APP-7 (BD), Rev. 12/2011, p.2]. Per general HK regulatory practice, BA does not reject merely because the AP is an architect; the issue is whether the required RSE involvement is provided.\n\nC is not correct. The retrieved materials distinguish clearly between APs and contractors/registered contractors, and do not support an AP acting as contractor merely by informing BD [General Guidelines on Minor Works Control System (BD), current, Section 6; PNRC 72 (BD), First issue Dec 2010, para. 9 context]. Per general HK regulatory practice, contractor registration and AP appointment are separate statutory capacities, with conflict/control restrictions.\n\nD is correct. Section 17(1) of the Buildings Ordinance empowers the Building Authority to refuse approval in prescribed circumstances, and per general HK regulatory practice one such circumstance is where duplicate or competing submissions are made by 2 or more APs for the same premises at the same time; BD’s practice note on refusal powers is directly relevant here [PNRC 33 (BD), May 2023, p.1 context]. The answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 65942,
+      "difficulty": "factual",
+      "category": "administration",
+      "requiresMultiStatement": false
+    },
+    {
+      "questionId": "mcq-029",
+      "question": "Under the Buildings Ordinance, it is the duty of a RGBC to:\n(1) co-ordinate subcontractors.\n(2) provide site agent.\n(3) notify BA of contravention.\n(4) certify works in accordance with BO prior to OP application.",
+      "expectedAnswer": "D",
+      "systemAnswer": "D",
+      "correct": true,
+      "sourceHit": false,
+      "responseText": "(1) **Co-ordinate subcontractors** — this is generally a contractor management function, but the retrieved text does **not** show it as a specific statutory duty “under the BO” of an RGBC. So it should **not** be treated as one of the listed BO duties on the basis of the provided sources.  \n(2) **Provide site agent** — the retrieved context does not identify this as a general statutory duty of an RGBC under the BO. While site supervision personnel may be required in practice, this is not shown here as the relevant BO duty.  \n(3) **Notify BA of contravention** — **yes**. PNRC 79 expressly states that registered contractors have statutory duties under the BO to “notify BD of any contravention of regulations” and comply generally with the BO. [PNRC 79: Practice Note for Registered Contractors (BD), current, para. 2]  \n(4) **Certify works in accordance with BO prior to OP application** — **yes** per general HK regulatory practice: before an occupation permit application, the registered contractor is required to certify completion/compliance of the building works in the prescribed forms under the BO/Building (Administration) Regulations process. This is also consistent with PNRC 73, which refers to whether building works have been completed or carried out in compliance with the BO. [PNRC 73: Practice Note for Registered Contractors (BD), current, p.1]  \n\nSo:  \n- A ((1) and (2) only) — incorrect  \n- B ((1) and (4) only) — incorrect  \n- C ((2) and (3) only) — incorrect  \n- D ((3) and (4) only) — correct  \n\nThe answer is D\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 62582,
+      "difficulty": "multi_statement",
+      "category": "primary_legislation",
+      "requiresMultiStatement": true
+    },
+    {
+      "questionId": "mcq-030",
+      "question": "Which is NOT required for a bridge uniting two buildings without fire shutters/lobbies under FRC Code?",
+      "expectedAnswer": "C",
+      "systemAnswer": "A",
+      "correct": false,
+      "sourceHit": true,
+      "responseText": "For a bridge linking two buildings **without fire barriers/fire shutters at each end**, the Code requires the bridge to be **unenclosed**, meaning **both sides throughout its whole length are provided with protective barriers or parapets not higher than 1.2 m**, and it must be **constructed of non-combustible materials**. It must also have the **longest FRR of the storeys it links** [Code of Practice for Fire Safety in Buildings (BD), 2011 (2024 Edition), Clause C15.1(b)]. The commentary adds that such an unenclosed bridge helps prevent fire spread and allows smoke dispersal [same document, Section 2, Commentary to C15.1].\n\nEvaluating the options:  \n- **A. Bridge shorter than 18m.** No such length limit appears in Clause C15.1(b), so this is **not required**.  \n- **B. Constructed of non-combustible materials.** This is **expressly required** [Clause C15.1(b)].  \n- **C. Open on both sides with at least 50% open area.** The retrieved clause does **not** state a “50% open area” criterion; it only defines “unenclosed” by protective barriers/parapets not higher than 1.2 m on both sides throughout the whole length [Clause C15.1(b)].  \n- **D. Provided at sides with barriers not higher than 1.2m.** This is **expressly required** for an unenclosed bridge [Clause C15.1(b)].\n\nThe answer is A\n\n---\n**Disclaimer:** This information is provided for reference purposes only and does not constitute legal advice. Regulations may have been amended since last ingestion. Always verify with the relevant Hong Kong government department and consult qualified professionals for compliance decisions.",
+      "latencyMs": 59463,
+      "difficulty": "factual",
+      "category": "fire_safety",
+      "requiresMultiStatement": false
+    }
+  ]
+}

@@ -34,6 +34,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@google/genai": "^1.50.1",
     "@types/node": "^25.5.0",
     "autoevals": "^0.0.132",
     "cheerio": "^1.2.0",
