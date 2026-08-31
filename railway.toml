@@ -1,7 +1,6 @@
 [build]
 builder = "NIXPACKS"
 buildCommand = "npx tsc"
-nixpacksVersion = "1.30.0"
 
 [build.nixpacks]
 NODE_VERSION = "22"

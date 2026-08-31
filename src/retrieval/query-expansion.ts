@@ -43,3 +43,32 @@ Return ONLY the alternative queries, one per line. Do not number them or add exp
   // Always include the original query
   return [query, ...expansions];
 }
+
+/**
+ * Generate a hypothetical answer document for HyDE (Hypothetical Document Embeddings).
+ * The hypothetical answer is in the same semantic space as regulation text,
+ * improving retrieval recall over question-form queries.
+ */
+export async function generateHyDE(
+  query: string,
+  options?: { client?: OpenAI }
+): Promise<string> {
+  const client = options?.client ?? getClient();
+
+  const response = await client.chat.completions.create({
+    model: 'gpt-5-mini',
+    max_completion_tokens: 200,
+    messages: [
+      {
+        role: 'system',
+        content: `You are a Hong Kong building regulations reference document. Given a question, write a SHORT passage (2-3 sentences) that would appear in the relevant regulation or code of practice to answer it. Use formal regulatory language with specific section references, clause numbers, and technical terminology as they would appear in HK building codes. Do not explain — write as if you ARE the regulation text.`,
+      },
+      {
+        role: 'user',
+        content: query,
+      },
+    ],
+  });
+
+  return response.choices[0]?.message?.content?.trim() ?? '';
+}

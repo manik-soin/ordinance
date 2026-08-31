@@ -187,6 +187,8 @@ function addOverlap(chunks: RawChunk[], overlapTokens: number): RawChunk[] {
 
 /**
  * Prepend contextual header with section hierarchy and source info.
+ * Uses Anthropic-style contextual chunking: a rich semantic prefix that helps
+ * the embedding model understand the chunk's role in the broader regulation.
  */
 function buildContextualContent(
   text: string,
@@ -194,8 +196,39 @@ function buildContextualContent(
   source: RegulationSource
 ): string {
   const hierarchyStr = hierarchy.join(' > ');
-  return `[Source: ${source.name} (${source.department}), ${source.version}]\n[Location: ${hierarchyStr}]\n\n${text}`;
+  const contextParts: string[] = [];
+
+  // Document-level context
+  contextParts.push(`This is from ${source.name} (${source.department}), ${source.version}.`);
+
+  // Section-level context
+  if (hierarchy.length > 0) {
+    const location = hierarchy.join(', under ');
+    contextParts.push(`It appears in ${location}.`);
+  }
+
+  // Department-level context for embedding enrichment
+  const deptContext = DEPARTMENT_CONTEXT[source.department];
+  if (deptContext) {
+    contextParts.push(deptContext);
+  }
+
+  const contextPrefix = contextParts.join(' ');
+
+  return `${contextPrefix}\n\n[Source: ${source.name} (${source.department}), ${source.version}]\n[Location: ${hierarchyStr}]\n\n${text}`;
 }
+
+/**
+ * Department-level context for chunk enrichment.
+ * Helps embeddings disambiguate between regulatory domains.
+ */
+const DEPARTMENT_CONTEXT: Record<string, string> = {
+  BD: 'This document is issued by the Buildings Department and governs building design, construction, planning, and structural requirements in Hong Kong.',
+  FSD: 'This document is issued by the Fire Services Department and covers fire safety installations, fire service requirements, and fire protection standards.',
+  EPD: 'This document is issued by the Environmental Protection Department and addresses environmental impact, noise control, air quality, and waste management.',
+  EMSD: 'This document is issued by the Electrical and Mechanical Services Department and covers electrical safety, lift/escalator installations, and gas safety.',
+  HA: 'This document is from the Hong Kong Housing Authority specifications for public housing design, construction, and building services.',
+};
 
 /**
  * Extract cross-references from text (Cap. numbers, PNAP refs, section refs).

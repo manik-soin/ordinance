@@ -76,27 +76,26 @@ describe('Generator', () => {
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain('NEVER fabricate');
     });
 
-    it('includes instruction to say "I don\'t have sufficient information"', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain("don't have sufficient information");
+    it('includes guidance for when context is insufficient', () => {
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('clearly unrelated to the question');
     });
 
     it('requires version/edition date in citations', () => {
       expect(COMPLIANCE_SYSTEM_PROMPT).toContain('version/edition date');
     });
 
-    it('contains all 7 non-negotiable rules', () => {
-      // The prompt explicitly numbers the rules 1-7
-      for (let i = 1; i <= 7; i++) {
+    it('contains all 9 rules', () => {
+      for (let i = 1; i <= 9; i++) {
         expect(COMPLIANCE_SYSTEM_PROMPT).toContain(`${i}.`);
       }
     });
 
-    it('rule 1: answer based on retrieved text', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('ONLY answer based on the retrieved regulation text');
+    it('rule 1: primarily answer based on retrieved text', () => {
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('PRIMARILY answer based on the retrieved regulation text');
     });
 
-    it('rule 3: includes fallback for unrelated context', () => {
-      expect(COMPLIANCE_SYSTEM_PROMPT).toContain("don't have sufficient information");
+    it('rule 3: allows parametric fallback for unrelated context', () => {
+      expect(COMPLIANCE_SYSTEM_PROMPT).toContain('answer using your regulatory knowledge');
     });
 
     it('rule 5: requires explicit cross-reference notation', () => {

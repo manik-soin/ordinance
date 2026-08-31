@@ -1,6 +1,6 @@
 import type pg from 'pg';
 import { hybridSearch } from '../retrieval/hybrid-search.js';
-import { expandQuery } from '../retrieval/query-expansion.js';
+import { expandQuery, generateHyDE } from '../retrieval/query-expansion.js';
 import { rerank } from '../retrieval/reranker.js';
 import { generateAnswer } from '../generator/index.js';
 import { verifyCitations, appendDisclaimer } from '../safety/citation-verifier.js';
@@ -11,6 +11,8 @@ import { liveWebSearch } from '../retrieval/web-search.js';
 import { checkExactCache, checkSemanticCache, writeCache } from '../cache/semantic-cache.js';
 import { estimateQueryCost } from '../observability/cost-tracker.js';
 import { contextualizeFollowUpQuery } from '../retrieval/follow-up-context.js';
+import { routeQuery } from '../retrieval/query-router.js';
+import { expandCrossReferences } from '../retrieval/cross-ref-expander.js';
 import type { SearchFilter, SearchResult } from '../retrieval/hybrid-search.js';
 import type { Citation } from '../generator/index.js';
 import type { VerificationResult } from '../safety/citation-verifier.js';
@@ -37,6 +39,8 @@ export interface QueryPipelineOptions {
   history?: ConversationTurn[];
   useQueryExpansion?: boolean;
   useReranker?: boolean;
+  useHyDE?: boolean;
+  useCRAG?: boolean;
   skipFaithfulness?: boolean;
   topK?: number;
 }
@@ -58,6 +62,10 @@ export async function queryPipeline(
     query,
     options?.history ?? []
   ).catch(() => query);
+
+  // 0a. Query routing — auto-detect regulatory domain and apply filter
+  const routedFilter = routeQuery(resolvedQuery);
+  const mergedFilter: SearchFilter | undefined = options?.filter ?? routedFilter;
 
   // 0. Exact-match cache avoids any model call on repeated queries.
   const exactCached = await checkExactCache(
@@ -130,25 +138,29 @@ export async function queryPipeline(
     };
   }
 
-  // 2. Run query expansion + primary search + live web search in parallel
-  //    The original query search starts immediately while expansion runs
-  const [primaryResults, expandedQueries, webSearch] = await Promise.all([
+  // 2. Run query expansion + primary search + HyDE + live web search in parallel
+  const useHyDE = options?.useHyDE ?? true;
+  const [primaryResults, expandedQueries, hydeDoc, webSearch] = await Promise.all([
     hybridSearch(pool, resolvedQuery, {
-      filter: options?.filter,
+      filter: mergedFilter,
       topK: topK * 2,
       queryEmbedding,
     }),
     useExpansion ? expandQuery(resolvedQuery) : Promise.resolve([resolvedQuery]),
+    useHyDE ? generateHyDE(resolvedQuery).catch(() => '') : Promise.resolve(''),
     liveWebSearch(resolvedQuery),
   ]);
 
-  // 3. If expansion produced extra queries, search those and fuse with primary
+  // 3. Search with expanded queries and HyDE document, then fuse all results
   let allResults: SearchResult[];
   const extraQueries = expandedQueries.filter((q) => q !== resolvedQuery);
-  if (extraQueries.length > 0) {
+  const hydeQueries = hydeDoc.length > 20 ? [hydeDoc] : [];
+  const allExtraQueries = [...extraQueries, ...hydeQueries];
+
+  if (allExtraQueries.length > 0) {
     const extraResults = await Promise.all(
-      extraQueries.map((q) =>
-        hybridSearch(pool, q, { filter: options?.filter, topK: topK })
+      allExtraQueries.map((q) =>
+        hybridSearch(pool, q, { filter: mergedFilter, topK: topK })
       )
     );
     const flat = [...primaryResults, ...extraResults.flat()];
@@ -165,8 +177,23 @@ export async function queryPipeline(
     reranked = allResults.slice(0, topK);
   }
 
+  // 4a. Cross-reference expansion — follow refs to related regulatory chunks
+  reranked = await expandCrossReferences(pool, reranked, { maxExpansion: 2 });
+
+  // 4b. CRAG — Corrective RAG: when retrieval confidence is very low, strip
+  //     the retrieved context entirely and let the model answer from parametric
+  //     knowledge. Benchmarks show misleading context hurts more than no context.
+  const useCRAG = options?.useCRAG ?? false; // Off by default — benchmarks show it hurts MCQ accuracy
+  let generationContext = reranked;
+  if (useCRAG) {
+    const retrievalConfidence = assessRetrievalConfidence(reranked);
+    if (!retrievalConfidence.confident) {
+      generationContext = [];
+    }
+  }
+
   // 5. Generate answer with citations
-  const generation = await generateAnswer(resolvedQuery, reranked, {
+  const generation = await generateAnswer(resolvedQuery, generationContext, {
     supplementaryContext: webSearch.supplementaryContext,
   });
 
@@ -235,5 +262,34 @@ export async function queryPipeline(
       source: w.source,
     })),
     cost,
+  };
+}
+
+/**
+ * CRAG: Assess retrieval confidence based on reranker scores and result diversity.
+ * Low confidence triggers a cautionary note to the generator.
+ */
+function assessRetrievalConfidence(results: SearchResult[]): {
+  confident: boolean;
+  topScore: number;
+  avgScore: number;
+} {
+  if (results.length === 0) {
+    return { confident: false, topScore: 0, avgScore: 0 };
+  }
+
+  const topScore = results[0].score;
+  const avgScore = results.reduce((s, r) => s + r.score, 0) / results.length;
+
+  // Thresholds tuned for Cohere rerank-v3.5 (scores 0-1) and
+  // RRF scores (much smaller, ~0.01-0.03).
+  // If top score is very low, context is likely irrelevant.
+  const isCohere = topScore > 0.1; // Cohere scores are typically 0.1-0.99
+  const threshold = isCohere ? 0.15 : 0.005;
+
+  return {
+    confident: topScore >= threshold && results.length >= 2,
+    topScore,
+    avgScore,
   };
 }

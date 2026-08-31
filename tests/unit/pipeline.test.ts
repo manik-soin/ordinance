@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../src/retrieval/query-expansion.js', () => ({
   expandQuery: vi.fn(),
+  generateHyDE: vi.fn(),
 }));
 
 vi.mock('../../src/retrieval/hybrid-search.js', () => ({
@@ -21,6 +22,14 @@ vi.mock('../../src/retrieval/web-search.js', () => ({
 
 vi.mock('../../src/retrieval/follow-up-context.js', () => ({
   contextualizeFollowUpQuery: vi.fn(),
+}));
+
+vi.mock('../../src/retrieval/query-router.js', () => ({
+  routeQuery: vi.fn(),
+}));
+
+vi.mock('../../src/retrieval/cross-ref-expander.js', () => ({
+  expandCrossReferences: vi.fn(),
 }));
 
 vi.mock('../../src/generator/index.js', () => ({
@@ -71,7 +80,9 @@ vi.mock('../../src/db/pool.js', () => ({
 import { queryPipeline } from '../../src/pipeline/query.js';
 import { ingestSource, ingestSources } from '../../src/pipeline/ingest.js';
 
-import { expandQuery } from '../../src/retrieval/query-expansion.js';
+import { expandQuery, generateHyDE } from '../../src/retrieval/query-expansion.js';
+import { routeQuery } from '../../src/retrieval/query-router.js';
+import { expandCrossReferences } from '../../src/retrieval/cross-ref-expander.js';
 import { hybridSearch, rrfFuse } from '../../src/retrieval/hybrid-search.js';
 import { rerank } from '../../src/retrieval/reranker.js';
 import { liveWebSearch } from '../../src/retrieval/web-search.js';
@@ -167,6 +178,9 @@ describe('queryPipeline', () => {
       'fire resistance requirements',
       'minimum fire rating',
     ]);
+    vi.mocked(generateHyDE).mockResolvedValue('The fire resistance period for structural elements shall be not less than 120 minutes per Table 4 of the Code of Practice.');
+    vi.mocked(routeQuery).mockReturnValue(undefined);
+    vi.mocked(expandCrossReferences).mockImplementation(async (_pool, results) => results);
     vi.mocked(contextualizeFollowUpQuery).mockImplementation(async (query: string) => query);
     vi.mocked(hybridSearch).mockResolvedValue(mockResults);
     vi.mocked(rrfFuse).mockReturnValue(mockResults);
@@ -193,8 +207,8 @@ describe('queryPipeline', () => {
     // 1. Query expansion called
     expect(expandQuery).toHaveBeenCalledWith('What is the fire resistance requirement?');
 
-    // 2. Hybrid search: primary query + expanded queries in parallel
-    expect(hybridSearch).toHaveBeenCalledTimes(3);
+    // 2. Hybrid search: primary query + expanded queries + HyDE doc
+    expect(hybridSearch).toHaveBeenCalledTimes(4);
 
     // 3. RRF fusion called to merge results
     expect(rrfFuse).toHaveBeenCalledTimes(1);
@@ -264,6 +278,7 @@ describe('queryPipeline', () => {
   it('skips query expansion when useQueryExpansion is false', async () => {
     const result = await queryPipeline(mockPool, 'direct query', {
       useQueryExpansion: false,
+      useHyDE: false,
     });
 
     // expandQuery should NOT be called
@@ -294,6 +309,7 @@ describe('queryPipeline', () => {
     const result = await queryPipeline(mockPool, 'test', {
       useQueryExpansion: false,
       useReranker: false,
+      useHyDE: false,
     });
 
     expect(rerank).not.toHaveBeenCalled();
