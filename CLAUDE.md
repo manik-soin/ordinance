@@ -21,8 +21,9 @@ src/
   chunker/     — Structure-aware chunking (Part > Section > Clause)
   embedder/    — OpenAI text-embedding-3-large (3072 dims)
   retrieval/   — Hybrid search (vector + BM25 FTS), RRF fusion, Cohere reranker
-  generator/   — GPT-4o citation-aware generation
+  generator/   — gpt-5.4 citation-aware generation
   safety/      — Prompt injection detection, citation verification, faithfulness scoring
+  agent/       — Agent harness: complexity router, ReAct loop, 4 tools, scratchpad, project memory, subagents
   pipeline/    — Orchestration (ingest + query pipelines)
   db/          — PostgreSQL + pgvector (pool, migrations, store)
   api/         — Express routes

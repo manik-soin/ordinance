@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
+import { z } from 'zod';
 import { getPool } from '../db/pool.js';
-import { validateQueryInput } from '../safety/guardrails.js';
+import { validateQueryInput, detectInjection, sanitizeInput } from '../safety/guardrails.js';
 import { queryPipeline } from '../pipeline/query.js';
+import { agentQuery } from '../agent/index.js';
+import type { ProjectMemory } from '../agent/index.js';
 import { streamAnswer } from '../generator/index.js';
 import { hybridSearch } from '../retrieval/hybrid-search.js';
 import { rerank } from '../retrieval/reranker.js';
@@ -78,6 +81,146 @@ router.post('/query', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('[API] Query error:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/** Extra inputs accepted only by the agent endpoint. */
+const agentExtrasSchema = z.object({
+  projectMemory: z
+    .object({
+      buildingType: z.string().max(40).optional(),
+      storeys: z.number().int().min(1).max(200).optional(),
+      useClass: z.string().max(20).optional(),
+      siteAreaSqm: z.number().min(1).optional(),
+      notes: z.array(z.string().max(200)).max(10).optional(),
+    })
+    .optional(),
+  mode: z.enum(['auto', 'static', 'agent']).optional(),
+});
+
+// Global concurrency cap for the agent path. Per-IP rate limiting bounds one
+// client but not aggregate load; agent requests are multi-minute and expensive,
+// so a global in-flight ceiling protects the event loop and DB pool.
+const AGENT_GLOBAL_CONCURRENCY = Number.parseInt(process.env.AGENT_GLOBAL_CONCURRENCY ?? '4', 10);
+let agentInFlight = 0;
+
+/**
+ * Screen and sanitize client-supplied project memory. The query-level injection
+ * filter only covers `query`, but memory strings render verbatim into the
+ * agent's working context, so they need the same screening.
+ */
+function screenProjectMemory(
+  memory: ProjectMemory | undefined
+): { ok: true; memory?: ProjectMemory } | { ok: false } {
+  if (!memory) return { ok: true };
+  const strings = [
+    memory.buildingType,
+    memory.useClass,
+    ...(memory.notes ?? []),
+  ].filter((s): s is string => typeof s === 'string');
+  if (strings.some((s) => detectInjection(s).detected)) return { ok: false };
+  return {
+    ok: true,
+    memory: {
+      ...memory,
+      buildingType: memory.buildingType ? sanitizeInput(memory.buildingType) : undefined,
+      useClass: memory.useClass ? sanitizeInput(memory.useClass) : undefined,
+      notes: memory.notes?.map(sanitizeInput),
+    },
+  };
+}
+
+/**
+ * POST /api/agent/query — Agentic query path.
+ * A complexity router sends single-hop questions to the static RAG pipeline
+ * and multi-hop / freshness-sensitive / context-dependent questions into the
+ * agent loop. Returns the step trace and the updated project memory.
+ */
+router.post('/agent/query', async (req: Request, res: Response) => {
+  const validation = validateQueryInput(req.body);
+  if (!validation.valid || !validation.data) {
+    res.status(400).json({
+      error: validation.error,
+      injectionDetected: validation.injectionDetected,
+    });
+    return;
+  }
+
+  const extras = agentExtrasSchema.safeParse(req.body);
+  if (!extras.success) {
+    res.status(400).json({ error: extras.error.issues[0]?.message ?? 'Invalid agent options' });
+    return;
+  }
+
+  const screened = screenProjectMemory(extras.data.projectMemory);
+  if (!screened.ok) {
+    res.status(400).json({ error: 'Query contains disallowed content', injectionDetected: true });
+    return;
+  }
+
+  if (agentInFlight >= AGENT_GLOBAL_CONCURRENCY) {
+    res.status(503).json({ error: 'The agent is busy. Please retry in a moment.' });
+    return;
+  }
+  agentInFlight++;
+
+  try {
+    const pool = getPool();
+    const result = await agentQuery(pool, validation.data.query, {
+      filter: validation.data.filter,
+      history: validation.data.history,
+      projectMemory: screened.memory,
+      mode: extras.data.mode,
+    });
+
+    res.json({
+      answer: result.answer,
+      citations: result.citations,
+      sources: result.sources.map((s) => ({
+        document_name: s.document_name,
+        department: s.source_department,
+        version: s.version,
+        section: s.section_hierarchy,
+        page: s.page_number,
+        score: s.score,
+      })),
+      quality: {
+        faithfulness: result.faithfulness.score,
+        citationAccuracy: result.verification.citationAccuracy,
+        phantomCitations: result.verification.phantomCitations.length,
+        uncitedClaims: result.verification.uncitedClaims.length,
+      },
+      path: result.path,
+      route_reasons: result.routeReasons,
+      trace: result.trace
+        ? {
+            step_budget: result.trace.stepBudget,
+            budget_exhausted: result.trace.budgetExhausted,
+            verification_retries: result.trace.verificationRetries,
+            subagent_runs: result.trace.subagentRuns,
+            steps: result.trace.steps.map((step) => ({
+              step: step.step,
+              thought: step.thought ?? null,
+              tool: step.tool ?? null,
+              args: step.args ?? null,
+              observation: step.observation,
+              duration_ms: step.durationMs,
+            })),
+          }
+        : null,
+      project_memory: result.projectMemory,
+      audit_id: result.auditId,
+      latency_ms: result.latencyMs,
+      model: result.model,
+      cached: result.cached ?? false,
+      webSources: result.webSources ?? [],
+      cost: result.cost ?? null,
+    });
+  } catch (err) {
+    console.error('[API] Agent query error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    agentInFlight--;
   }
 });
 

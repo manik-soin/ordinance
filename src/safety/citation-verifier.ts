@@ -53,7 +53,7 @@ export function verifyCitations(
  * Find factual-sounding statements that lack citations.
  * Looks for sentences containing regulatory keywords without bracket citations.
  */
-function findUncitedClaims(answer: string, citations: Citation[]): string[] {
+export function findUncitedClaims(answer: string, citations: Citation[]): string[] {
   const sentences = answer.split(/[.!?]\s+/);
   const uncited: string[] = [];
 

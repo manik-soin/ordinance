@@ -37,7 +37,16 @@ flowchart LR
         VER --> OUT
         VER --> AUD[("Audit log")]
     end
+    subgraph AGT[Agent path · multi-hop / fresh / context-dependent]
+        ROUTE{"Complexity<br/>router"} -->|"complex"| LOOP["ReAct loop · 4 tools<br/>retrieve · gov_lookup<br/>resolve_reference · verify_citation"]
+        LOOP --> GATE["Exit gate:<br/>citation verify + faithfulness"]
+    end
+    Q -.->|route| ROUTE
+    ROUTE -.->|"single-hop"| CACHE
+    GATE -.-> OUT
 ```
+
+See [Agent Mode](#agent-mode) for the router, tools, and exit gate in detail.
 
 ## What it does
 
@@ -60,8 +69,8 @@ The server is an Express 5 app that auto-runs DB migrations on boot, ensures the
 - API server: Express 5
 - Database: PostgreSQL + `pgvector`
 - Embeddings: `text-embedding-3-large` (3072 dimensions)
-- Generation: `gpt-4o`
-- Query expansion and faithfulness judge: OpenAI chat models
+- Generation and agent loop: `gpt-5.4`
+- Query expansion, follow-up contextualization, faithfulness judge, subagents: `gpt-5-mini`
 - Reranking: Cohere `rerank-v3.5` when `COHERE_API_KEY` is set
 - Deployment: Railway (`railway.toml`) + Neon/Postgres
 
@@ -147,6 +156,41 @@ Important behavior:
 - Streaming queries keep web search off the critical path and emit `web_sources` after answer tokens to preserve faster time-to-first-byte.
 - The health endpoint intentionally returns HTTP `200` even when DB connectivity is degraded so Railway health checks do not flap.
 
+## Agent Mode
+
+`POST /api/agent/query` wraps the static pipeline in an agent harness (see
+`src/agent/`). Design writeup: [One Retrieval Wasn't Enough](https://maniksoin.com/blog/from-rag-to-agent-harnessing-ordinance).
+
+- **Complexity router** (`complexity-router.ts`): a keyword heuristic (microseconds,
+  no tokens) sends single-hop questions straight to the static pipeline. Only
+  multi-hop, freshness-sensitive, or context-dependent questions enter the agent
+  loop. The agent is the exception path, not the default.
+- **ReAct loop** (`loop.ts`): Thought-Action-Observation with a hard step budget
+  (default 6). The working context is rebuilt every step from an external
+  scratchpad; there is no growing chat transcript.
+- **Four tools** (`tools.ts`), Zod-validated, each with when-to-use guidance:
+  `retrieve` (hybrid search + rerank, callable repeatedly with model-composed
+  queries, plus fetch-on-demand of full chunk text by id), `gov_lookup` (live
+  data.gov.hk datasets: fire doorsets/glazing/stop materials, MiC systems,
+  fire-safety stats), `resolve_reference` (second hop for "Part IV" / "Cap. 123F" /
+  "PNAP ADV-33" cross-references), `verify_citation` (mid-flight self-check).
+- **Context discipline** (`scratchpad.ts`): tool results are summarized into the
+  scratchpad with chunk pointers; full chunks live in a store and never re-enter
+  the prompt unless explicitly fetched. Older observations collapse to a ledger.
+- **Durable project memory** (`memory.ts`): building type, storey count, use class
+  extracted heuristically and pinned as structured facts instead of replayed history.
+- **Subagent fan-out** (`subagents.ts`): comparison queries spawn up to 3
+  clean-context subagents on `gpt-5-mini` (retrieve + resolve_reference only);
+  the lead agent sees only their cited summaries, while their chunks feed
+  verification.
+- **Exit gate**: citation verification + faithfulness scoring run on every final
+  answer, with one corrective retry. The agent can take any path to the answer;
+  it cannot skip the part that makes the answer trustworthy. Agent answers are
+  never cached (they may depend on live data or session memory).
+
+Responses include the route decision, full step trace, quality scores, and
+updated project memory. Live smoke test: `npx tsx scripts/agent-smoke.ts`.
+
 ## API Surface
 
 <details>
@@ -154,6 +198,7 @@ Important behavior:
 
 - `POST /api/query`
 - `POST /api/query/stream`
+- `POST /api/agent/query`
 - `GET /api/health`
 - `GET /api/sources`
 - `GET /api/documents`
@@ -236,6 +281,7 @@ The server will apply migrations on boot, then create the semantic cache table i
 ## Repo Layout
 
 ```text
+src/agent         agent harness: router, ReAct loop, tools, scratchpad, memory, subagents
 src/api           HTTP routes plus live/open-data integrations
 src/cache         semantic query cache
 src/cli           ingestion entrypoints
@@ -247,6 +293,7 @@ src/safety        prompt-injection checks, citation verification, faithfulness
 src/scheduler     cron-based change-detection helpers
 src/sources       curated source definitions
 public/           single-file frontend
+scripts/          live smoke tests
 tests/            unit, integration, and eval suites
 ```
 

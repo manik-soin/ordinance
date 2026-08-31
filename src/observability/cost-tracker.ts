@@ -7,7 +7,7 @@
  */
 
 // Pricing per 1M tokens (as of March 2026)
-const MODEL_PRICING: Record<string, { input: number; output: number }> = {
+export const MODEL_PRICING: Record<string, { input: number; output: number }> = {
   'gpt-5.4': { input: 2.50, output: 15.00 },
   'gpt-5-mini': { input: 0.40, output: 1.60 },
   'text-embedding-3-large': { input: 0.13, output: 0 },

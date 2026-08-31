@@ -86,13 +86,6 @@ const burstRateLimitMiddleware = createRateLimitMiddleware([
     errorMessage: 'Too many requests. Please wait a moment before asking again.',
   },
   {
-    name: 'query-daily',
-    match: (req) => req.method === 'POST' && req.path === '/api/query',
-    windowMs: envInt('QUERY_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
-    maxRequests: envInt('QUERY_DAILY_LIMIT_MAX', 50),
-    errorMessage: 'Daily query limit reached. Please try again tomorrow.',
-  },
-  {
     name: 'query-stream-minute',
     match: (req) => req.method === 'POST' && req.path === '/api/query/stream',
     windowMs: envInt('QUERY_STREAM_RATE_LIMIT_WINDOW_MS', 60_000),
@@ -101,11 +94,14 @@ const burstRateLimitMiddleware = createRateLimitMiddleware([
     errorMessage: 'Streaming rate limit exceeded. Please wait a moment before trying again.',
   },
   {
-    name: 'query-stream-daily',
-    match: (req) => req.method === 'POST' && req.path === '/api/query/stream',
-    windowMs: envInt('QUERY_STREAM_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
-    maxRequests: envInt('QUERY_STREAM_DAILY_LIMIT_MAX', 25),
-    errorMessage: 'Daily streaming limit reached. Please try again tomorrow.',
+    // Agent queries cost several times a static query (multiple model
+    // round-trips), so the burst limit is tighter.
+    name: 'agent-query-minute',
+    match: (req) => req.method === 'POST' && req.path === '/api/agent/query',
+    windowMs: envInt('AGENT_RATE_LIMIT_WINDOW_MS', 60_000),
+    maxRequests: envInt('AGENT_RATE_LIMIT_MAX', 3),
+    concurrencyLimit: envInt('AGENT_CONCURRENCY_LIMIT', 1),
+    errorMessage: 'Agent query rate limit exceeded. Please wait a moment before asking again.',
   },
 ]);
 
@@ -123,6 +119,13 @@ const dailyRateLimitMiddleware = createRateLimitMiddleware([
     windowMs: envInt('QUERY_STREAM_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
     maxRequests: envInt('QUERY_STREAM_DAILY_LIMIT_MAX', 25),
     errorMessage: 'Daily streaming limit reached. Please try again tomorrow.',
+  },
+  {
+    name: 'agent-query-daily',
+    match: (req) => req.method === 'POST' && req.path === '/api/agent/query',
+    windowMs: envInt('AGENT_DAILY_LIMIT_WINDOW_MS', 24 * 60 * 60_000),
+    maxRequests: envInt('AGENT_DAILY_LIMIT_MAX', 15),
+    errorMessage: 'Daily agent query limit reached. Please try again tomorrow.',
   },
 ]);
 
