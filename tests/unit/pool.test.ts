@@ -6,6 +6,7 @@ vi.mock('pg', () => {
   class MockPool {
     end = vi.fn().mockResolvedValue(undefined);
     query = vi.fn();
+    on = vi.fn();
     constructor(opts: any) {
       poolConstructorArgs.push(opts);
     }
@@ -66,14 +67,14 @@ describe('pool', () => {
     });
   });
 
-  it('getPool sets ssl for production NODE_ENV', async () => {
+  it('getPool passes no manual ssl override in production (sslmode lives in the connection string)', async () => {
     process.env.NODE_ENV = 'production';
     const { getPool } = await import('../../src/db/pool.js');
 
     getPool();
 
     expect(poolConstructorArgs).toHaveLength(1);
-    expect(poolConstructorArgs[0].ssl).toEqual({ rejectUnauthorized: false });
+    expect(poolConstructorArgs[0].ssl).toBeUndefined();
   });
 
   it('getPool does not set ssl for development', async () => {

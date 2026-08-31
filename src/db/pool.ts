@@ -11,6 +11,12 @@ export function getPool(connectionString?: string): pg.Pool {
       max: 10,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
     });
+    // An idle client dropping its connection (Neon pooler timeout, network
+    // blip) emits 'error' on the pool; without a handler that event crashes
+    // the whole process. Log and let the pool replace the client.
+    _pool.on('error', (err) => {
+      console.error('[DB] Idle client error (non-fatal):', err.message);
+    });
   }
   return _pool;
 }
